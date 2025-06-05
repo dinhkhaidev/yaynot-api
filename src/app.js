@@ -11,7 +11,6 @@ app.use((req, res, next) => {
   next(error);
 });
 app.use((err, req, res, next) => {
-  console.log("err", err.message);
   const messageError = err.message || "Internal Server Error!";
   const statusError = err.status || 500;
   res.status(statusError).json({

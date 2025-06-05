@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const userRole = require("../../constants/userRole");
-const DOCUMENT_NAME = "user";
+const userRole = require("../constants/userRole");
+const DOCUMENT_NAME = "User";
 const COLLECTION_NAME = "users";
 const userSchema = new mongoose.Schema(
   {
@@ -8,10 +8,10 @@ const userSchema = new mongoose.Schema(
     user_address: { type: String },
     user_email: { type: String, required: true },
     user_password: { type: String, required: true },
-    user_role: { type: String, enum: Object.values(userRole), default: "USER" },
+    user_role: { type: String, enum: Object.values(userRole), default: "001" },
     user_isVerify: { type: Boolean, default: false },
     user_phone: { type: String },
-    user_status: { type: Boolean, default: false },
+    user_status: { type: Boolean, default: true },
   },
   {
     timestamps: true,

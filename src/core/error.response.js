@@ -20,34 +20,34 @@ class ErrorResponse extends Error {
   }
 }
 class BadRequestError extends ErrorResponse {
-  constructor({
+  constructor(
     message = ReasonPhrases.BAD_REQUEST,
-    status = StatusCodes.BAD_REQUEST,
-  }) {
+    status = StatusCodes.BAD_REQUEST
+  ) {
     super(message, status);
   }
 }
 class NotFoundError extends ErrorResponse {
-  constructor({
+  constructor(
     message = ReasonPhrases.NOT_FOUND,
-    status = StatusCodes.NOT_FOUND,
-  }) {
+    status = StatusCodes.NOT_FOUND
+  ) {
     super(message, status);
   }
 }
 class AuthFailureError extends ErrorResponse {
-  constructor({
+  constructor(
     message = ReasonPhrases.UNAUTHORIZED,
-    status = StatusCodes.UNAUTHORIZED,
-  }) {
+    status = StatusCodes.UNAUTHORIZED
+  ) {
     super(message, status);
   }
 }
 class ForbiddenError extends ErrorResponse {
-  constructor({
+  constructor(
     message = ReasonPhrases.FORBIDDEN,
-    status = StatusCodes.FORBIDDEN,
-  }) {
+    status = StatusCodes.FORBIDDEN
+  ) {
     super(message, status);
   }
 }
