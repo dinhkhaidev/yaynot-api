@@ -12,8 +12,66 @@ const userModel = require("../models/user.model");
 const KeyTokenService = require("./keyToken.service");
 const { convertToObjectId, getInfoData } = require("../utils");
 const { createTokenPair } = require("../auth/authUtil");
+const keyTokenModel = require("../models/keyToken.model");
+const { default: mongoose } = require("mongoose");
 const saltRounds = 10;
 class AccessService {
+  static logout = async ({ id, token }) => {
+    if (!id || !token)
+      throw new NotFoundError("Missing token or ID for logout.");
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestError("Type of id not correct!");
+    await KeyTokenService.pushTokenToBlackList(token);
+    const result = await KeyTokenService.deleteTokenById(id);
+    if (result.deletedCount !== 1)
+      throw new BadRequestError("Logout failed. Token not deleted.");
+    return { result };
+  };
+  static login = async ({ email, password }) => {
+    const missingField = [];
+    if (!email) missingField.push("email");
+    if (!password) missingField.push("password");
+    if (missingField.length > 0)
+      throw new BadRequestError(`Missing field: ${missingField.join(", ")}`);
+    const foundUser = await findUserByEmail(email);
+    if (!foundUser) throw new NotFoundError("User not found!");
+    const comparePassword = await bcrypt.compare(
+      password,
+      foundUser.user_password
+    );
+    if (!comparePassword) throw new AuthFailureError("Password incorrect!");
+    const { privateKey, publicKey } = generateKeyPairSync("rsa", {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+    });
+    const payload = {
+      user_id: foundUser.id,
+      name: foundUser.user_name,
+      email: foundUser.user_email,
+      role: foundUser.user_role,
+    };
+    const tokens = createTokenPair(payload, publicKey, privateKey);
+    const newKeyToken = await KeyTokenService.createKeyToken({
+      publicKey,
+      privateKey,
+      user_id: convertToObjectId(foundUser.id),
+      refreshToken: tokens.refreshToken,
+    });
+    return {
+      user: getInfoData({
+        object: foundUser,
+        field: ["user_name", "user_email", "user_isVerify", "user_role"],
+      }),
+      tokens,
+    };
+  };
   static signUp = async ({ name, email, password }) => {
     let missingField = [];
     if (!name) missingField.push("name");

@@ -14,4 +14,16 @@ const keyTokenSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-module.exports = mongoose.model(DOCUMENT_NAME, keyTokenSchema);
+const blackListSchema = new mongoose.Schema(
+  {
+    token: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+    collection: "blacklists",
+  }
+);
+module.exports = {
+  keyTokenModel: mongoose.model(DOCUMENT_NAME, keyTokenSchema),
+  blackListModel: mongoose.model("blackList", blackListSchema),
+};

@@ -1,8 +1,8 @@
-const asyncHandle = (func) => async (err, req, res, next) => {
+const asyncHandle = (func) => async (req, res, next) => {
   try {
-    await func(req, res, next);
+    return await func(req, res, next);
   } catch (error) {
-    next(err);
+    next(error);
   }
 };
 module.exports = asyncHandle;
