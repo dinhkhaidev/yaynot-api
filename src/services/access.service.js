@@ -6,16 +6,43 @@ const {
   NotFoundError,
   BadRequestError,
   AuthFailureError,
+  ForbiddenError,
 } = require("../core/error.response");
 const { findUserByEmail } = require("../models/repositories/access.repo");
 const userModel = require("../models/user.model");
 const KeyTokenService = require("./keyToken.service");
 const { convertToObjectId, getInfoData } = require("../utils");
 const { createTokenPair } = require("../auth/authUtil");
-const keyTokenModel = require("../models/keyToken.model");
+const { keyTokenModel } = require("../models/keyToken.model");
 const { default: mongoose } = require("mongoose");
 const saltRounds = 10;
 class AccessService {
+  static handleToken = async (user, keyToken, refreshToken) => {
+    if (!refreshToken) throw new NotFoundError("Missing refreshToken!");
+    if (keyToken.refreshToken !== refreshToken)
+      throw new AuthFailureError("Refresh token does not match current token!");
+    if (keyToken.refreshTokenUsed.includes(refreshToken)) {
+      await KeyTokenService.deleteTokenById(keyToken._id);
+      throw new ForbiddenError("Something wrong happended. Relogin please!");
+    }
+    const { user_id, name, email, role } = user;
+    const { publicKey, privateKey } = keyToken;
+    const foundUser = await findUserByEmail(email);
+    if (!foundUser) throw new NotFoundError("User not registered!");
+    const tokens = createTokenPair(
+      { user_id, name, email, role },
+      publicKey,
+      privateKey
+    );
+    const test = await keyTokenModel.updateMany(
+      { _id: keyToken.id },
+      {
+        $set: { refreshToken: tokens.refreshToken },
+        $push: { refreshTokenUsed: refreshToken },
+      }
+    );
+    return { tokens, test };
+  };
   static logout = async ({ id, token }) => {
     if (!id || !token)
       throw new NotFoundError("Missing token or ID for logout.");
@@ -52,7 +79,7 @@ class AccessService {
       },
     });
     const payload = {
-      user_id: foundUser.id,
+      user_id: foundUser._id,
       name: foundUser.user_name,
       email: foundUser.user_email,
       role: foundUser.user_role,
@@ -61,7 +88,7 @@ class AccessService {
     const newKeyToken = await KeyTokenService.createKeyToken({
       publicKey,
       privateKey,
-      user_id: convertToObjectId(foundUser.id),
+      user_id: convertToObjectId(foundUser._id),
       refreshToken: tokens.refreshToken,
     });
     return {

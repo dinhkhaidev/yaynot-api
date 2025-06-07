@@ -8,6 +8,7 @@ const {
   loginUserSchema,
   logoutUserSchema,
 } = require("../../validations/user.validation");
+const { authentication } = require("../../auth/authUtil");
 router.post(
   "/register",
   validate(createUserSchema),
@@ -18,9 +19,11 @@ router.post(
   validate(loginUserSchema),
   asyncHandle(AccessController.login)
 );
+router.use(authentication);
 router.post(
   "/logout",
   validate(logoutUserSchema),
   asyncHandle(AccessController.logout)
 );
+router.post("/refresh-token", asyncHandle(AccessController.handleToken));
 module.exports = router;

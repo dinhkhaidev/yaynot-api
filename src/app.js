@@ -1,10 +1,13 @@
 const express = require("express");
 const app = express();
+// const swaggerUi = require("swagger-ui-express");
+// const swaggerDocument = require("./swagger.json");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/", require("./routes/index"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {
   const error = new Error("Route not found!");
   error.status = 404;
