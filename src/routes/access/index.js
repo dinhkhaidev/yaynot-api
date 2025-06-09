@@ -7,7 +7,7 @@ const {
   createUserSchema,
   loginUserSchema,
   logoutUserSchema,
-} = require("../../validations/user.validation");
+} = require("../../validations/Joi/user.validation");
 const { authentication } = require("../../auth/authUtil");
 router.post(
   "/register",

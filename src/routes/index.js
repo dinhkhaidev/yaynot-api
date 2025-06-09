@@ -1,5 +1,8 @@
 const express = require("express");
+const { authentication } = require("../auth/authUtil");
 const router = express.Router();
 router.use("/v1/auth", require("./access/index"));
 router.use("/v1/test", require("./test/index"));
+router.use(authentication);
+router.use("/v1/question", require("./question/index"));
 module.exports = router;

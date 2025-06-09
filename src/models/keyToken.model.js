@@ -17,6 +17,12 @@ const keyTokenSchema = new mongoose.Schema(
 const blackListSchema = new mongoose.Schema(
   {
     token: { type: String, required: true },
+    expireAt: {
+      type: Date,
+      default: () =>
+        new Date(Date.now() + (process.env.TTL_BLACKLIST || 180) * 1000),
+      expires: 0,
+    },
   },
   {
     timestamps: true,

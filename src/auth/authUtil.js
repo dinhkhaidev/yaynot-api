@@ -6,17 +6,22 @@ const {
 } = require("../core/error.response");
 const asyncHandle = require("../helpers/asyncHandle");
 const header = require("../constants/header");
-const { findKeyTokenByUserId } = require("../services/keyToken.service");
+const {
+  findKeyTokenByUserId,
+  findTokenBlackList,
+} = require("../services/keyToken.service");
 const { default: mongoose } = require("mongoose");
+const { isObjectId } = require("../utils/validateType");
 const createTokenPair = (payload, publicKey, privateKey) => {
   try {
+    console.log("process.env.TTL_ACCESS_TOKEN", process.env.TTL_ACCESS_TOKEN);
     const accessToken = jwt.sign(payload, privateKey, {
       algorithm: "RS256",
-      expiresIn: "1d",
+      expiresIn: `${process.env.TTL_ACCESS_TOKEN}`,
     });
     const refreshToken = jwt.sign(payload, privateKey, {
       algorithm: "RS256",
-      expiresIn: "5 days",
+      expiresIn: `${process.env.TTL_REFRESH_TOKEN}`,
     });
     // const verify = jwt.verify(refreshToken, publicKey, function (err, decode) {
     //   if (err) throw new BadRequestError("Token invalid!");
@@ -36,17 +41,24 @@ const decodeToken = (token, publicKey) => {
 };
 const authentication = asyncHandle(async (req, res, next) => {
   const userId = req.header(header.USER_ID);
-  if (!userId || !mongoose.Types.ObjectId.isValid(userId))
+  if (!userId || !isObjectId(userId))
     throw new BadRequestError("Invalid or missing userId!");
-  const foundUserId = await findKeyTokenByUserId(userId);
-  if (!foundUserId) throw new NotFoundError("UserId not found!");
   const accessToken = req.header(header.AUTHORIZATION);
   if (!accessToken) throw new AuthFailureError("Missing access token!");
-  const decodeAccessToken = decodeToken(accessToken, foundUserId.publicKey);
-  if (!decodeAccessToken)
-    throw new BadRequestError("Access token expried or invalid!");
-  req.keyToken = foundUserId;
-  req.user = decodeAccessToken;
+  const isTokenBlackListed = await findTokenBlackList(accessToken);
+  if (isTokenBlackListed) {
+    throw new AuthFailureError(
+      "Access token has been revoked. Please re-login."
+    );
+  }
+  const userKeyTokenRecord = await findKeyTokenByUserId(userId);
+  if (!userKeyTokenRecord) throw new NotFoundError("UserId not found!");
+
+  const decodedToken = decodeToken(accessToken, userKeyTokenRecord.publicKey);
+  if (!decodedToken)
+    throw new BadRequestError("Access token expired or invalid!");
+  req.keyToken = userKeyTokenRecord;
+  req.user = decodedToken;
   return next();
 });
 
