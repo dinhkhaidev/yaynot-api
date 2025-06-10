@@ -5,8 +5,17 @@ const {
   createQuestionInDB,
   findQuestionById,
   updateQuestionInDB,
+  getListQuestionInDB,
+  softDeleteQuestionInDB,
+  hardDeleteQuestionInDB,
 } = require("../models/repositories/question.repo");
-const validateUpdateQuestionPayload = require("../validations/service/questionService.validate");
+const {
+  validateUpdateQuestionPayload,
+  validateIdQuestionPayload,
+  validateFindQuestionById,
+} = require("../validations/service/questionService.validate");
+const { getInfoData } = require("../utils");
+const { isObjectId } = require("../utils/validateType");
 
 class QuestionService {
   static createQuestion = async ({ title, content, topicId, userId }) => {
@@ -31,8 +40,43 @@ class QuestionService {
     // if (!questionRecord) throw new NotFoundError("Id question not found!");
     const userRecord = await findUserById(userId);
     if (!userRecord) throw new NotFoundError("User not found!");
-    const questionData = await updateQuestionInDB(payload);
+    const questionData = await updateQuestionInDB(id, payload);
     return questionData;
+  };
+  static getListQuestion = async ({
+    id,
+    limit = 30,
+    sort = "ctime",
+    page = 0,
+    select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
+  }) => {
+    const listQuestion = await getListQuestionInDB({
+      id,
+      limit,
+      sort,
+      page,
+      select,
+    });
+    if (!listQuestion) throw new BadRequestError("Can not get list question!");
+    return listQuestion;
+  };
+  static getQuestionById = async (questionId) => {
+    validateIdQuestionPayload(questionId);
+    const questionRecord = await findQuestionById(questionId);
+    if (!questionRecord) throw new NotFoundError("Question not found!");
+    return questionRecord;
+  };
+  static softDeleteQuestion = async (questionId) => {
+    validateIdQuestionPayload(questionId);
+    await validateFindQuestionById(questionId);
+    const deleteQuestion = await softDeleteQuestionInDB(questionId);
+    return deleteQuestion;
+  };
+  static hardDeleteQuestion = async (questionId) => {
+    validateIdQuestionPayload(questionId);
+    await validateFindQuestionById(questionId);
+    const deleteQuestion = await hardDeleteQuestionInDB(questionId);
+    return deleteQuestion;
   };
 }
 module.exports = QuestionService;
