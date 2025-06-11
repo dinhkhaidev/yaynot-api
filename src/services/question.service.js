@@ -8,6 +8,8 @@ const {
   getListQuestionInDB,
   softDeleteQuestionInDB,
   hardDeleteQuestionInDB,
+  getAllDraftQuestionInDB,
+  getAllPublishQuestionInDB,
 } = require("../models/repositories/question.repo");
 const {
   validateUpdateQuestionPayload,
@@ -45,14 +47,12 @@ class QuestionService {
   };
   static getListQuestion = async ({
     id,
-    limit = 30,
     sort = "ctime",
     page = 0,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
   }) => {
     const listQuestion = await getListQuestionInDB({
       id,
-      limit,
       sort,
       page,
       select,
@@ -77,6 +77,37 @@ class QuestionService {
     await validateFindQuestionById(questionId);
     const deleteQuestion = await hardDeleteQuestionInDB(questionId);
     return deleteQuestion;
+  };
+  //get publish or draft, achive list
+  static getAllDraftQuestion = async ({
+    id,
+    sort = "ctime",
+    page = 0,
+    select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
+  }) => {
+    validateIdQuestionPayload(id);
+    const filter = {
+      userId: id,
+      status: "draft",
+      moderationStatus: "ok",
+      isDeleted: false,
+    };
+    return await getAllDraftQuestionInDB({ filter, sort, page, select });
+  };
+  static getAllPublishQuestion = async ({
+    id,
+    sort = "ctime",
+    page = 0,
+    select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
+  }) => {
+    validateIdQuestionPayload(id);
+    const filter = {
+      userId: id,
+      status: "publish",
+      moderationStatus: "ok",
+      isDeleted: false,
+    };
+    return await getAllPublishQuestionInDB({ filter, sort, page, select });
   };
 }
 module.exports = QuestionService;

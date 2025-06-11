@@ -27,6 +27,7 @@ router.post(
   asyncHandle(QuestionController.updateQuestion)
 );
 router.get("/", asyncHandle(QuestionController.getListQuestion));
+router.get("/drafts", asyncHandle(QuestionController.getAllDraftQuestion));
 router.get("/:questionId", asyncHandle(QuestionController.getQuestionById));
 router.patch(
   "/:questionId",
@@ -47,5 +48,9 @@ router.delete(
     ownerField: "userId",
   }),
   asyncHandle(QuestionController.hardDeleteQuestion)
+);
+router.get(
+  "/publish/:questionId",
+  asyncHandle(QuestionController.getAllPublishQuestion)
 );
 module.exports = router;

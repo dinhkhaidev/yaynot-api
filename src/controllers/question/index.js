@@ -48,5 +48,23 @@ class QuestionController {
       metadata: await QuestionService.hardDeleteQuestion(req.params.questionId),
     }).send(res);
   };
+  getAllDraftQuestion = async (req, res, next) => {
+    new OK({
+      message: "Get all draft question successful!",
+      metadata: await QuestionService.getAllDraftQuestion({
+        ...req.query,
+        id: req.user.user_id,
+      }),
+    }).send(res);
+  };
+  getAllPublishQuestion = async (req, res, next) => {
+    new OK({
+      message: "Get all publish question successful!",
+      metadata: await QuestionService.getAllPublishQuestion({
+        ...req.query,
+        id: req.params.questionId,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new QuestionController();

@@ -10,7 +10,7 @@ const updateQuestionInDB = async (id, payload) => {
 const findQuestionById = async (id) => {
   return await questionModel.findById(id).lean();
 };
-const getListQuestionInDB = async ({ id, limit, sort, page, select }) => {
+const getListQuestionInDB = async ({ id, limit = 30, sort, page, select }) => {
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const skip = page * limit;
   return await questionModel
@@ -37,6 +37,37 @@ const softDeleteQuestionInDB = async (id, statusDelete) => {
 const hardDeleteQuestionInDB = async (id) => {
   return await questionModel.deleteOne({ _id: id });
 };
+const getAllDraftQuestionInDB = async ({
+  filter,
+  limit = 30,
+  sort,
+  page,
+  select,
+}) => {
+  const sortBy = sort === "ctime" ? { updateAt: -1 } : { updateAt: 1 };
+  const skip = page * limit;
+  return await queryProduct({ filter, sortBy, skip, select });
+};
+const getAllPublishQuestionInDB = async ({
+  filter,
+  limit = 30,
+  sort,
+  page,
+  select,
+}) => {
+  const sortBy = sort === "ctime" ? { updateAt: -1 } : { updateAt: 1 };
+  const skip = page * limit;
+  return await queryProduct({ filter, sortBy, skip, select });
+};
+const queryProduct = async ({ filter, limit = 30, sortBy, skip, select }) => {
+  return await questionModel
+    .find(filter)
+    .limit(limit)
+    .skip(skip)
+    .sort(sortBy)
+    .select(getUnselectData(select))
+    .lean();
+};
 module.exports = {
   createQuestionInDB,
   updateQuestionInDB,
@@ -44,4 +75,6 @@ module.exports = {
   getListQuestionInDB,
   softDeleteQuestionInDB,
   hardDeleteQuestionInDB,
+  getAllDraftQuestionInDB,
+  getAllPublishQuestionInDB,
 };
