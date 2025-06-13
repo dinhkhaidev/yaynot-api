@@ -23,6 +23,7 @@ const checkOwnership = ({
       if (!result) throw new NotFoundError(`${model.modelName} not found!`);
       if (result[ownerField].toString() !== req.user.user_id)
         throw new ForbiddenError("You do not own this resource");
+      req.resource = result;
       next();
     } catch (error) {
       next(error);

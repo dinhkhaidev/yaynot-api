@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const statusQuestion = require("../constants/statusQuestion");
 const DOCUMENT_NAME = "question";
 const COLLECTION_NAME = "questions";
 const questionSchema = new mongoose.Schema(
@@ -8,7 +9,7 @@ const questionSchema = new mongoose.Schema(
     image: { type: [String] },
     status: {
       type: String,
-      enum: ["draft", "published", "archived"],
+      enum: Object.values(statusQuestion),
       default: "draft",
     },
     moderationStatus: {

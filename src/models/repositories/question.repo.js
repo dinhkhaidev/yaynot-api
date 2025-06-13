@@ -46,7 +46,7 @@ const getAllDraftQuestionInDB = async ({
 }) => {
   const sortBy = sort === "ctime" ? { updateAt: -1 } : { updateAt: 1 };
   const skip = page * limit;
-  return await queryProduct({ filter, sortBy, skip, select });
+  return await queryQuestion({ filter, sortBy, skip, select });
 };
 const getAllPublishQuestionInDB = async ({
   filter,
@@ -57,9 +57,9 @@ const getAllPublishQuestionInDB = async ({
 }) => {
   const sortBy = sort === "ctime" ? { updateAt: -1 } : { updateAt: 1 };
   const skip = page * limit;
-  return await queryProduct({ filter, sortBy, skip, select });
+  return await queryQuestion({ filter, sortBy, skip, select });
 };
-const queryProduct = async ({ filter, limit = 30, sortBy, skip, select }) => {
+const queryQuestion = async ({ filter, limit = 30, sortBy, skip, select }) => {
   return await questionModel
     .find(filter)
     .limit(limit)
@@ -67,6 +67,15 @@ const queryProduct = async ({ filter, limit = 30, sortBy, skip, select }) => {
     .sort(sortBy)
     .select(getUnselectData(select))
     .lean();
+};
+const publishForQuestionInDB = async (id) => {
+  return await questionModel.findByIdAndUpdate(id, { status: "publish" });
+};
+const draftForQuestionInDB = async (id) => {
+  return await questionModel.findByIdAndUpdate(id, { status: "draft" });
+};
+const archiveForQuestionInDB = async (id) => {
+  return await questionModel.findByIdAndUpdate(id, { status: "archive" });
 };
 module.exports = {
   createQuestionInDB,
@@ -77,4 +86,7 @@ module.exports = {
   hardDeleteQuestionInDB,
   getAllDraftQuestionInDB,
   getAllPublishQuestionInDB,
+  publishForQuestionInDB,
+  draftForQuestionInDB,
+  archiveForQuestionInDB,
 };

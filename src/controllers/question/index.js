@@ -66,5 +66,14 @@ class QuestionController {
       }),
     }).send(res);
   };
+  changeQuestionStatus = async (req, res, next) => {
+    new OK({
+      message: "Change status for question successful!",
+      metadata: await QuestionService.changeQuestionStatusFactory({
+        resource: req.resource,
+        payload: req.body,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new QuestionController();

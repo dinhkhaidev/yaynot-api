@@ -14,7 +14,6 @@ const { default: mongoose } = require("mongoose");
 const { isObjectId } = require("../utils/validateType");
 const createTokenPair = (payload, publicKey, privateKey) => {
   try {
-    console.log("process.env.TTL_ACCESS_TOKEN", process.env.TTL_ACCESS_TOKEN);
     const accessToken = jwt.sign(payload, privateKey, {
       algorithm: "RS256",
       expiresIn: `${process.env.TTL_ACCESS_TOKEN}`,

@@ -9,7 +9,6 @@ const {
 const { validate } = require("../../middlewares/validate");
 const { checkOwnership } = require("../../middlewares/checkOwnership");
 const questionModel = require("../../models/question.model");
-const QuestionService = require("../../services/question.service");
 router.post(
   "/",
   validate(createQuestionSchema),
@@ -52,5 +51,15 @@ router.delete(
 router.get(
   "/publish/:questionId",
   asyncHandle(QuestionController.getAllPublishQuestion)
+);
+router.post(
+  "/status/:questionId",
+  checkOwnership({
+    model: questionModel,
+    param: "body",
+    resultId: "questionId",
+    ownerField: "userId",
+  }),
+  asyncHandle(QuestionController.changeQuestionStatus)
 );
 module.exports = router;

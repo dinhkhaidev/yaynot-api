@@ -10,6 +10,10 @@ const {
   hardDeleteQuestionInDB,
   getAllDraftQuestionInDB,
   getAllPublishQuestionInDB,
+  changeQuestionStatus,
+  publishForQuestionInDB,
+  draftForQuestionInDB,
+  archiveForQuestionInDB,
 } = require("../models/repositories/question.repo");
 const {
   validateUpdateQuestionPayload,
@@ -18,6 +22,7 @@ const {
 } = require("../validations/service/questionService.validate");
 const { getInfoData } = require("../utils");
 const { isObjectId } = require("../utils/validateType");
+const statusQuestion = require("../constants/statusQuestion");
 
 class QuestionService {
   static createQuestion = async ({ title, content, topicId, userId }) => {
@@ -108,6 +113,32 @@ class QuestionService {
       isDeleted: false,
     };
     return await getAllPublishQuestionInDB({ filter, sort, page, select });
+  };
+  static changeQuestionStatusFactory = async ({ resource, payload }) => {
+    const { questionId, newStatus } = payload;
+    if (resource && resource.status === newStatus)
+      throw new BadRequestError(
+        `Don't any change because status is ${newStatus}!`
+      );
+    if (!Object.values(statusQuestion).includes(newStatus))
+      throw new NotFoundError(`Type question ${newStatus} not exist!`);
+    const questionStatusMap = {
+      publish: QuestionService.publishQuestionStatus,
+      draft: QuestionService.draftQuestionStatus,
+      archive: QuestionService.archiveStatus,
+    };
+    const handle = questionStatusMap[newStatus];
+    if (!handle) throw new BadRequestError("Incorect status question!");
+    return await handle(questionId);
+  };
+  static publishQuestionStatus = async (questionId) => {
+    return await publishForQuestionInDB(questionId);
+  };
+  static draftQuestionStatus = async (questionId) => {
+    return await draftForQuestionInDB(questionId);
+  };
+  static archiveStatus = async (questionId) => {
+    return await archiveForQuestionInDB(questionId);
   };
 }
 module.exports = QuestionService;
