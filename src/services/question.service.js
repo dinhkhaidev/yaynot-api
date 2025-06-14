@@ -25,7 +25,7 @@ const { isObjectId } = require("../utils/validateType");
 const statusQuestion = require("../constants/statusQuestion");
 
 class QuestionService {
-  static createQuestion = async ({ title, content, topicId, userId }) => {
+  static async createQuestion({ title, content, topicId, userId }) {
     if (!userId) throw new NotFoundError("User ID is required!");
     const userRecord = await findUserById(userId);
     if (!userRecord) throw new NotFoundError("User not found!");
@@ -36,26 +36,23 @@ class QuestionService {
       userId,
     });
     return newQuestion;
-  };
-  static updateQuestion = async (payload) => {
+  }
+
+  static async updateQuestion(payload) {
     const { id, userId } = payload;
     validateUpdateQuestionPayload(id, userId);
-    // const [questionRecord, userRecord] = await Promise.all([
-    //   findQuestionById(id),
-    //   findUserById(userId),
-    // ]);
-    // if (!questionRecord) throw new NotFoundError("Id question not found!");
     const userRecord = await findUserById(userId);
     if (!userRecord) throw new NotFoundError("User not found!");
     const questionData = await updateQuestionInDB(id, payload);
     return questionData;
-  };
-  static getListQuestion = async ({
+  }
+
+  static async getListQuestion({
     id,
     sort = "ctime",
     page = 0,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
-  }) => {
+  }) {
     const listQuestion = await getListQuestionInDB({
       id,
       sort,
@@ -64,32 +61,35 @@ class QuestionService {
     });
     if (!listQuestion) throw new BadRequestError("Can not get list question!");
     return listQuestion;
-  };
-  static getQuestionById = async (questionId) => {
+  }
+
+  static async getQuestionById(questionId) {
     validateIdQuestionPayload(questionId);
     const questionRecord = await findQuestionById(questionId);
     if (!questionRecord) throw new NotFoundError("Question not found!");
     return questionRecord;
-  };
-  static softDeleteQuestion = async (questionId) => {
+  }
+
+  static async softDeleteQuestion(questionId) {
     validateIdQuestionPayload(questionId);
     await validateFindQuestionById(questionId);
     const deleteQuestion = await softDeleteQuestionInDB(questionId);
     return deleteQuestion;
-  };
-  static hardDeleteQuestion = async (questionId) => {
+  }
+
+  static async hardDeleteQuestion(questionId) {
     validateIdQuestionPayload(questionId);
     await validateFindQuestionById(questionId);
     const deleteQuestion = await hardDeleteQuestionInDB(questionId);
     return deleteQuestion;
-  };
-  //get publish or draft, achive list
-  static getAllDraftQuestion = async ({
+  }
+
+  static async getAllDraftQuestion({
     id,
     sort = "ctime",
     page = 0,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
-  }) => {
+  }) {
     validateIdQuestionPayload(id);
     const filter = {
       userId: id,
@@ -98,13 +98,14 @@ class QuestionService {
       isDeleted: false,
     };
     return await getAllDraftQuestionInDB({ filter, sort, page, select });
-  };
-  static getAllPublishQuestion = async ({
+  }
+
+  static async getAllPublishQuestion({
     id,
     sort = "ctime",
     page = 0,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
-  }) => {
+  }) {
     validateIdQuestionPayload(id);
     const filter = {
       userId: id,
@@ -113,8 +114,9 @@ class QuestionService {
       isDeleted: false,
     };
     return await getAllPublishQuestionInDB({ filter, sort, page, select });
-  };
-  static changeQuestionStatusFactory = async ({ resource, payload }) => {
+  }
+
+  static async changeQuestionStatusFactory({ resource, payload }) {
     const { questionId, newStatus } = payload;
     if (resource && resource.status === newStatus)
       throw new BadRequestError(
@@ -122,23 +124,28 @@ class QuestionService {
       );
     if (!Object.values(statusQuestion).includes(newStatus))
       throw new NotFoundError(`Type question ${newStatus} not exist!`);
+
     const questionStatusMap = {
       publish: QuestionService.publishQuestionStatus,
       draft: QuestionService.draftQuestionStatus,
       archive: QuestionService.archiveStatus,
     };
     const handle = questionStatusMap[newStatus];
-    if (!handle) throw new BadRequestError("Incorect status question!");
+    if (!handle) throw new BadRequestError("Incorrect status question!");
     return await handle(questionId);
-  };
-  static publishQuestionStatus = async (questionId) => {
+  }
+
+  static async publishQuestionStatus(questionId) {
     return await publishForQuestionInDB(questionId);
-  };
-  static draftQuestionStatus = async (questionId) => {
+  }
+
+  static async draftQuestionStatus(questionId) {
     return await draftForQuestionInDB(questionId);
-  };
-  static archiveStatus = async (questionId) => {
+  }
+
+  static async archiveStatus(questionId) {
     return await archiveForQuestionInDB(questionId);
-  };
+  }
 }
+
 module.exports = QuestionService;

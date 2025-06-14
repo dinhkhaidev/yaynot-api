@@ -16,9 +16,10 @@ const { createTokenPair } = require("../auth/authUtil");
 const { keyTokenModel } = require("../models/keyToken.model");
 const { default: mongoose } = require("mongoose");
 const { isObjectId } = require("../utils/validateType");
+
 const saltRounds = 10;
 class AccessService {
-  static handleToken = async (user, keyToken, refreshToken) => {
+  static async handleToken(user, keyToken, refreshToken) {
     if (!refreshToken) throw new NotFoundError("Missing refreshToken!");
     if (keyToken.refreshTokenUsed.includes(refreshToken)) {
       await KeyTokenService.deleteTokenById(keyToken._id);
@@ -43,8 +44,8 @@ class AccessService {
       }
     );
     return { tokens, test };
-  };
-  static logout = async ({ id, token }) => {
+  }
+  static async logout({ id, token }) {
     if (!id || !token)
       throw new NotFoundError("Missing token or ID for logout.");
     if (!isObjectId(id)) throw new BadRequestError("Type of id not correct!");
@@ -53,8 +54,8 @@ class AccessService {
     if (result.deletedCount !== 1)
       throw new BadRequestError("Logout failed. Token not deleted.");
     return { result };
-  };
-  static login = async ({ email, password }) => {
+  }
+  static async login({ email, password }) {
     const missingField = [];
     if (!email) missingField.push("email");
     if (!password) missingField.push("password");
@@ -69,14 +70,8 @@ class AccessService {
     if (!comparePassword) throw new AuthFailureError("Password incorrect!");
     const { privateKey, publicKey } = generateKeyPairSync("rsa", {
       modulusLength: 4096,
-      publicKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-      privateKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
+      publicKeyEncoding: { type: "pkcs1", format: "pem" },
+      privateKeyEncoding: { type: "pkcs1", format: "pem" },
     });
     const payload = {
       user_id: foundUser._id,
@@ -98,9 +93,9 @@ class AccessService {
       }),
       tokens,
     };
-  };
-  static signUp = async ({ name, email, password }) => {
-    let missingField = [];
+  }
+  static async signUp({ name, email, password }) {
+    const missingField = [];
     if (!name) missingField.push("name");
     if (!email) missingField.push("email");
     if (!password) missingField.push("password");
@@ -114,46 +109,37 @@ class AccessService {
       user_email: email,
       user_password: passwordHash,
     });
-    if (newUser) {
-      //handle jwt
-      const { privateKey, publicKey } = generateKeyPairSync("rsa", {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-          type: "pkcs1",
-          format: "pem",
-        },
-        privateKeyEncoding: {
-          type: "pkcs1",
-          format: "pem",
-        },
-      });
-
-      const payload = {
-        user_id: newUser.id,
-        name: newUser.user_name,
-        email: newUser.user_email,
-      };
-      const tokens = await createTokenPair(payload, publicKey, privateKey);
-      const newKeyToken = await KeyTokenService.createKeyToken({
-        publicKey,
-        privateKey,
-        user_id: convertToObjectId(newUser.id),
-        refreshToken: tokens.refreshToken,
-      });
-      if (!newKeyToken) {
-        return {
-          message: "Key Token Error!",
-        };
-      }
+    if (!newUser) throw new Error("User creation failed!");
+    const { privateKey, publicKey } = generateKeyPairSync("rsa", {
+      modulusLength: 4096,
+      publicKeyEncoding: { type: "pkcs1", format: "pem" },
+      privateKeyEncoding: { type: "pkcs1", format: "pem" },
+    });
+    const payload = {
+      user_id: newUser.id,
+      name: newUser.user_name,
+      email: newUser.user_email,
+    };
+    const tokens = await createTokenPair(payload, publicKey, privateKey);
+    const newKeyToken = await KeyTokenService.createKeyToken({
+      publicKey,
+      privateKey,
+      user_id: convertToObjectId(newUser.id),
+      refreshToken: tokens.refreshToken,
+    });
+    if (!newKeyToken) {
       return {
-        user: getInfoData({
-          object: newUser,
-          field: ["user_name", "user_email", "user_isVerify"],
-        }),
-        tokens,
+        message: "Key Token Error!",
       };
     }
-    throw new Error("User creation failed!");
-  };
+    return {
+      user: getInfoData({
+        object: newUser,
+        field: ["user_name", "user_email", "user_isVerify"],
+      }),
+      tokens,
+    };
+  }
 }
+
 module.exports = AccessService;
