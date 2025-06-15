@@ -6,13 +6,14 @@ const commentSchema = new mongoose.Schema(
     commentParentId: { type: string, default: null },
     content: { type: String, required: true },
     left: { type: Number, default: 0 },
-    right: { type: Number, default: 1 },
+    right: { type: Number, default: 0 },
     questionId: {
       type: mongoose.Types.ObjectId,
       ref: "question",
       required: true,
     },
     userId: { type: mongoose.Types.ObjectId, ref: "user", required: true },
+    like: { type: Number, default: 0 },
     isAnonymous: { type: Boolean, default: false },
   },
   {
@@ -21,5 +22,5 @@ const commentSchema = new mongoose.Schema(
   }
 );
 module.exports = {
-  comment: mongoose.model(DOCUMENT_NAME, commentSchema),
+  nestedComment: mongoose.model(DOCUMENT_NAME, commentSchema),
 };
