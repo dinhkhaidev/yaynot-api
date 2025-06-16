@@ -3,7 +3,7 @@ const DOCUMENT_NAME = "comment";
 const COLLECTION_NAME = "comments";
 const commentSchema = new mongoose.Schema(
   {
-    commentParentId: { type: string, default: null },
+    commentParentId: { type: String, default: null },
     content: { type: String, required: true },
     left: { type: Number, default: 0 },
     right: { type: Number, default: 0 },

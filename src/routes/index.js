@@ -5,4 +5,5 @@ router.use("/v1/auth", require("./access/index"));
 router.use("/v1/test", require("./test/index"));
 router.use(authentication);
 router.use("/v1/question", require("./question/index"));
+router.use("/v1/comment", require("./nestedComment/index"));
 module.exports = router;
