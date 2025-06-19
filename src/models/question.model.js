@@ -31,9 +31,9 @@ const questionSchema = new mongoose.Schema(
     },
     tags: { type: [String] },
     //fast for queue
-    voteYesCount: { type: Number, default: 0 },
-    voteNoCount: { type: Number, default: 0 },
-    commentCount: { type: Number, default: 0 },
+    // voteYesCount: { type: Number, default: 0 },
+    // voteNoCount: { type: Number, default: 0 },
+    // commentCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

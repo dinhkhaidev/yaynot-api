@@ -1,7 +1,9 @@
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
-  findVoteUserInDB,
-  createVoteInDB,
+  findVoteByUserAndQuestionInDB,
+  deleteVoteInDB,
+  updateVoteSummaryById,
+  findVoteById,
 } = require("../models/repositories/vote.repo");
 const {
   validateFindQuestionById,
@@ -9,12 +11,33 @@ const {
 const { acquireLock } = require("./redis.service");
 
 class VoteService {
-  static async createVote({ questionId, voteType, userId }) {
+  static async upsertVote({ questionId, voteType, userId }) {
     if (!userId) throw new NotFoundError("User ID is required!");
-    const voteRecord = await findVoteUserInDB(userId, questionId);
-    if (voteRecord) throw new BadRequestError("Vote is existed!");
+    const voteRecord = await findVoteByUserAndQuestionInDB(userId, questionId);
+    if (voteRecord && voteRecord.voteType === voteType)
+      throw new BadRequestError("Vote is existed!");
     const newVote = await acquireLock({ questionId, voteType, userId });
     return newVote;
+  }
+  static async deleteVote(voteId) {
+    const voteRecord = await findVoteById(voteId);
+    if (!voteRecord) throw new NotFoundError("Vote not found!");
+    const deleteVote = await deleteVoteInDB(voteId);
+    const voteTypeIncrease = voteRecord.voteType
+      ? "voteYesCount"
+      : "voteNoCount";
+    console.log("voteTypeIncrease", voteTypeIncrease);
+    await updateVoteSummaryById({
+      questionId: voteRecord.questionId,
+      voteTypeIncrease,
+      type: false,
+    });
+    return deleteVote;
+  }
+  //handle detail vote of question
+  static async getDetailVote({ voteId }) {
+    const voteRecord = await findVoteById(voteId);
+    if (!voteRecord) throw new NotFoundError("Vote not found!");
   }
 }
 module.exports = VoteService;

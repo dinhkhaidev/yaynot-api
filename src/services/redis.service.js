@@ -1,5 +1,8 @@
 const Redis = require("ioredis");
-const { createVoteInDB } = require("../models/repositories/vote.repo");
+const {
+  upsertVoteInDB,
+  updateVoteSummaryById,
+} = require("../models/repositories/vote.repo");
 const redis = new Redis();
 console.log(redis.status);
 const acquireLock = async ({ questionId, voteType, userId }) => {
@@ -11,7 +14,15 @@ const acquireLock = async ({ questionId, voteType, userId }) => {
     if (result) {
       let voteResult;
       try {
-        const newVote = await createVoteInDB({ questionId, voteType, userId });
+        const newVote = await upsertVoteInDB({ questionId, voteType, userId });
+        const voteTypeIncrease = voteType ? "voteYesCount" : "voteNoCount";
+        if (!newVote.lastErrorObject.updatedExisting) {
+          await updateVoteSummaryById({
+            questionId,
+            voteTypeIncrease,
+            type: true,
+          });
+        }
         if (!newVote) {
           voteResult = "vote_failed";
         }
