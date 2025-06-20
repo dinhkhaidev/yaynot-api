@@ -35,7 +35,7 @@ const softDeleteQuestionInDB = async (id, statusDelete) => {
   );
 };
 const hardDeleteQuestionInDB = async (id) => {
-  return await questionModel.deleteOne({ _id: id });
+  return await questionModel.deleteOne({ _id: id }).lean();
 };
 const getAllDraftQuestionInDB = async ({
   filter,
@@ -69,13 +69,17 @@ const queryQuestion = async ({ filter, limit = 30, sortBy, skip, select }) => {
     .lean();
 };
 const publishForQuestionInDB = async (id) => {
-  return await questionModel.findByIdAndUpdate(id, { status: "publish" });
+  return await questionModel
+    .findByIdAndUpdate(id, { status: "publish" })
+    .lean();
 };
 const draftForQuestionInDB = async (id) => {
-  return await questionModel.findByIdAndUpdate(id, { status: "draft" });
+  return await questionModel.findByIdAndUpdate(id, { status: "draft" }).lean();
 };
 const archiveForQuestionInDB = async (id) => {
-  return await questionModel.findByIdAndUpdate(id, { status: "archive" });
+  return await questionModel
+    .findByIdAndUpdate(id, { status: "archive" })
+    .lean();
 };
 module.exports = {
   createQuestionInDB,

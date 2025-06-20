@@ -17,5 +17,14 @@ class VoteController {
       metadata: await VoteService.deleteVote(req.params.voteId),
     }).send(res);
   };
+  getDetailVote = async (req, res, next) => {
+    new OK({
+      message: "Get detail vote successful!",
+      metadata: await VoteService.getDetailVote({
+        questionId: req.params.questionId,
+        myVote: req.voteUser.voteType,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new VoteController();

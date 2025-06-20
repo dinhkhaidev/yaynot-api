@@ -7,9 +7,11 @@ const findCommentInDB = async (commentId) => {
   return await nestedComment.findById(commentId);
 };
 const findCommentParentInDB = async (questionId) => {
-  return await nestedComment.findOne({
-    questionId: questionId,
-  });
+  return await nestedComment
+    .findOne({
+      questionId: questionId,
+    })
+    .lean();
 };
 const updateLeftRightNested = async (questionId, rightValue) => {
   await nestedComment.updateMany(

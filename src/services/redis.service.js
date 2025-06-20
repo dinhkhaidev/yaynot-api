@@ -16,15 +16,27 @@ const acquireLock = async ({ questionId, voteType, userId }) => {
       try {
         const newVote = await upsertVoteInDB({ questionId, voteType, userId });
         const voteTypeIncrease = voteType ? "voteYesCount" : "voteNoCount";
+        const voteTypeDecrease = !voteType ? "voteYesCount" : "voteNoCount";
+        if (!newVote) {
+          voteResult = "vote_failed";
+        }
         if (!newVote.lastErrorObject.updatedExisting) {
           await updateVoteSummaryById({
             questionId,
             voteTypeIncrease,
-            type: true,
+            typeIncr: true,
           });
-        }
-        if (!newVote) {
-          voteResult = "vote_failed";
+        } else {
+          await updateVoteSummaryById({
+            questionId,
+            voteTypeIncrease,
+            typeIncr: true,
+          });
+          await updateVoteSummaryById({
+            questionId,
+            voteTypeIncrease: voteTypeDecrease,
+            typeIncr: false,
+          });
         }
         voteResult = newVote;
       } catch (error) {
