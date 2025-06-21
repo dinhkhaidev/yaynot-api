@@ -24,12 +24,6 @@ const questionSchema = new mongoose.Schema(
       required: true,
       ref: "user",
     },
-    topicId: {
-      type: mongoose.Types.ObjectId,
-      // required: true,
-      ref: "topic",
-    },
-    tags: { type: [String] },
     //fast for queue
     // voteYesCount: { type: Number, default: 0 },
     // voteNoCount: { type: Number, default: 0 },

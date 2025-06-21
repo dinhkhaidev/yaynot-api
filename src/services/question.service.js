@@ -23,9 +23,10 @@ const {
 const { getInfoData } = require("../utils");
 const { isObjectId } = require("../utils/validateType");
 const statusQuestion = require("../constants/statusQuestion");
+const TagService = require("./tag.service");
 
 class QuestionService {
-  static async createQuestion({ title, content, topicId, userId }) {
+  static async createQuestion({ title, content, topicId, userId, tags }) {
     if (!userId) throw new NotFoundError("User ID is required!");
     const userRecord = await findUserById(userId);
     if (!userRecord) throw new NotFoundError("User not found!");
@@ -35,6 +36,17 @@ class QuestionService {
       topicId,
       userId,
     });
+    if (!newQuestion) throw new BadRequestError("Can't create question!");
+    if (tags && Array.isArray(tags)) {
+      await Promise.all(
+        tags.map((tag) =>
+          TagService.upsertTag({
+            name: tag.trim().toLowerCase(),
+            questionId: newQuestion._id,
+          })
+        )
+      );
+    }
     return newQuestion;
   }
 
