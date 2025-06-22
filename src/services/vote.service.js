@@ -1,3 +1,5 @@
+const Redis = require("ioredis");
+const redis = new Redis();
 const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
   findVoteByUserAndQuestionInDB,
@@ -6,6 +8,7 @@ const {
   findVoteById,
   getVoteSummaryByQuestionId,
   findVoteByQuestionId,
+  upsertVoteInDB,
 } = require("../models/repositories/vote.repo");
 const { voteSummaryModel } = require("../models/vote.model");
 const {
@@ -13,15 +16,47 @@ const {
   validateIdQuestionPayload,
 } = require("../validations/service/questionService.validate");
 const { acquireLock } = require("./redis.service");
-
 class VoteService {
   static async upsertVote({ questionId, voteType, userId }) {
     if (!userId) throw new NotFoundError("User ID is required!");
     const voteRecord = await findVoteByUserAndQuestionInDB(userId, questionId);
     if (voteRecord && voteRecord.voteType === voteType)
       throw new BadRequestError("Vote is existed!");
-    const newVote = await acquireLock({ questionId, voteType, userId });
-    return newVote;
+    // const newVote = await acquireLock({ questionId, voteType, userId });
+    let key;
+    try {
+      const newVote = await upsertVoteInDB({ questionId, voteType, userId });
+      const voteTypeIncrease = voteType ? "voteYesCount" : "voteNoCount";
+      const voteTypeDecrease = !voteType ? "voteYesCount" : "voteNoCount";
+      const keyLock = await acquireLock({ questionId, userId });
+      key = keyLock.key;
+      if (!newVote) {
+        return "vote_failed";
+      }
+      if (!newVote.lastErrorObject.updatedExisting) {
+        await updateVoteSummaryById({
+          questionId,
+          voteTypeIncrease,
+          typeIncr: true,
+        });
+      } else {
+        await updateVoteSummaryById({
+          questionId,
+          voteTypeIncrease,
+          typeIncr: true,
+        });
+        await updateVoteSummaryById({
+          questionId,
+          voteTypeIncrease: voteTypeDecrease,
+          typeIncr: false,
+        });
+      }
+      return newVote;
+    } catch (error) {
+      throw new Error("Distribute lock error!");
+    } finally {
+      if (key) await redis.del(key);
+    }
   }
   static async deleteVote(voteId) {
     const voteRecord = await findVoteById(voteId);

@@ -4,6 +4,7 @@ const { OK } = require("../../core/success.response");
 const { authentication } = require("../../auth/authUtil");
 const { checkOwnership } = require("../../middlewares/checkOwnership");
 const questionModel = require("../../models/question.model");
+const TagService = require("../../services/tag.service");
 const router = express.Router();
 router.get(
   "/",
@@ -24,4 +25,8 @@ router.get(
     new OK({ message: "Test successful!" }).send(res);
   })
 );
+router.get("/tag", async (req, res, next) => {
+  const data = await TagService.getTagByName("test");
+  res.json(data);
+});
 module.exports = router;

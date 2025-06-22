@@ -5,6 +5,7 @@ const tagSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
     displayName: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
     description: { type: String },
     questionCount: { type: Number, default: 0 },
     isFlag: { type: Boolean, default: false },
@@ -27,7 +28,7 @@ const tagQuestionMapSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    collection: "tags-questions",
+    collection: "tags_questions",
   }
 );
 // tagSchema.pre("save", function (next) {

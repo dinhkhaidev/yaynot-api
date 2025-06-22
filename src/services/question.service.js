@@ -35,16 +35,17 @@ class QuestionService {
       content,
       topicId,
       userId,
+      shortTag: tags,
     });
     if (!newQuestion) throw new BadRequestError("Can't create question!");
     if (tags && Array.isArray(tags)) {
       await Promise.all(
-        tags.map((tag) =>
-          TagService.upsertTag({
+        tags.map(async (tag) => {
+          await TagService.upsertTag({
             name: tag.trim().toLowerCase(),
             questionId: newQuestion._id,
-          })
-        )
+          });
+        })
       );
     }
     return newQuestion;
@@ -148,14 +149,18 @@ class QuestionService {
   }
 
   static async publishQuestionStatus(questionId) {
+    //handle publish tag when public question
+    await TagService.publicTagStatus({ questionId, type: true });
     return await publishForQuestionInDB(questionId);
   }
 
   static async draftQuestionStatus(questionId) {
+    await TagService.publicTagStatus({ questionId, type: false });
     return await draftForQuestionInDB(questionId);
   }
 
   static async archiveStatus(questionId) {
+    await TagService.publicTagStatus({ questionId, type: false });
     return await archiveForQuestionInDB(questionId);
   }
 }

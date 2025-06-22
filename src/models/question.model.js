@@ -24,6 +24,7 @@ const questionSchema = new mongoose.Schema(
       required: true,
       ref: "user",
     },
+    shortTag: { type: [String], default: [] },
     //fast for queue
     // voteYesCount: { type: Number, default: 0 },
     // voteNoCount: { type: Number, default: 0 },

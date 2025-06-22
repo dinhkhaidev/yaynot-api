@@ -51,9 +51,18 @@ class ForbiddenError extends ErrorResponse {
     super(message, status);
   }
 }
+class RequestTimeoutError extends ErrorResponse {
+  constructor(
+    message = ReasonPhrases.REQUEST_TIMEOUT,
+    status = StatusCodes.REQUEST_TIMEOUT
+  ) {
+    super(message, status);
+  }
+}
 module.exports = {
   AuthFailureError,
   BadRequestError,
   NotFoundError,
   ForbiddenError,
+  RequestTimeoutError,
 };
