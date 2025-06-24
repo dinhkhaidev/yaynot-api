@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 const DOCUMENT_NAME = "comment";
 const COLLECTION_NAME = "comments";
@@ -21,6 +22,10 @@ const commentSchema = new mongoose.Schema(
     collection: COLLECTION_NAME,
   }
 );
+const commentLikeSchema = new mongoose.Schema({
+  userId: { type: mongoose.Types.ObjectId, required: true, ref: "user" },
+  commentId: { type: mongoose.Types.ObjectId, required: true, ref: "comment" },
+});
 module.exports = {
   nestedComment: mongoose.model(DOCUMENT_NAME, commentSchema),
 };

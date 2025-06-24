@@ -1,3 +1,6 @@
+const {
+  buildResultCursorBased,
+} = require("../../helpers/buildResultCursorBased");
 const { getSelectData, getUnselectData } = require("../../utils");
 const questionModel = require("../question.model");
 
@@ -10,20 +13,18 @@ const updateQuestionInDB = async (id, payload) => {
 const findQuestionById = async (id) => {
   return await questionModel.findById(id).lean();
 };
-const getListQuestionInDB = async ({ id, limit = 30, sort, page, select }) => {
-  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
-  const skip = page * limit;
-  return await questionModel
-    .find({
-      userId: id,
-      moderationStatus: "ok",
-      isDeleted: false,
-    })
-    .limit(limit)
-    .skip(skip)
+const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
+  const sortBy = sort ? sort : { _id: -1 };
+  const query = { userId: id, moderationStatus: "ok", isDeleted: false };
+  if (cursor) query._id = { $lt: cursor };
+  questonList = await questionModel
+    .find(query)
     .sort(sortBy)
+    .limit(limit)
     .select(getUnselectData(select))
     .lean();
+
+  return buildResultCursorBased({ questonList, limit });
 };
 const softDeleteQuestionInDB = async (id, statusDelete) => {
   return await questionModel.findByIdAndUpdate(
@@ -37,36 +38,27 @@ const softDeleteQuestionInDB = async (id, statusDelete) => {
 const hardDeleteQuestionInDB = async (id) => {
   return await questionModel.deleteOne({ _id: id }).lean();
 };
-const getAllDraftQuestionInDB = async ({
+const getAllStatusQuestionInDB = async ({
   filter,
-  limit = 30,
+  limit,
   sort,
-  page,
+  cursor,
   select,
 }) => {
-  const sortBy = sort === "ctime" ? { updateAt: -1 } : { updateAt: 1 };
-  const skip = page * limit;
-  return await queryQuestion({ filter, sortBy, skip, select });
+  return await queryQuestion({ filter, limit, sort, cursor, select });
 };
-const getAllPublishQuestionInDB = async ({
-  filter,
-  limit = 30,
-  sort,
-  page,
-  select,
-}) => {
-  const sortBy = sort === "ctime" ? { updateAt: -1 } : { updateAt: 1 };
-  const skip = page * limit;
-  return await queryQuestion({ filter, sortBy, skip, select });
-};
-const queryQuestion = async ({ filter, limit = 30, sortBy, skip, select }) => {
-  return await questionModel
-    .find(filter)
-    .limit(limit)
-    .skip(skip)
+const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
+  const sortBy = sort ? sort : { _id: -1 };
+  const query = filter;
+  if (cursor) query._id = { $lt: cursor };
+  questonList = await questionModel
+    .find(query)
     .sort(sortBy)
+    .limit(limit)
     .select(getUnselectData(select))
     .lean();
+
+  return buildResultCursorBased({ questonList, limit });
 };
 const publishForQuestionInDB = async (id) => {
   return await questionModel
@@ -88,8 +80,7 @@ module.exports = {
   getListQuestionInDB,
   softDeleteQuestionInDB,
   hardDeleteQuestionInDB,
-  getAllDraftQuestionInDB,
-  getAllPublishQuestionInDB,
+  getAllStatusQuestionInDB,
   publishForQuestionInDB,
   draftForQuestionInDB,
   archiveForQuestionInDB,

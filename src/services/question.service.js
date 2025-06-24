@@ -14,6 +14,7 @@ const {
   publishForQuestionInDB,
   draftForQuestionInDB,
   archiveForQuestionInDB,
+  getAllStatusQuestionInDB,
 } = require("../models/repositories/question.repo");
 const {
   validateUpdateQuestionPayload,
@@ -62,14 +63,16 @@ class QuestionService {
 
   static async getListQuestion({
     id,
-    sort = "ctime",
-    page = 0,
-    select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
+    sort,
+    limit = 10,
+    cursor,
+    select = ["userId", "isAnonymous", "isDeleted", "__v"],
   }) {
     const listQuestion = await getListQuestionInDB({
       id,
       sort,
-      page,
+      limit,
+      cursor,
       select,
     });
     if (!listQuestion) throw new BadRequestError("Can not get list question!");
@@ -99,8 +102,9 @@ class QuestionService {
 
   static async getAllDraftQuestion({
     id,
-    sort = "ctime",
-    page = 0,
+    sort,
+    limit = 10,
+    cursor,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
   }) {
     validateIdQuestionPayload(id);
@@ -110,13 +114,20 @@ class QuestionService {
       moderationStatus: "ok",
       isDeleted: false,
     };
-    return await getAllDraftQuestionInDB({ filter, sort, page, select });
+    return await getAllStatusQuestionInDB({
+      filter,
+      limit,
+      sort,
+      cursor,
+      select,
+    });
   }
 
   static async getAllPublishQuestion({
     id,
-    sort = "ctime",
-    page = 0,
+    sort,
+    limit = 10,
+    cursor,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
   }) {
     validateIdQuestionPayload(id);
@@ -126,7 +137,13 @@ class QuestionService {
       moderationStatus: "ok",
       isDeleted: false,
     };
-    return await getAllPublishQuestionInDB({ filter, sort, page, select });
+    return await getAllStatusQuestionInDB({
+      filter,
+      limit,
+      sort,
+      cursor,
+      select,
+    });
   }
 
   static async changeQuestionStatusFactory({ resource, payload }) {

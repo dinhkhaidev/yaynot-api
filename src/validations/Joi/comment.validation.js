@@ -5,4 +5,8 @@ const createCommentSchema = Joi.object({
   content: Joi.string().min(2).max(300).required(),
   questionId: Joi.string().hex().length(24).required(),
 });
-module.exports = { createCommentSchema };
+
+const likeCommentSchema = Joi.object({
+  questionId: Joi.string().hex().length(24).required(),
+});
+module.exports = { createCommentSchema, likeCommentSchema };

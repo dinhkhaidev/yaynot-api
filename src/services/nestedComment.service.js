@@ -112,5 +112,6 @@ class CommentService {
     );
     return deleteComment;
   }
+  static async likeComment({ questionId, userId }) {}
 }
 module.exports = CommentService;
