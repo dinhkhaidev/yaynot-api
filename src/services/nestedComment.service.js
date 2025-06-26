@@ -11,15 +11,21 @@ const {
   deleteCommentInDB,
   findCommentParentInDB,
   updateLeftRightNested,
-  getListNestedInDB,
   getListNestedCommentInDB,
   getListParentNestedCommentInDB,
   updateCommentInDB,
+  findCommentLikeByUserCommentId,
+  likeCommentInDB,
+  unlikeCommentInDB,
+  getListCommentLikeInDB,
 } = require("../models/repositories/nestedComment.repo");
 const {
   validateFindQuestionById,
 } = require("../validations/service/questionService.validate");
 const { nestedComment } = require("../models/nestedComment.model");
+const {
+  commentServiceValidate,
+} = require("../validations/service/commentService.validate");
 
 class CommentService {
   static async createComment({
@@ -112,6 +118,34 @@ class CommentService {
     );
     return deleteComment;
   }
-  static async likeComment({ questionId, userId }) {}
+  static async likeCommentByAction({ commentId, action, userId }) {
+    await commentServiceValidate(commentId);
+    const commentLikeRecord = await findCommentLikeByUserCommentId({
+      userId,
+      commentId,
+    });
+    if (action === "like") {
+      if (commentLikeRecord)
+        throw new BadRequestError("You already liked this comment!");
+      const likeCommentData = await likeCommentInDB({ userId, commentId });
+      return likeCommentData;
+    }
+    if (action === "unlike") {
+      if (!commentLikeRecord)
+        throw new BadRequestError("You haven't liked this comment yet!");
+      const unlikeCommentData = await unlikeCommentInDB({ userId, commentId });
+      return unlikeCommentData;
+    }
+    throw new BadRequestError("Action must be like or unlike!");
+  }
+  static async getListLikeComment({ cursor, commentId, sort }) {
+    await commentServiceValidate(commentId);
+    const listCommentLike = await getListCommentLikeInDB(
+      cursor,
+      commentId,
+      sort
+    );
+    return listCommentLike;
+  }
 }
 module.exports = CommentService;

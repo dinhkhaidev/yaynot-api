@@ -34,4 +34,16 @@ router.delete(
   }),
   asyncHandle(NestedCommentController.deleteComment)
 );
+router.post(
+  "/:commentId/like",
+  asyncHandle(NestedCommentController.likeComment)
+);
+router.delete(
+  "/:commentId/like",
+  asyncHandle(NestedCommentController.unlikeComment)
+);
+router.get(
+  "/:commentId/likes",
+  asyncHandle(NestedCommentController.getListLikeComment)
+);
 module.exports = router;

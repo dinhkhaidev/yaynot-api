@@ -5,7 +5,6 @@ const COLLECTION_NAME = "users";
 const userSchema = new mongoose.Schema(
   {
     user_name: { type: String, required: true },
-    user_address: { type: String },
     user_email: { type: String, required: true },
     user_password: { type: String, required: true },
     user_role: { type: String, enum: Object.values(userRole), default: "001" },

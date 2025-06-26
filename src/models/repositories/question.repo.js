@@ -24,7 +24,7 @@ const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
     .select(getUnselectData(select))
     .lean();
 
-  return buildResultCursorBased({ questonList, limit });
+  return buildResultCursorBased(questonList, limit);
 };
 const softDeleteQuestionInDB = async (id, statusDelete) => {
   return await questionModel.findByIdAndUpdate(
@@ -51,14 +51,14 @@ const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
   const sortBy = sort ? sort : { _id: -1 };
   const query = filter;
   if (cursor) query._id = { $lt: cursor };
-  questonList = await questionModel
+  questionList = await questionModel
     .find(query)
     .sort(sortBy)
     .limit(limit)
     .select(getUnselectData(select))
     .lean();
 
-  return buildResultCursorBased({ questonList, limit });
+  return buildResultCursorBased(questionList, limit);
 };
 const publishForQuestionInDB = async (id) => {
   return await questionModel

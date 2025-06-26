@@ -1,8 +1,8 @@
-const buildResultCursorBased = ({ questonList, limit }) => {
+const buildResultCursorBased = (listData, limit) => {
   let cursorBased = {};
-  cursorBased.data = questonList;
-  const lengthQuestionList = questonList.length;
-  cursorBased.nextCursor = questonList[lengthQuestionList - 1]?._id;
+  cursorBased.data = listData;
+  const lengthQuestionList = listData.length;
+  cursorBased.nextCursor = listData[lengthQuestionList - 1]?._id;
   cursorBased.total = lengthQuestionList || 0;
   cursorBased.hasMore = lengthQuestionList === limit;
   return cursorBased;
