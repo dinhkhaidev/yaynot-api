@@ -12,5 +12,11 @@ class UserProfileController {
       }),
     }).send(res);
   };
+  getInfoProfile = async (req, res, next) => {
+    new OK({
+      message: "Get detail profile succesful!",
+      metadata: await UserProfileService.getInfoProfile(req.user),
+    }).send(res);
+  };
 }
 module.exports = new UserProfileController();

@@ -4,8 +4,9 @@ const {
   findUserProfileInDB,
 } = require("../models/repositories/user.repo");
 const { getInfoData } = require("../utils");
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, NotFoundError } = require("../core/error.response");
 const _ = require("lodash");
+const { cloudinary } = require("../configs/cloudinary.config");
 class UserProfileService {
   //handle when user want update profile
   static async upsertUserProfile(payload) {
@@ -27,6 +28,17 @@ class UserProfileService {
       return await upsertUserProfileInDB({ userId, payload: differences });
     }
     throw new BadRequestError("No changes detected in submitted data!");
+  }
+  static async getInfoProfile({ user_id, name }) {
+    const userProfileRecord = await findUserProfileInDB({ userId: user_id });
+    if (!userProfileRecord) {
+      return { username: name, name };
+    }
+    return { ...userProfileRecord, username: name };
+  }
+  static async setAvatarProfile({ path, folderName }) {
+    const result = await cloudinary.uploader.upload(path);
+    return result;
   }
 }
 module.exports = UserProfileService;

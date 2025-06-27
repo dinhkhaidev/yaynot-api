@@ -117,7 +117,7 @@ class AccessService {
     });
     const payload = {
       user_id: newUser.id,
-      name: newUser.user_name,
+      username: newUser.user_name,
       email: newUser.user_email,
     };
     const tokens = await createTokenPair(payload, publicKey, privateKey);
