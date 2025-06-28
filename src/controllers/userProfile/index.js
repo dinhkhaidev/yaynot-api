@@ -18,5 +18,14 @@ class UserProfileController {
       metadata: await UserProfileService.getInfoProfile(req.user),
     }).send(res);
   };
+  updateAvatar = async (req, res, next) => {
+    new OK({
+      message: "Update avatar succesful!",
+      metadata: await UserProfileService.updateAvatar({
+        userId: req.user.user_id,
+        url: req.body.url,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new UserProfileController();

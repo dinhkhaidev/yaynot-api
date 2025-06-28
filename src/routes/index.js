@@ -8,4 +8,5 @@ router.use("/v1/question", require("./question/index"));
 router.use("/v1/comment", require("./nestedComment/index"));
 router.use("/v1/vote", require("./vote/index"));
 router.use("/v1/profile", require("./userProfile/index"));
+router.use("/v1/upload", require("./upload/index"));
 module.exports = router;

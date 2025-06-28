@@ -4,9 +4,12 @@ const createUserProfileSchema = Joi.object({
   name: Joi.string().min(3).max(255),
   birthday: Joi.date(),
   // location: Joi.string().min(3),
-  avatar: Joi.link(),
+  avatar: Joi.string().uri(),
   biography: Joi.string().min(1).max(300),
-  link: Joi.link(),
+  link: Joi.string().uri(),
   gender: Joi.string().valid(...Object.values(gender)),
 });
-module.exports = { createUserProfileSchema };
+const updateAvatarSchema = Joi.object({
+  url: Joi.string().uri().required(),
+});
+module.exports = { createUserProfileSchema, updateAvatarSchema };

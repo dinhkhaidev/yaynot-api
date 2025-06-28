@@ -2,6 +2,7 @@ const diff = require("deep-diff");
 const {
   upsertUserProfileInDB,
   findUserProfileInDB,
+  updateAvatarInDB,
 } = require("../models/repositories/user.repo");
 const { getInfoData } = require("../utils");
 const { BadRequestError, NotFoundError } = require("../core/error.response");
@@ -25,6 +26,7 @@ class UserProfileService {
       return diff;
     }, {});
     if (Object.keys(differences).length > 0) {
+      differences._id = userId;
       return await upsertUserProfileInDB({ userId, payload: differences });
     }
     throw new BadRequestError("No changes detected in submitted data!");
@@ -36,9 +38,8 @@ class UserProfileService {
     }
     return { ...userProfileRecord, username: name };
   }
-  static async setAvatarProfile({ path, folderName }) {
-    const result = await cloudinary.uploader.upload(path);
-    return result;
+  static async updateAvatar({ userId, url }) {
+    return await updateAvatarInDB({ userId, url });
   }
 }
 module.exports = UserProfileService;

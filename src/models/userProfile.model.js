@@ -3,7 +3,7 @@ const DOCUMENT_NAME = "userProfile";
 const COLLECTION_NAME = "user_profiles";
 const userProfileSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Types.ObjectId, required: true, ref: "user" },
+    // userId: { type: mongoose.Types.ObjectId, required: true, ref: "user" },
     name: { type: String },
     birthday: { type: Date },
     location: { type: String, default: "VietNam" },
