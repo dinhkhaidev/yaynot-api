@@ -14,6 +14,8 @@ const userProfileSchema = new mongoose.Schema(
     biography: { type: String },
     link: { type: String },
     gender: { type: String, enum: ["male", "female", "other"] },
+    follower: { type: Number, default: 0 },
+    following: { type: Number, default: 0 },
   },
   {
     timestamps: true,

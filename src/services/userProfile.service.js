@@ -34,7 +34,7 @@ class UserProfileService {
   static async getInfoProfile({ user_id, name }) {
     const userProfileRecord = await findUserProfileInDB({ userId: user_id });
     if (!userProfileRecord) {
-      return { username: name, name };
+      return { username: name, name, follower: 0, following: 0 };
     }
     return { ...userProfileRecord, username: name };
   }

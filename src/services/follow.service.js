@@ -12,6 +12,10 @@ const {
   getListFollowingById,
   getListFollowerById,
 } = require("../models/repositories/follow.repo");
+const {
+  updateFollowCount,
+  updateUnfollowCount,
+} = require("../models/repositories/user.repo");
 
 class FollowSerivice {
   static async followUser({ followerId, followingId }) {
@@ -25,7 +29,9 @@ class FollowSerivice {
     });
     if (followUserRecord)
       throw new BadRequestError("You are already following this user!");
-    return await followUserInDB({ followerId, followingId });
+    const followUserData = await followUserInDB({ followerId, followingId });
+    await updateFollowCount({ followerId, followingId });
+    return followUserData;
   }
   static async unfollowUser({ followerId, followingId }) {
     const userRecord = await findUserById(followingId);
@@ -36,7 +42,12 @@ class FollowSerivice {
     });
     if (!followUserRecord)
       throw new BadRequestError("You are not following this user!");
-    return await unfollowUserInDB({ followerId, followingId });
+    const unfollowUserData = await unfollowUserInDB({
+      followerId,
+      followingId,
+    });
+    await updateUnfollowCount({ followerId, followingId });
+    return unfollowUserData;
   }
   static async getListFollowByAction({ followId, cursor, sort, action }) {
     if (action === "follower")

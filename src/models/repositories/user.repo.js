@@ -24,8 +24,38 @@ const updateAvatarInDB = async ({ userId, url }) => {
     { new: true }
   );
 };
+const updateFollowCount = async ({ followerId, followingId }) => {
+  const followerCountData = await userProfileModel.findByIdAndUpdate(
+    followerId,
+    { $inc: { following: 1 } }
+  );
+  const followingCountData = await userProfileModel.findByIdAndUpdate(
+    followingId,
+    { $inc: { follower: 1 } }
+  );
+  return {
+    followerCountData,
+    followingCountData,
+  };
+};
+const updateUnfollowCount = async ({ followerId, followingId }) => {
+  const followerCountData = await userProfileModel.findByIdAndUpdate(
+    followerId,
+    { $inc: { following: -1 } }
+  );
+  const followingCountData = await userProfileModel.findByIdAndUpdate(
+    followingId,
+    { $inc: { follower: -1 } }
+  );
+  return {
+    followerCountData,
+    followingCountData,
+  };
+};
 module.exports = {
   upsertUserProfileInDB,
   findUserProfileInDB,
   updateAvatarInDB,
+  updateFollowCount,
+  updateUnfollowCount,
 };
