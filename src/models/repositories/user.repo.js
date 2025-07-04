@@ -52,10 +52,14 @@ const updateUnfollowCount = async ({ followerId, followingId }) => {
     followingCountData,
   };
 };
+const findUserProfileById = async (profileId) => {
+  return await userProfileModel.findById(profileId);
+};
 module.exports = {
   upsertUserProfileInDB,
   findUserProfileInDB,
   updateAvatarInDB,
   updateFollowCount,
   updateUnfollowCount,
+  findUserProfileById,
 };

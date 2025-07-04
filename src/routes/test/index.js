@@ -13,7 +13,11 @@ const {
 } = require("../../validations/Joi/userProfile.validation");
 const UserProfileService = require("../../services/userProfile.service");
 const { convertToObjectId } = require("../../utils");
+const ChatService = require("../../services/chat.service");
 const router = express.Router();
+const {
+  createMessageSchema,
+} = require("../../validations/Joi/chat.validation");
 router.get(
   "/",
   authentication,
@@ -65,5 +69,50 @@ router.post(
     });
     res.json(data);
   }
+);
+router.post(
+  "/conventions",
+  validate(createMessageSchema),
+  asyncHandle(async (req, res, next) => {
+    res.json(
+      await ChatService.createMessage({
+        content: "Xin chao",
+        convoId: "68677f6d963999c3f807f257",
+        senderId: "6862581564c4f74e37bed3a5",
+        receiveId: "6862581564c4f74e37bed3a4",
+      })
+    );
+  })
+);
+router.get(
+  "/conventions",
+  // validate(createMessageSchema),
+  asyncHandle(async (req, res, next) => {
+    res.json(
+      await ChatService.getListConventionsUser({
+        userId: "6862581564c4f74e37bed3a4",
+      })
+    );
+  })
+);
+router.get(
+  "/messages",
+  // validate(createMessageSchema),
+  asyncHandle(async (req, res, next) => {
+    res.json(
+      await ChatService.getConventionMessages({
+        convoId: "68677f6d963999c3f807f257",
+      })
+    );
+  })
+);
+router.delete(
+  "/messages",
+  // validate(createMessageSchema),
+  asyncHandle(async (req, res, next) => {
+    res.json(
+      await ChatService.deleteMessage({ messageId: "68677f6d963999c3f807f259" })
+    );
+  })
 );
 module.exports = router;

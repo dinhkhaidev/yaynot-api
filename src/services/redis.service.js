@@ -4,8 +4,8 @@ const {
   updateVoteSummaryById,
 } = require("../models/repositories/vote.repo");
 const { RequestTimeoutError } = require("../core/error.response");
-const redis = new Redis();
-console.log(redis.status);
+// const redis = new Redis(); //TURNOFF REDIS
+// console.log(redis.status);
 const acquireLock = async ({ questionId, userId }) => {
   const key = `${process.env.DISTRIBUTED_LOCK}-${questionId}-${userId}`;
   const retries = 10;

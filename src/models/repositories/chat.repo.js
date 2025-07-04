@@ -1,6 +1,67 @@
+const {
+  buildResultCursorBased,
+} = require("../../helpers/buildResultCursorBased");
 const conventionModel = require("../convention.model");
+const messageModel = require("../message.model");
 
-const createConventionInDB = (payload) => {
-  return conventionModel.create(payload);
+const createConventionInDB = async (payload) => {
+  return await conventionModel.create(payload);
 };
-module.exports = { createConventionInDB };
+const findConventionInDB = async (query) => {
+  return await conventionModel.findOne(query).lean();
+};
+const findConventionByIdInDB = async (conventionId) => {
+  return await conventionModel.findById(conventionId).lean();
+};
+const createMessageInDB = async (payload) => {
+  return await messageModel.create(payload);
+};
+const getListConventionsUserInDB = async ({ userId, limit = 10, cursor }) => {
+  const query = {
+    participants: { $in: userId },
+  };
+  if (cursor) query._id = { $lt: cursor };
+  const conventionList = await conventionModel
+    .find(query)
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .select("-__v -createdAt -updatedAt")
+    .lean();
+  return buildResultCursorBased(conventionList, limit);
+};
+const getConventionMessagesInDB = async ({ convoId, limit = 15, cursor }) => {
+  const query = {
+    convoId,
+  };
+  if (cursor) query._id = { $lt: cursor };
+  const messageList = await messageModel
+    .find(query)
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .select("-__v")
+    .lean();
+  return buildResultCursorBased(messageList, limit);
+};
+const updateLastMessage = async ({ convoId, content, senderId }) => {
+  return await conventionModel.findOneAndUpdate(
+    { _id: convoId },
+    { $set: { lastMessage: { content, senderId, createdAt: Date.now() } } }
+  );
+};
+const deleteMessageInDB = async (messageId) => {
+  return await messageModel.deleteOne({ _id: messageId });
+};
+const findMessageInDB = async (messageId) => {
+  return await messageModel.findById(messageId).lean();
+};
+module.exports = {
+  createConventionInDB,
+  findConventionInDB,
+  createMessageInDB,
+  findConventionByIdInDB,
+  getListConventionsUserInDB,
+  updateLastMessage,
+  getConventionMessagesInDB,
+  deleteMessageInDB,
+  findMessageInDB,
+};

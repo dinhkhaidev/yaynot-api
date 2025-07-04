@@ -5,8 +5,8 @@ const COLLECTION_NAME = "conventions";
 const conventionSchema = new mongoose.Schema(
   {
     name: { type: String },
-    type: { type: String, enum: ["private", "group"], default: "private" },
-    participal: {
+    type: { type: String, enum: ["private", "group"], required: true },
+    participants: {
       type: [mongoose.Types.ObjectId],
       required: true,
       ref: "user",
@@ -20,6 +20,6 @@ const conventionSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  } 
+  }
 );
 module.exports = mongoose.model(DOCUMENT_NAME, conventionSchema);

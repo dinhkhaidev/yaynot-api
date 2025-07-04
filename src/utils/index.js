@@ -12,9 +12,13 @@ const getSelectData = (select = []) => {
 const getUnselectData = (unselect = []) => {
   return Object.fromEntries(unselect.map((item) => [item, 0]));
 };
+const getIdSlice = (string, number = -6) => {
+  return string.slice(number);
+};
 module.exports = {
   convertToObjectId,
   getInfoData,
   getSelectData,
   getUnselectData,
+  getIdSlice,
 };
