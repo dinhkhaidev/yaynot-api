@@ -35,12 +35,14 @@ class ChatService {
     if (!convoId) {
       const payload = { type: "private", participants: [senderId, receiveId] };
       const { _id } = await ChatService.createConvention(payload);
-      return await createMessageInDB({
+      const newMessage = await createMessageInDB({
         content,
         attachment,
         convoId: _id,
         senderId,
       });
+      await updateLastMessage({ convoId: _id, content, senderId });
+      return newMessage;
     } else {
       const conventionRecord = await findConventionByIdInDB(convoId);
       if (!conventionRecord) throw new NotFoundError("Convention not existed!");

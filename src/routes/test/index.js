@@ -71,13 +71,13 @@ router.post(
   }
 );
 router.post(
-  "/conventions",
+  "/messages",
   validate(createMessageSchema),
   asyncHandle(async (req, res, next) => {
     res.json(
       await ChatService.createMessage({
-        content: "Xin chao",
-        convoId: "68677f6d963999c3f807f257",
+        content: "Xin chao1",
+        convoId: "68688e5f06666e4532544605",
         senderId: "6862581564c4f74e37bed3a5",
         receiveId: "6862581564c4f74e37bed3a4",
       })
@@ -101,7 +101,7 @@ router.get(
   asyncHandle(async (req, res, next) => {
     res.json(
       await ChatService.getConventionMessages({
-        convoId: "68677f6d963999c3f807f257",
+        convoId: "68688e5f06666e4532544605",
       })
     );
   })
