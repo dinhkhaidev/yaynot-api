@@ -2,6 +2,9 @@ const { NotFoundError } = require("../../core/error.response");
 const {
   findConventionByIdInDB,
 } = require("../../models/repositories/chat.repo");
+const ChatService = require("../../services/chat.service");
+const { createMessage } = require("../../services/chat.service");
+const socketAuth = require("../middlewares/socketAuth");
 const wrapAsync = require("../middlewares/wrapAsync");
 
 /**
@@ -10,12 +13,11 @@ const wrapAsync = require("../middlewares/wrapAsync");
 const chatSocket = (io) => {
   io.on("connection", (socket) => {
     console.log("user connect");
+    io.use(socketAuth);
     //fe send userId and receiveId when send message
-    socket.on("joinConvention", async ({ convoId, userId }, callback) => {
+    socket.on("join_convention", async ({ convoId, userId }, callback) => {
       try {
         const conventionRecord = await findConventionByIdInDB(convoId);
-        console.log("conventionRecord", conventionRecord);
-        console.log("convoId", convoId);
         if (!conventionRecord) {
           return callback({
             success: false,
@@ -36,8 +38,33 @@ const chatSocket = (io) => {
       }
     });
 
-    socket.on("sendMessage", ({ convoId, userId, receiveId }) => {
-      //save dtb, handle conventions
+    socket.on("send_message", async (data, callback) => {
+      try {
+        const newMessage = await ChatService.createMessage(data);
+        if (!newMessage) {
+          return callback({
+            success: false,
+            message: "Can't create message!",
+          });
+        }
+
+        socket.join(newMessage.convoId);
+        io.to(newMessage.convoId).emit("receive_message", newMessage);
+        if (callback) {
+          callback({
+            success: true,
+            message: newMessage,
+          });
+        }
+      } catch (err) {
+        console.error("Socket send_message error:", err);
+        if (callback) {
+          callback({
+            success: false,
+            message: err.message || "Internal Server Error",
+          });
+        }
+      }
     });
 
     socket.on("disconnect", () => {

@@ -30,6 +30,7 @@ class ChatService {
     senderId,
     receiveId,
   }) {
+    console.log("receiveId", senderId);
     const userRecord = await findUserProfileById(receiveId);
     if (!userRecord) throw new BadRequestError("Receive id invalid!");
     if (!convoId) {
@@ -59,9 +60,15 @@ class ChatService {
   static async getListConventionsUser({ userId, cursor }) {
     return await getListConventionsUserInDB({ userId, cursor });
   }
-  static async getConventionMessages({ convoId, cursor }) {
-    const conventionRecord = await findConventionByIdInDB(convoId);
-    if (!conventionRecord) throw new NotFoundError("Convention not existed!");
+  static async getConventionMessages({ userId, convoId, cursor }) {
+    const query = {
+      type: "private",
+      _id: convoId,
+      participants: { $in: userId },
+    };
+    const conventionRecord = await findConventionInDB(query);
+    if (!conventionRecord)
+      throw new NotFoundError("Convention invalid or not existed!");
     return await getConventionMessagesInDB({ convoId, cursor });
   }
   static async deleteMessage({ messageId }) {

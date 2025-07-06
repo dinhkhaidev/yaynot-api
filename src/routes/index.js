@@ -10,4 +10,5 @@ router.use("/v1/vote", require("./vote/index"));
 router.use("/v1/profile", require("./userProfile/index"));
 router.use("/v1/upload", require("./upload/index"));
 router.use("/v1/follow", require("./follow/index"));
+router.use("/v1/chat", require("./chat/index"));
 module.exports = router;

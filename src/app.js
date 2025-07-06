@@ -1,9 +1,16 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 // const swaggerUi = require("swagger-ui-express");
 // const swaggerDocument = require("./swagger.json");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
+app.use(
+  cors({
+    origin: "*", //* for dev
+    credentials: true,
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/", require("./routes/index"));
