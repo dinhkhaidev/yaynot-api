@@ -66,7 +66,7 @@ const chatSocket = (io) => {
         }
       }
     });
-
+    //handle listen user typing,...
     socket.on("disconnect", () => {
       console.log("user disconnect");
     });

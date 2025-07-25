@@ -11,4 +11,7 @@ const followSchema = new mongoose.Schema(
     collection: COLLECTION_NAME,
   }
 );
+// followSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
+// followSchema.index({ followerId: 1, _id: -1 });
+// followSchema.index({ followingId: 1, _id: -1 });
 module.exports = mongoose.model(DOCUMENT_NAME, followSchema);

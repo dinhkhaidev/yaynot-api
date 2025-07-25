@@ -21,5 +21,15 @@ class ChatController {
       }),
     }).send(res);
   };
+  searchMessage = async (req, res, next) => {
+    new OK({
+      message: "Get message search successful!",
+      metadata: await ChatService.searchMessage({
+        ...req.query,
+        convoId: req.params.convoId,
+        userId: req.user.user_id,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new ChatController();

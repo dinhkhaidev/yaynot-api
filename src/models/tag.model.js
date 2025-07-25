@@ -3,7 +3,7 @@ const DOCUMENT_NAME = "tag";
 const COLLECTION_NAME = "tags";
 const tagSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, index: true },
     displayName: { type: String, required: true, unique: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
@@ -23,8 +23,14 @@ const tagQuestionMapSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: true,
       ref: "question",
+      index: true,
     },
-    tagId: { type: mongoose.Types.ObjectId, required: true, ref: "vote" },
+    tagId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "vote",
+      index: true,
+    },
   },
   {
     timestamps: true,

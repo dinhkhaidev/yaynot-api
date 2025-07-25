@@ -9,6 +9,7 @@ const {
   getConventionMessagesInDB,
   deleteMessageInDB,
   findMessageInDB,
+  searchMessageInDB,
 } = require("../models/repositories/chat.repo");
 const { findUserProfileById } = require("../models/repositories/user.repo");
 const { getIdSlice } = require("../utils");
@@ -75,6 +76,17 @@ class ChatService {
     const messageRecord = await findMessageInDB(messageId);
     if (!messageRecord) throw new NotFoundError("Message not existed!");
     return await deleteMessageInDB(messageId);
+  }
+  static async searchMessage({ keyword, convoId, userId }) {
+    const query = {
+      type: "private",
+      _id: convoId,
+      participants: { $in: userId },
+    };
+    const conventionRecord = await findConventionInDB(query);
+    if (!conventionRecord)
+      throw new NotFoundError("Convention invalid or not existed!");
+    return await searchMessageInDB({ keyword, convoId });
   }
 }
 module.exports = ChatService;

@@ -10,7 +10,6 @@ const commentSchema = new mongoose.Schema(
     questionId: {
       type: mongoose.Types.ObjectId,
       ref: "question",
-      required: true,
     },
     userId: { type: mongoose.Types.ObjectId, ref: "user", required: true },
     like: { type: Number, default: 0 },
@@ -35,6 +34,10 @@ const commentLikeSchema = new mongoose.Schema(
     collection: "comment_likes",
   }
 );
+commentSchema.index({ userId: 1 });
+commentSchema.index({ questionId: 1, commentParentId: 1 });
+commentSchema.index({ questionId: 1, left: 1, right: 1 });
+commentLikeSchema.index({ commentId: 1, userId: 1 }, { unique: true });
 module.exports = {
   nestedComment: mongoose.model(DOCUMENT_NAME, commentSchema),
   commentLike: mongoose.model("commentLike", commentLikeSchema),

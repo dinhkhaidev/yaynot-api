@@ -54,6 +54,20 @@ const deleteMessageInDB = async (messageId) => {
 const findMessageInDB = async (messageId) => {
   return await messageModel.findById(messageId).lean();
 };
+const searchMessageInDB = async ({ keyword, convoId, cursor, limit = 20 }) => {
+  const query = {
+    content: { $regex: keyword },
+    convoId,
+  };
+  if (cursor) query._id = { $lt: cursor };
+  const messageList = await messageModel
+    .find(query)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .select("content senderId")
+    .lean();
+  return buildResultCursorBased(messageList, limit);
+};
 module.exports = {
   createConventionInDB,
   findConventionInDB,
@@ -64,4 +78,5 @@ module.exports = {
   getConventionMessagesInDB,
   deleteMessageInDB,
   findMessageInDB,
+  searchMessageInDB,
 };
