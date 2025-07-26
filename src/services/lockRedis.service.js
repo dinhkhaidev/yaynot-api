@@ -1,11 +1,9 @@
-const Redis = require("ioredis");
+const redis = require("../configs/redis.config");
 const {
   upsertVoteInDB,
   updateVoteSummaryById,
 } = require("../models/repositories/vote.repo");
 const { RequestTimeoutError } = require("../core/error.response");
-// const redis = new Redis(); //TURNOFF REDIS
-// console.log(redis.status);
 const acquireLock = async ({ questionId, userId }) => {
   const key = `${process.env.DISTRIBUTED_LOCK}-${questionId}-${userId}`;
   const retries = 10;

@@ -15,7 +15,7 @@ const {
   validateFindQuestionById,
   validateIdQuestionPayload,
 } = require("../validations/service/questionService.validate");
-const { acquireLock } = require("./redis.service");
+const { acquireLock } = require("./lockRedis.service");
 class VoteService {
   static async upsertVote({ questionId, voteType, userId }) {
     if (!userId) throw new NotFoundError("User ID is required!");

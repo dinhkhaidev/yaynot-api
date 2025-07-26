@@ -5,6 +5,7 @@ const cors = require("cors");
 // const swaggerDocument = require("./swagger.json");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
+require("./configs/redis.config");
 app.use(
   cors({
     origin: "*", //* for dev
