@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const logger = require("./configs/loggerWinston.config");
 // const swaggerUi = require("swagger-ui-express");
 // const swaggerDocument = require("./swagger.json");
 // const mongodb=require("./databases/mongodb.database")
@@ -24,6 +25,13 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   const messageError = err.message || "Internal Server Error!";
   const statusError = err.status || 500;
+  logger.error({
+    messageError,
+    url: req.originalUrl,
+    method: req.method,
+    status: statusError,
+    err: err.stack,
+  });
   res.status(statusError).json({
     status: "Error",
     code: statusError,

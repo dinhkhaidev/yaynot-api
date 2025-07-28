@@ -1,6 +1,8 @@
 const express = require("express");
 const { authentication } = require("../auth/authUtil");
+const loggerMiddleware = require("../middlewares/logger.middleware");
 const router = express.Router();
+router.use(loggerMiddleware());
 router.use("/v1/auth", require("./access/index"));
 router.use("/v1/test", require("./test/index"));
 router.use(authentication);

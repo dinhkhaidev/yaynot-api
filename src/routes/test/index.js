@@ -18,6 +18,7 @@ const router = express.Router();
 const {
   createMessageSchema,
 } = require("../../validations/Joi/chat.validation");
+const loggerMiddleware = require("../../middlewares/logger.middleware");
 router.get(
   "/",
   authentication,
@@ -41,7 +42,7 @@ router.get("/tag", async (req, res, next) => {
   const data = await TagService.getTagByName("test");
   res.json(data);
 });
-router.use(authentication);
+// router.use(authentication);
 router.post("/like", async (req, res, next) => {
   const data = await CommentService.likeCommentByAction({
     commentId: "68501e32dfd2c0c391226469",
@@ -113,6 +114,14 @@ router.delete(
     res.json(
       await ChatService.deleteMessage({ messageId: "68677f6d963999c3f807f259" })
     );
+  })
+);
+router.get(
+  "/log",
+  loggerMiddleware(),
+  // validate(createMessageSchema),
+  asyncHandle(async (req, res, next) => {
+    res.json({ log: "log123" });
   })
 );
 module.exports = router;
