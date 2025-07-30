@@ -6,5 +6,7 @@ const findUserByEmail = async (email) => {
 const findUserById = async (id) => {
   return await userModel.findById(id).lean();
 };
-
-module.exports = { findUserByEmail, findUserById };
+const findListUserId = async (limit) => {
+  return userModel.find().select("_id").cursor({ batchSize: limit });
+};
+module.exports = { findUserByEmail, findUserById, findListUserId };
