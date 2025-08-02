@@ -29,6 +29,8 @@ const userNotificationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+userNotificationSchema.index({ userId: 1 });
+userNotificationSchema.index({ notificationId: 1, userId: 1 });
 module.exports = {
   notificationModel: mongoose.model(DOCUMENT_NAME, notificationSchema),
   userNotificationModel: mongoose.model(
