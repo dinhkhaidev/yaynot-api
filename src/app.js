@@ -15,7 +15,8 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use("/", require("./routes/index"));
+app.use("/v1", require("./routes/index"));
+app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {
   const error = new Error("Route not found!");

@@ -19,6 +19,7 @@ const {
   createMessageSchema,
 } = require("../../validations/Joi/chat.validation");
 const loggerMiddleware = require("../../middlewares/logger.middleware");
+const rbac = require("../../middlewares/rbac");
 router.get(
   "/",
   authentication,
@@ -120,6 +121,13 @@ router.get(
   "/log",
   loggerMiddleware(),
   // validate(createMessageSchema),
+  asyncHandle(async (req, res, next) => {
+    res.json({ log: "log123" });
+  })
+);
+router.get(
+  "/rbac",
+  rbac("readAny", "picture"),
   asyncHandle(async (req, res, next) => {
     res.json({ log: "log123" });
   })
