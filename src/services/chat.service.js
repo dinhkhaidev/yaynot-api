@@ -31,7 +31,6 @@ class ChatService {
     senderId,
     receiveId,
   }) {
-    console.log("receiveId", senderId);
     const userRecord = await findUserProfileById(receiveId);
     if (!userRecord) throw new BadRequestError("Receive id invalid!");
     if (!convoId) {

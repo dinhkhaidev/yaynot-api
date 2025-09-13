@@ -1,6 +1,7 @@
 const pushNotificationType = {
-  ALL: "ALL",
-  QUESTION001: "QUESTION001",
-  MESSAGE: "MESSAGE",
+  ALL: "all",
+  QUESTION001: "q0001",
+  MESSAGE: "message",
+  COMMENT: "comment",
 };
 module.exports = { pushNotificationType };

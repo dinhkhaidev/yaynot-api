@@ -1,4 +1,10 @@
+const {
+  pushNotificationType,
+} = require("../../constants/pushNotificationType");
 const { NotFoundError } = require("../../core/error.response");
+const {
+  notificationProducer,
+} = require("../../message-queue/rabbitmq/producers/commentNotification.producer");
 const {
   findConventionByIdInDB,
 } = require("../../models/repositories/chat.repo");
@@ -11,9 +17,9 @@ const wrapAsync = require("../middlewares/wrapAsync");
  * @param {import("socket.io").Namespace} io
  */
 const chatSocket = (io) => {
+  io.use(socketAuth);
   io.on("connection", (socket) => {
     console.log("user connect");
-    io.use(socketAuth);
     //fe send userId and receiveId when send message
     socket.on("join_convention", async ({ convoId, userId }, callback) => {
       try {
@@ -22,6 +28,12 @@ const chatSocket = (io) => {
           return callback({
             success: false,
             message: "Convention does not exist!",
+          });
+        }
+        if (!conventionRecord.participants.includes(userId)) {
+          return callback({
+            success: false,
+            message: "You are not a participant in this conversation!",
           });
         }
         socket.join(convoId);
@@ -47,9 +59,18 @@ const chatSocket = (io) => {
             message: "Can't create message!",
           });
         }
-
-        socket.join(newMessage.convoId);
         io.to(newMessage.convoId).emit("receive_message", newMessage);
+        //message queue notification
+        const notification = {
+          title: "Message",
+          content: newMessage.content,
+          type: pushNotificationType.MESSAGE,
+          senderId: newMessage.senderId,
+          //fe data must have receiveId
+          receiveId: data.receiveId,
+          message: `${newMessage.senderId} đã gửi cho bạn tin nhắn!`,
+        };
+        // notificationProducer(notification);
         if (callback) {
           callback({
             success: true,

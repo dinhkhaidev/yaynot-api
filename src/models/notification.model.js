@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { pushNotificationType } = require("../constants/pushNotificationType");
 const DOCUMENT_NAME = "notification";
 const COLLECTION_NAME = "notifications";
 const notificationSchema = new mongoose.Schema(
@@ -7,8 +8,8 @@ const notificationSchema = new mongoose.Schema(
     content: { type: String, required: true },
     type: {
       type: String,
-      enum: ["ALL", "QUESTION001", "MESSAGE"],
-      default: "QUESTION001",
+      enum: Object.values(pushNotificationType),
+      default: "q0001",
     },
     senderId: { type: mongoose.Types.ObjectId, required: true },
     options: { type: Object, default: {} },
@@ -18,6 +19,7 @@ const notificationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+//noti for user with table field id
 const userNotificationSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Types.ObjectId, required: true },

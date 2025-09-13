@@ -63,10 +63,10 @@ class NotificationService {
       options,
     });
     switch (type) {
-      case "ALL":
+      case "all":
         await new SenderAll().pushNotification(newNotification);
         break;
-      case "MESSAGE":
+      case "message":
         await new SenderSingle().pushNotification(newNotification, receiveId);
         break;
       //case ...
