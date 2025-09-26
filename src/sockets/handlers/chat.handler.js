@@ -4,7 +4,7 @@ const {
 const { NotFoundError } = require("../../core/error.response");
 const {
   notificationProducer,
-} = require("../../message-queue/rabbitmq/producers/commentNotification.producer");
+} = require("../../message-queue/rabbitmq/producers/notification.producer");
 const {
   findConventionByIdInDB,
 } = require("../../models/repositories/chat.repo");

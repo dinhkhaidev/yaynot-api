@@ -1,0 +1,1363 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "YayNot API",
+    "description": "API documentation for YayNot social Q&A platform"
+  },
+  "host": "localhost:8888",
+  "basePath": "/v1",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT token with Bearer prefix"
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "required": ["email", "name", "password"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 30
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6
+        }
+      }
+    },
+    "LoginUser": {
+      "type": "object",
+      "required": ["email", "password"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6
+        }
+      }
+    },
+    "LogoutUser": {
+      "type": "object",
+      "required": ["id", "token"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string",
+          "pattern": "^Bearer\\s[\\w-]+\\.[\\w-]+\\.[\\w-]+$"
+        }
+      }
+    },
+    "Question": {
+      "type": "object",
+      "required": ["title", "content"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "content": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 200
+        },
+        "topicId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        },
+        "image": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UpdateQuestion": {
+      "type": "object",
+      "required": ["content"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 200
+        },
+        "content": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 200
+        },
+        "image": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "required": ["content", "questionId"],
+      "properties": {
+        "commentParentId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        },
+        "content": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 300
+        },
+        "questionId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        }
+      }
+    },
+    "Vote": {
+      "type": "object",
+      "required": ["questionId", "voteType"],
+      "properties": {
+        "questionId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        },
+        "voteType": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UserProfile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 255
+        },
+        "birthday": {
+          "type": "string",
+          "format": "date"
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "biography": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "link": {
+          "type": "string",
+          "format": "uri"
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["male", "female", "other"]
+        }
+      }
+    },
+    "UpdateAvatar": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "Follow": {
+      "type": "object",
+      "required": ["followingId"],
+      "properties": {
+        "followingId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        }
+      }
+    },
+    "Notification": {
+      "type": "object",
+      "required": ["title", "content", "type"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 150
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "type": {
+          "type": "string",
+          "enum": ["all", "q0001", "message", "comment"]
+        }
+      }
+    },
+    "NotificationMQ": {
+      "type": "object",
+      "required": [
+        "title",
+        "content",
+        "type",
+        "senderId",
+        "receiveId",
+        "message"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 150
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "type": {
+          "type": "string",
+          "enum": ["all", "q0001", "message", "comment"]
+        },
+        "senderId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        },
+        "receiveId": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{24}$"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "description": "Create a new user account",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "409": {
+            "description": "Conflict - User already exists"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate user and return JWT token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "400": {
+            "description": "Bad Request - Invalid credentials"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User logout",
+        "description": "Logout user and invalidate token",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LogoutUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh JWT token",
+        "description": "Get new access token using refresh token",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/questions": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Create new question",
+        "description": "Create a new question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Question"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Question created successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get list of questions",
+        "description": "Retrieve paginated list of questions",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/questions/{id}": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Update question",
+        "description": "Update existing question by ID",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateQuestion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question updated successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/drafts": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get draft questions",
+        "description": "Get all draft questions for current user",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Draft questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get question by ID",
+        "description": "Retrieve specific question by ID",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Questions"],
+        "summary": "Soft delete question",
+        "description": "Soft delete question (mark as deleted)",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question soft deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Questions"],
+        "summary": "Hard delete question",
+        "description": "Permanently delete question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/publish/{questionId}": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get published questions",
+        "description": "Get all published questions",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/questions/status/{questionId}": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Change question status",
+        "description": "Change question status (publish, draft, archive)",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["publish", "draft", "archive"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question status changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/comments": {
+      "post": {
+        "tags": ["Comments"],
+        "summary": "Create comment",
+        "description": "Create a new comment on a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Comment"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Comment created successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Get comments",
+        "description": "Get list of comments",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "query",
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Comments"],
+        "summary": "Update comment",
+        "description": "Update existing comment",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "commentId": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{24}$"
+                },
+                "content": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 300
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Comments"],
+        "summary": "Delete comment",
+        "description": "Delete existing comment",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "commentId": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{24}$"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          }
+        }
+      }
+    },
+    "/comments/{commentId}/like": {
+      "post": {
+        "tags": ["Comments"],
+        "summary": "Like comment",
+        "description": "Like a comment",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment liked successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Comments"],
+        "summary": "Unlike comment",
+        "description": "Remove like from comment",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment unliked successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/comments/{commentId}/likes": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Get comment likes",
+        "description": "Get list of users who liked the comment",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment likes retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/votes": {
+      "post": {
+        "tags": ["Votes"],
+        "summary": "Vote on question",
+        "description": "Upvote or downvote a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Vote"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote recorded successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/votes/{voteId}": {
+      "delete": {
+        "tags": ["Votes"],
+        "summary": "Delete vote",
+        "description": "Remove vote from question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "voteId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          }
+        }
+      }
+    },
+    "/votes/{questionId}": {
+      "get": {
+        "tags": ["Votes"],
+        "summary": "Get vote details",
+        "description": "Get vote details for a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote details retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/profiles": {
+      "patch": {
+        "tags": ["User Profile"],
+        "summary": "Update user profile",
+        "description": "Update or create user profile",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserProfile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": ["User Profile"],
+        "summary": "Get user profile",
+        "description": "Get current user profile information",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/profiles/avatar": {
+      "patch": {
+        "tags": ["User Profile"],
+        "summary": "Update avatar",
+        "description": "Update user avatar URL",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateAvatar"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar updated successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/uploads/{type}": {
+      "post": {
+        "tags": ["Upload"],
+        "summary": "Upload image",
+        "description": "Upload image by type",
+        "security": [{ "Bearer": [] }],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": ["avatar", "post", "thumb", "comment"]
+          },
+          {
+            "name": "w",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "description": "Image width"
+          },
+          {
+            "name": "h",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "description": "Image height"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Image file to upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image uploaded successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/follows": {
+      "post": {
+        "tags": ["Follow"],
+        "summary": "Follow user",
+        "description": "Follow another user",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Follow"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User followed successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Follow"],
+        "summary": "Unfollow user",
+        "description": "Unfollow a user",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Follow"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User unfollowed successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/follows/followers": {
+      "get": {
+        "tags": ["Follow"],
+        "summary": "Get followers",
+        "description": "Get list of followers",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Followers retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/follows/followings": {
+      "get": {
+        "tags": ["Follow"],
+        "summary": "Get followings",
+        "description": "Get list of users being followed",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Followings retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/chats/conventions": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Get conversations",
+        "description": "Get list of user conversations",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Conversations retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/chats/{convoId}/messages": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Get conversation messages",
+        "description": "Get messages from a specific conversation",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "convoId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/chats/{convoId}/find": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Search messages",
+        "description": "Search messages in a conversation",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "convoId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "type": "string",
+            "description": "Search query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Send notification",
+        "description": "Send push notification (Admin only)",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Notification"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification sent successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get notifications",
+        "description": "Get list of user notifications",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Notifications retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/notifications/marked/{notificationId}": {
+      "patch": {
+        "tags": ["Notifications"],
+        "summary": "Mark notification as read",
+        "description": "Mark notification as read",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marked as read"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/notifications/{notificationId}": {
+      "delete": {
+        "tags": ["Notifications"],
+        "summary": "Delete notification",
+        "description": "Delete a notification",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification deleted successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/rbac/resource": {
+      "post": {
+        "tags": ["RBAC"],
+        "summary": "Create resource",
+        "description": "Create new RBAC resource",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "201": {
+            "description": "Resource created successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": ["RBAC"],
+        "summary": "Get resources",
+        "description": "Get list of RBAC resources",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Resources retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/rbac/role": {
+      "post": {
+        "tags": ["RBAC"],
+        "summary": "Create role",
+        "description": "Create new RBAC role",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "201": {
+            "description": "Role created successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": ["RBAC"],
+        "summary": "Get roles",
+        "description": "Get list of RBAC roles",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Roles retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  }
+}

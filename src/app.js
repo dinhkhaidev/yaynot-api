@@ -4,22 +4,32 @@ const cors = require("cors");
 const logger = require("./configs/loggerWinston.config");
 const logCustom = require("./logger/logCustom");
 const { v4: uuidv4 } = require("uuid");
-// const swaggerUi = require("swagger-ui-express");
-// const swaggerDocument = require("./swagger.json");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("../swagger/swagger-output.json");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
 require("./configs/redis.config");
-app.use(
-  cors({
-    origin: "*", //* for dev
-    credentials: true,
-  })
-);
+app.use(cors());
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Security headers
+app.use((req, res, next) => {
+  res.header("X-Content-Type-Options", "nosniff");
+  res.header("X-Frame-Options", "DENY");
+  res.header("X-XSS-Protection", "1; mode=block");
+  next();
+});
 app.use("/v1", require("./routes/index"));
 app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//swagger
+app.get("/swagger-output.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerDocument);
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {
   const error = new Error("Route not found!");
   error.status = 404;

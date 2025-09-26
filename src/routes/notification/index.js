@@ -21,6 +21,6 @@ router.patch(
 router.delete(
   "/:notificationId",
   validate(markAndDeleteNotificationSchema),
-  asyncHandle(NotificationController.getListNotification)
+  asyncHandle(NotificationController.deleteUserNotification)
 );
 module.exports = router;

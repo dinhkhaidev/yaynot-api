@@ -6,7 +6,7 @@ module.exports = () => {
     // req.requestId = uuidv4();
     try {
       const start = Date.now();
-      const requestId = req.header["x-trace-id"] || uuidv4();
+      const requestId = req.headers["x-trace-id"] || uuidv4();
       req.requestId = requestId;
       res.on("finish", () => {
         const duration = Date.now() - start;
