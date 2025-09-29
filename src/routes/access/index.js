@@ -19,11 +19,13 @@ router.post(
   validate(loginUserSchema),
   asyncHandle(AccessController.login)
 );
+//middleware check auth
 router.use(authentication);
 router.post(
   "/logout",
   validate(logoutUserSchema),
   asyncHandle(AccessController.logout)
 );
+router.post("/verify", asyncHandle(AccessController.verifyOtp));
 router.post("/refresh-token", asyncHandle(AccessController.handleToken));
 module.exports = router;

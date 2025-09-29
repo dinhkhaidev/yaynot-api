@@ -15,4 +15,5 @@ router.use("/follows", require("./follow/index"));
 router.use("/chats", require("./chat/index"));
 router.use("/notifications", require("./notification/index"));
 router.use("/rbac", require("./rbac/index"));
+router.use("/email", require("./email/index"));
 module.exports = router;

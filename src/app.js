@@ -6,11 +6,11 @@ const logCustom = require("./logger/logCustom");
 const { v4: uuidv4 } = require("uuid");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger/swagger-output.json");
+const { sendEmailVerify } = require("./services/email.service");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
 require("./configs/redis.config");
 app.use(cors());
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

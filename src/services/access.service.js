@@ -16,9 +16,27 @@ const { createTokenPair } = require("../auth/authUtil");
 const { keyTokenModel } = require("../models/keyToken.model");
 const { default: mongoose } = require("mongoose");
 const { isObjectId } = require("../utils/validateType");
+const { sendEmailVerify } = require("./email.service");
+const { checkOtpToken } = require("./otp.service");
+const { deleteOtpByEmail } = require("../models/repositories/email.repo");
 
 const saltRounds = 10;
 class AccessService {
+  static async verifyUser({ email, otp }) {
+    const foundUser = await findUserByEmail(email);
+    if (foundUser.user_isVerify) {
+      throw new BadRequestError("Account has been verified!");
+    }
+    const checkOtp = await checkOtpToken(otp);
+    if (checkOtp) {
+      const updateVerify = await userModel.updateOne(
+        { user_email: email },
+        { user_isVerify: true }
+      );
+      await deleteOtpByEmail(email);
+      return updateVerify;
+    } else throw new BadRequestError("OTP incorrect!");
+  }
   static async handleToken(user, keyToken, refreshToken) {
     if (!refreshToken) throw new NotFoundError("Missing refreshToken!");
     if (keyToken.refreshTokenUsed.includes(refreshToken)) {
@@ -132,6 +150,7 @@ class AccessService {
         message: "Key Token Error!",
       };
     }
+    await sendEmailVerify({ email: newUser.user_email, name: "email-verify" });
     return {
       user: getInfoData({
         object: newUser,

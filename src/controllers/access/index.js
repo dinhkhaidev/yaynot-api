@@ -35,5 +35,14 @@ class AccessController {
       ),
     }).send(res);
   };
+  verifyOtp = async (req, res, next) => {
+    new OK({
+      message: "Verify otp successful!",
+      metadata: await AccessService.verifyUser({
+        email: req.user.email,
+        otp: req.query.otp,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new AccessController();
