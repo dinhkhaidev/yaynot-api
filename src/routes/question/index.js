@@ -5,6 +5,7 @@ const asyncHandle = require("../../helpers/asyncHandle");
 const {
   createQuestionSchema,
   updateQuestionSchema,
+  visibilitySchema,
 } = require("../../validations/Joi/question.validation");
 const { validate } = require("../../middlewares/validate");
 const { checkOwnership } = require("../../middlewares/checkOwnership");
@@ -56,10 +57,21 @@ router.post(
   "/status/:questionId",
   checkOwnership({
     model: questionModel,
-    param: "body",
+    param: "params",
     resultId: "questionId",
     ownerField: "userId",
   }),
   asyncHandle(QuestionController.changeQuestionStatus)
+);
+router.post(
+  "/visibility/:questionId",
+  validate(visibilitySchema),
+  checkOwnership({
+    model: questionModel,
+    param: "params",
+    resultId: "questionId",
+    ownerField: "userId",
+  }),
+  asyncHandle(QuestionController.changeVisibilityQuestion)
 );
 module.exports = router;

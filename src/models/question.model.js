@@ -12,6 +12,11 @@ const questionSchema = new mongoose.Schema(
       enum: Object.values(statusQuestion),
       default: "draft",
     },
+    visibility: {
+      type: String,
+      enum: ["public", "friend", "follower", "private"],
+      default: "private",
+    },
     moderationStatus: {
       type: String,
       enum: ["ok", "warn", "ban"],
@@ -25,7 +30,7 @@ const questionSchema = new mongoose.Schema(
       ref: "user",
     },
     shortTag: { type: [String], default: [] },
-    //fast for queue
+    //fast for query
     // voteYesCount: { type: Number, default: 0 },
     // voteNoCount: { type: Number, default: 0 },
     // commentCount: { type: Number, default: 0 },

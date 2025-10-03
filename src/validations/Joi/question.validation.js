@@ -12,4 +12,13 @@ const updateQuestionSchema = Joi.object({
   image: Joi.array().items(Joi.string()),
   tags: Joi.array().items(Joi.string()),
 });
-module.exports = { createQuestionSchema, updateQuestionSchema };
+const visibilitySchema = Joi.object({
+  visibility: Joi.string()
+    .valid("public", "friend", "follower", "private")
+    .required(),
+});
+module.exports = {
+  createQuestionSchema,
+  updateQuestionSchema,
+  visibilitySchema,
+};

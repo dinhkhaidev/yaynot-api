@@ -71,7 +71,22 @@ class QuestionController {
       message: "Change status for question successful!",
       metadata: await QuestionService.changeQuestionStatusFactory({
         resource: req.resource,
-        payload: req.body,
+        payload: {
+          questionId: req.params.questionId,
+          newStatus: req.body.newStatus,
+        },
+      }),
+    }).send(res);
+  };
+  changeVisibilityQuestion = async (req, res, next) => {
+    new OK({
+      message: "Change visibility for question successful!",
+      metadata: await QuestionService.changeVisibilityQuestion({
+        resource: req.resource,
+        payload: {
+          questionId: req.params.questionId,
+          visibility: req.body.visibility,
+        },
       }),
     }).send(res);
   };

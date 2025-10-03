@@ -15,6 +15,7 @@ const {
   draftForQuestionInDB,
   archiveForQuestionInDB,
   getAllStatusQuestionInDB,
+  changeVisibilityQuestionInDB,
 } = require("../models/repositories/question.repo");
 const {
   validateUpdateQuestionPayload,
@@ -25,7 +26,10 @@ const { getInfoData } = require("../utils");
 const { isObjectId } = require("../utils/validateType");
 const statusQuestion = require("../constants/statusQuestion");
 const TagService = require("./tag.service");
-
+const statusMapping = {
+  private: "archive",
+  public: "publish",
+};
 class QuestionService {
   static async createQuestion({ title, content, topicId, userId, tags }) {
     if (!userId) throw new NotFoundError("User ID is required!");
@@ -150,7 +154,7 @@ class QuestionService {
     const { questionId, newStatus } = payload;
     if (resource && resource.status === newStatus)
       throw new BadRequestError(
-        `Don't any change because status is ${newStatus}!`
+        `No changes applied. Visibility is already ${newStatus}!`
       );
     if (!Object.values(statusQuestion).includes(newStatus))
       throw new NotFoundError(`Type question ${newStatus} not exist!`);
@@ -179,6 +183,32 @@ class QuestionService {
   static async archiveStatus(questionId) {
     await TagService.publicTagStatus({ questionId, type: false });
     return await archiveForQuestionInDB(questionId);
+  }
+  static async changeVisibilityQuestion({ resource, payload }) {
+    const { questionId, visibility } = payload;
+    if (resource.status === "draft") {
+      throw new BadRequestError(
+        "You must publish this question before changing visibility."
+      );
+    }
+    if (resource.visibility === visibility)
+      throw new BadRequestError(
+        `No changes applied. Visibility is already ${visibility}!`
+      );
+
+    if (visibility === "private") {
+      await this.changeQuestionStatusFactory({
+        resource,
+        payload: { questionId, newStatus: statusMapping.private },
+      });
+      return await changeVisibilityQuestionInDB(questionId, visibility);
+    } else if (resource.status === "archive") {
+      await this.changeQuestionStatusFactory({
+        resource,
+        payload: { questionId, newStatus: statusMapping.public },
+      });
+    }
+    return await changeVisibilityQuestionInDB(questionId, visibility);
   }
 }
 

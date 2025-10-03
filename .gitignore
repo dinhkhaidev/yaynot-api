@@ -5,3 +5,4 @@ src/tests
 .env
 test
 src/logs/result/
+/md-docs

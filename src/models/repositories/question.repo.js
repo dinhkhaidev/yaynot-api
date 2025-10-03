@@ -62,16 +62,29 @@ const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
 };
 const publishForQuestionInDB = async (id) => {
   return await questionModel
-    .findByIdAndUpdate(id, { status: "publish" })
+    .findByIdAndUpdate(id, { status: "publish", visibility: "public" })
     .lean();
 };
 const draftForQuestionInDB = async (id) => {
-  return await questionModel.findByIdAndUpdate(id, { status: "draft" }).lean();
+  return await questionModel
+    .findByIdAndUpdate(id, { status: "draft", visibility: "private" })
+    .lean();
 };
 const archiveForQuestionInDB = async (id) => {
   return await questionModel
-    .findByIdAndUpdate(id, { status: "archive" })
+    .findByIdAndUpdate(id, { status: "archive", visibility: "private" })
     .lean();
+};
+const changeVisibilityQuestionInDB = async (id, type) => {
+  return await questionModel.findByIdAndUpdate(
+    id,
+    {
+      visibility: type,
+    },
+    {
+      new: true,
+    }
+  );
 };
 module.exports = {
   createQuestionInDB,
@@ -84,4 +97,5 @@ module.exports = {
   publishForQuestionInDB,
   draftForQuestionInDB,
   archiveForQuestionInDB,
+  changeVisibilityQuestionInDB,
 };
