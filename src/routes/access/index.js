@@ -9,6 +9,7 @@ const {
   logoutUserSchema,
 } = require("../../validations/Joi/user.validation");
 const { authentication } = require("../../auth/authUtil");
+const loggerMiddleware = require("../../middlewares/logger.middleware");
 router.post(
   "/register",
   validate(createUserSchema),
@@ -21,6 +22,7 @@ router.post(
 );
 //middleware check auth
 router.use(authentication);
+router.use(loggerMiddleware());
 router.post(
   "/logout",
   validate(logoutUserSchema),

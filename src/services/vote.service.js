@@ -1,5 +1,4 @@
-const Redis = require("ioredis");
-const redis = new Redis();
+const redis = require("../configs/redis.config");
 const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
   findVoteByUserAndQuestionInDB,

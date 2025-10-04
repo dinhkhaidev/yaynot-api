@@ -46,7 +46,7 @@ class UserProfileService {
     await cacheRepo.set(
       key,
       JSON.stringify({ ...userProfileRecord, username: name }),
-      1800
+      180
     );
     return { ...userProfileRecord, username: name };
   }

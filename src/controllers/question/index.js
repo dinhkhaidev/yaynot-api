@@ -1,7 +1,8 @@
 const { CREATED, OK } = require("../../core/success.response");
 const QuestionService = require("../../services/question.service");
-
+const BookmarkService = require("../../services/bookmark.service");
 class QuestionController {
+  //question methods
   createQuestion = async (req, res, next) => {
     new CREATED({
       message: "Create question successful!",
@@ -66,6 +67,7 @@ class QuestionController {
       }),
     }).send(res);
   };
+  //pivacy control
   changeQuestionStatus = async (req, res, next) => {
     new OK({
       message: "Change status for question successful!",
@@ -87,6 +89,36 @@ class QuestionController {
           questionId: req.params.questionId,
           visibility: req.body.visibility,
         },
+      }),
+    }).send(res);
+  };
+
+  // Bookmark methods
+  bookmarkQuestion = async (req, res, next) => {
+    new CREATED({
+      message: "Bookmark question successful!",
+      metadata: await BookmarkService.createBookmark({
+        userId: req.user.user_id,
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
+
+  unbookmarkQuestion = async (req, res, next) => {
+    new OK({
+      message: "Unbookmark question successful!",
+      metadata: await BookmarkService.deleteBookmark({
+        userId: req.user.user_id,
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
+
+  getListBookmark = async (req, res, next) => {
+    new OK({
+      message: "Get list bookmark successful!",
+      metadata: await BookmarkService.getListBookmark({
+        userId: req.user.user_id,
       }),
     }).send(res);
   };

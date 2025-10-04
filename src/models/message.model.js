@@ -20,4 +20,6 @@ const messageSchema = new mongoose.Schema(
     collection: COLLECTION_NAME,
   }
 );
+messageSchema.index({ convoId: 1, createdAt: -1 });
+messageSchema.index({ convoId: 1, updatedAt: -1 });
 module.exports = mongoose.model(DOCUMENT_NAME, messageSchema);

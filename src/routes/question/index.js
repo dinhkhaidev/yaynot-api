@@ -10,6 +10,7 @@ const {
 const { validate } = require("../../middlewares/validate");
 const { checkOwnership } = require("../../middlewares/checkOwnership");
 const questionModel = require("../../models/question.model");
+const { bookmarkSchema } = require("../../validations/Joi/bookmark.validation");
 router.post(
   "/",
   validate(createQuestionSchema),
@@ -74,4 +75,15 @@ router.post(
   }),
   asyncHandle(QuestionController.changeVisibilityQuestion)
 );
+router.post(
+  "/:questionId/bookmark",
+  validate(bookmarkSchema, "params"),
+  asyncHandle(QuestionController.bookmarkQuestion)
+);
+router.delete(
+  "/:questionId/bookmark",
+  validate(bookmarkSchema, "params"),
+  asyncHandle(QuestionController.unbookmarkQuestion)
+);
+router.get("/me/bookmarks", asyncHandle(QuestionController.getListBookmark));
 module.exports = router;

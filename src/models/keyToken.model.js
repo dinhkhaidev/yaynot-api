@@ -29,6 +29,8 @@ const blackListSchema = new mongoose.Schema(
     collection: "blacklists",
   }
 );
+keyTokenSchema.index({ user_id: 1 }, { unique: true });
+blackListSchema.index({ token: 1 });
 module.exports = {
   keyTokenModel: mongoose.model(DOCUMENT_NAME, keyTokenSchema),
   blackListModel: mongoose.model("blackList", blackListSchema),
