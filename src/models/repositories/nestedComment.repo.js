@@ -9,10 +9,10 @@ const createCommentInDB = async (payload) => {
 const findCommentInDB = async (commentId) => {
   return await nestedComment.findById(commentId);
 };
-const findCommentParentInDB = async (questionId) => {
+const findCommentParentInDB = async (commentParentId) => {
   return await nestedComment
     .findOne({
-      questionId: questionId,
+      _id: commentParentId,
     })
     .lean();
 };

@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger/swagger-output.json");
 const { sendEmailVerify } = require("./services/email.service");
+const asyncViewCronjob = require("./cronjob/question/asyncView.cron");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
 require("./configs/redis.config");
@@ -21,6 +22,10 @@ app.use((req, res, next) => {
   res.header("X-XSS-Protection", "1; mode=block");
   next();
 });
+//cronjob async data
+asyncViewCronjob({ patternKeyViewQuestion: "question:*:view", mode: "start" });
+
+//routes
 app.use("/v1", require("./routes/index"));
 app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
 //swagger

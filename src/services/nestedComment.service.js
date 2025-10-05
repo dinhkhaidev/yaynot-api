@@ -26,6 +26,7 @@ const { nestedComment } = require("../models/nestedComment.model");
 const {
   commentServiceValidate,
 } = require("../validations/service/commentService.validate");
+const { voteSummaryModel } = require("../models/vote.model");
 
 class CommentService {
   static async createComment({
@@ -65,6 +66,17 @@ class CommentService {
       createComment.right = rightValue + 1;
     }
     await createComment.save();
+    await voteSummaryModel.findOneAndUpdate(
+      { questionId: questionId },
+      {
+        $inc: {
+          commentCount: 1,
+        },
+      },
+      {
+        upsert: true,
+      }
+    );
     return createComment;
   }
   static async getListComment({
@@ -114,6 +126,17 @@ class CommentService {
       { questionId: questionId, left: { $gte: right } },
       {
         $inc: { left: -right },
+      }
+    );
+    await voteSummaryModel.findOneAndUpdate(
+      { questionId: questionId },
+      {
+        $inc: {
+          commentCount: -1,
+        },
+      },
+      {
+        upsert: true,
       }
     );
     return deleteComment;

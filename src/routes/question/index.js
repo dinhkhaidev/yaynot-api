@@ -86,4 +86,8 @@ router.delete(
   asyncHandle(QuestionController.unbookmarkQuestion)
 );
 router.get("/me/bookmarks", asyncHandle(QuestionController.getListBookmark));
+router.post(
+  "/:questionId/view",
+  asyncHandle(QuestionController.countViewQuestion)
+);
 module.exports = router;

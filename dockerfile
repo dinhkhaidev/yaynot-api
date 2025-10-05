@@ -12,4 +12,4 @@ FROM node:24-alpine3.21 AS runner
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=builder /app ./
 EXPOSE 8888
-CMD [ "node", "server.js" ]
+CMD npm run initdb && npm start

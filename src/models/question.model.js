@@ -29,6 +29,7 @@ const questionSchema = new mongoose.Schema(
       required: true,
       ref: "user",
     },
+    view: { type: Number, default: 0 },
     shortTag: { type: [String], default: [] },
     //fast for query
     // voteYesCount: { type: Number, default: 0 },

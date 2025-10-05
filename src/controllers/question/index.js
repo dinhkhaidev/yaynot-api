@@ -122,5 +122,13 @@ class QuestionController {
       }),
     }).send(res);
   };
+  countViewQuestion = async (req, res, next) => {
+    new OK({
+      message: "Count view question successful!",
+      metadata: await QuestionService.countViewQuestion({
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new QuestionController();
