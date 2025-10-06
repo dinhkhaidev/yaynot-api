@@ -2,6 +2,7 @@ const {
   buildResultCursorBased,
 } = require("../../helpers/buildResultCursorBased");
 const { getSelectData, getUnselectData } = require("../../utils");
+const careQuestionModel = require("../careQuestion.model");
 const questionModel = require("../question.model");
 
 const createQuestionInDB = async (payload) => {
@@ -86,6 +87,28 @@ const changeVisibilityQuestionInDB = async (id, type) => {
     }
   );
 };
+//care question
+const careQuestionInDB = async ({ userId, questionId }) => {
+  return await careQuestionModel.create({
+    userId,
+    questionId,
+  });
+};
+const unCareQuestionInDB = async ({ userId, questionId }) => {
+  return await careQuestionModel.updateOne(
+    {
+      userId,
+      questionId,
+    },
+    {
+      isDeleted: true,
+    }
+  );
+};
+const getListCareQuestionByUser = async ({ userId }) => {
+  //handle sort, cursor,...
+  return await careQuestionModel.find({ userId }).lean();
+};
 module.exports = {
   createQuestionInDB,
   updateQuestionInDB,
@@ -98,4 +121,7 @@ module.exports = {
   draftForQuestionInDB,
   archiveForQuestionInDB,
   changeVisibilityQuestionInDB,
+  careQuestionInDB,
+  unCareQuestionInDB,
+  getListCareQuestionByUser,
 };

@@ -130,5 +130,33 @@ class QuestionController {
       }),
     }).send(res);
   };
+  //care question
+  careQuestion = async (req, res, next) => {
+    new CREATED({
+      message: "Care question successful!",
+      metadata: await QuestionService.careQuestion({
+        userId: req.user.user_id,
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
+  uncareQuestion = async (req, res, next) => {
+    new OK({
+      message: "Uncare question successful!",
+      metadata: await QuestionService.uncareQuestion({
+        userId: req.user.user_id,
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
+  getListCareQuestionByUser = async (req, res, next) => {
+    new OK({
+      message: "Get list care question by user successful!",
+      metadata: await QuestionService.getListCareQuestionByUser({
+        userId: req.user.user_id,
+        ...req.query,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new QuestionController();

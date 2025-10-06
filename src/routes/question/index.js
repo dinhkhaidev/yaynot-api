@@ -90,4 +90,14 @@ router.post(
   "/:questionId/view",
   asyncHandle(QuestionController.countViewQuestion)
 );
+//care question
+router.post("/:questionId/care", asyncHandle(QuestionController.careQuestion));
+router.delete(
+  "/:questionId/uncare",
+  asyncHandle(QuestionController.uncareQuestion)
+);
+router.get(
+  "/me/care-questions",
+  asyncHandle(QuestionController.getListCareQuestionByUser)
+);
 module.exports = router;
