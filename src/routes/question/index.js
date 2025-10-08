@@ -86,9 +86,14 @@ router.delete(
   asyncHandle(QuestionController.unbookmarkQuestion)
 );
 router.get("/me/bookmarks", asyncHandle(QuestionController.getListBookmark));
+//count data with cache redis
 router.post(
   "/:questionId/view",
   asyncHandle(QuestionController.countViewQuestion)
+);
+router.post(
+  "/:questionId/share",
+  asyncHandle(QuestionController.countShareQuestion)
 );
 //care question
 router.post("/:questionId/care", asyncHandle(QuestionController.careQuestion));

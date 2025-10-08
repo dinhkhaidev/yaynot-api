@@ -158,5 +158,13 @@ class QuestionController {
       }),
     }).send(res);
   };
+  countShareQuestion = async (req, res, next) => {
+    new OK({
+      message: "Count share question successful!",
+      metadata: await QuestionService.countShareQuestion({
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new QuestionController();

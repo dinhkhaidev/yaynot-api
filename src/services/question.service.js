@@ -29,6 +29,8 @@ const TagService = require("./tag.service");
 const {
   keyFlushViewQuestion,
   keyViewQuestion,
+  keyShareQuestion,
+  keyFlushShareQuestion,
 } = require("../utils/cacheRedis");
 const { get, setnx, incr } = require("../models/repositories/cache.repo");
 const statusMapping = {
@@ -249,6 +251,30 @@ class QuestionService {
       const questionFound = await findQuestionById(questionId);
       await setnx(keyQuestion, questionFound.view, 1800);
       await setnx(keyFlush, questionFound.view, 3600);
+    }
+    const newCount = await incr(keyQuestion);
+    return newCount;
+  }
+  static async countShareQuestion({ questionId }) {
+    const foundQuestion = await validateFindQuestionById(questionId, {
+      returnRecord: true,
+    });
+    if (
+      foundQuestion.status === "draft" ||
+      foundQuestion.visibility === "private" ||
+      foundQuestion.moderationStatus === "ban" ||
+      foundQuestion.isDeleted
+    ) {
+      throw new BadRequestError("Question not valid!");
+    }
+    const keyQuestion = keyShareQuestion(questionId);
+    console.log("keyQuestion", keyQuestion);
+    const keyFlush = keyFlushShareQuestion(questionId);
+    const cached = await get(keyQuestion);
+    if (!cached) {
+      const questionFound = await findQuestionById(questionId);
+      await setnx(keyQuestion, questionFound.shareCount, 1800);
+      await setnx(keyFlush, questionFound.shareCount, 3600);
     }
     const newCount = await incr(keyQuestion);
     return newCount;

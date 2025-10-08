@@ -11,9 +11,17 @@ const keyViewQuestion = (question_id) => {
 const keyFlushViewQuestion = (question_id) => {
   return `flushed:${question_id}:view`;
 };
+const keyShareQuestion = (question_id) => {
+  return `question:${question_id}:share`;
+};
+const keyFlushShareQuestion = (question_id) => {
+  return `flushed:${question_id}:share`;
+};
 module.exports = {
   keyProfile,
   keyProfilePrivate,
   keyViewQuestion,
   keyFlushViewQuestion,
+  keyShareQuestion,
+  keyFlushShareQuestion,
 };

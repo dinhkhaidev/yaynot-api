@@ -30,6 +30,7 @@ const questionSchema = new mongoose.Schema(
       ref: "user",
     },
     view: { type: Number, default: 0 },
+    shareCount: { type: Number, default: 0 },
     shortTag: { type: [String], default: [] },
     //fast for query
     // voteYesCount: { type: Number, default: 0 },

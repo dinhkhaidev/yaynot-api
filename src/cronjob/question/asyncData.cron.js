@@ -2,22 +2,26 @@ require("dotenv").config();
 const cron = require("node-cron");
 const { keys, get, set } = require("../../models/repositories/cache.repo");
 const questionModel = require("../../models/question.model");
-const { keyFlushViewQuestion } = require("../../utils/cacheRedis");
 require("../../configs/redis.config");
-const asyncViewCronjob = async ({ patternKeyViewQuestion, mode = "start" }) => {
+const asyncDataCronjob = async ({
+  patternKey,
+  mode = "start",
+  keyFlushFunc,
+  fieldData,
+}) => {
   const task = cron.schedule(
     "*/10 * * * *",
     async () => {
       //after handle: Update distribute lock for cronjob, avoid error race condition
       //handle logic cronjob, batch or all
-      await keys(patternKeyViewQuestion).then(async (keys) => {
+      await keys(patternKey).then(async (keys) => {
         for (const key of keys) {
-          const keyFlushValue = keyFlushViewQuestion(key.split(":")[1]);
+          const keyFlushValue = keyFlushFunc(key.split(":")[1]);
           const keyView = await get(key);
           const keyFlush = (await get(keyFlushValue)) || keyView;
           await questionModel.updateOne(
             { _id: key.split(":")[1] },
-            { $inc: { view: parseInt(keyView - keyFlush, 10) || 0 } }
+            { $inc: { [fieldData]: parseInt(keyView - keyFlush, 10) || 0 } }
           );
           await set(keyFlushValue, keyView, 3600);
         }
@@ -28,12 +32,12 @@ const asyncViewCronjob = async ({ patternKeyViewQuestion, mode = "start" }) => {
     }
   );
   if (mode === "start" && typeof task[mode] === "function") {
-    console.log("Cronjob view start");
+    console.log(`Cronjob ${fieldData} start `);
     task[mode]();
   } else if (mode === "stop" && typeof task[mode] === "function") {
-    console.log("Cronjob view close");
+    console.log(`Cronjob ${fieldData} close, turn on to use!`);
   } else {
-    console.log(`Invalid mode: ${mode}`);
+    console.log(`Invalid mode: ${mode} in ${fieldData} cronjob`);
   }
 };
-module.exports = asyncViewCronjob;
+module.exports = asyncDataCronjob;

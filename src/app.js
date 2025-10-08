@@ -8,6 +8,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger/swagger-output.json");
 const { sendEmailVerify } = require("./services/email.service");
 const asyncViewCronjob = require("./cronjob/question/asyncView.cron");
+const asyncDataCronjob = require("./cronjob/question/asyncData.cron");
+const { keyFlushShareQuestion } = require("./utils/cacheRedis");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
 require("./configs/redis.config");
@@ -24,6 +26,12 @@ app.use((req, res, next) => {
 });
 //cronjob async data
 asyncViewCronjob({ patternKeyViewQuestion: "question:*:view", mode: "start" });
+asyncDataCronjob({
+  patternKey: "question:*:share",
+  mode: "start",
+  keyFlushFunc: keyFlushShareQuestion,
+  fieldData: "shareCount",
+});
 
 //routes
 app.use("/v1", require("./routes/index"));

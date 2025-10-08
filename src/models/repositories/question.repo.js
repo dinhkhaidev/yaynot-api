@@ -63,17 +63,35 @@ const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
 };
 const publishForQuestionInDB = async (id) => {
   return await questionModel
-    .findByIdAndUpdate(id, { status: "publish", visibility: "public" })
+    .findByIdAndUpdate(
+      id,
+      { status: "publish", visibility: "public" },
+      {
+        new: true,
+      }
+    )
     .lean();
 };
 const draftForQuestionInDB = async (id) => {
   return await questionModel
-    .findByIdAndUpdate(id, { status: "draft", visibility: "private" })
+    .findByIdAndUpdate(
+      id,
+      { status: "draft", visibility: "private" },
+      {
+        new: true,
+      }
+    )
     .lean();
 };
 const archiveForQuestionInDB = async (id) => {
   return await questionModel
-    .findByIdAndUpdate(id, { status: "archive", visibility: "private" })
+    .findByIdAndUpdate(
+      id,
+      { status: "archive", visibility: "private" },
+      {
+        new: true,
+      }
+    )
     .lean();
 };
 const changeVisibilityQuestionInDB = async (id, type) => {
