@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
-const { BadRequestError, NotFoundError } = require("../core/error.response");
-const { findUserById } = require("../models/repositories/access.repo");
+const { BadRequestError, NotFoundError } = require("../../core/error.response");
+const { findUserById } = require("../../models/repositories/access.repo");
 const {
   createQuestionInDB,
   findQuestionById,
@@ -16,23 +16,24 @@ const {
   archiveForQuestionInDB,
   getAllStatusQuestionInDB,
   changeVisibilityQuestionInDB,
-} = require("../models/repositories/question.repo");
+} = require("../../models/repositories/question.repo");
 const {
   validateUpdateQuestionPayload,
   validateIdQuestionPayload,
   validateFindQuestionById,
-} = require("../validations/service/questionService.validate");
-const { getInfoData } = require("../utils");
-const { isObjectId } = require("../utils/validateType");
-const statusQuestion = require("../constants/statusQuestion");
-const TagService = require("./tag.service");
+} = require("../../validations/service/questionService.validate");
+const { getInfoData } = require("../../utils");
+const { isObjectId } = require("../../utils/validateType");
+const statusQuestion = require("../../constants/statusQuestion");
+const TagService = require("../tag.service");
 const {
   keyFlushViewQuestion,
   keyViewQuestion,
   keyShareQuestion,
   keyFlushShareQuestion,
-} = require("../utils/cacheRedis");
-const { get, setnx, incr } = require("../models/repositories/cache.repo");
+} = require("../../utils/cacheRedis");
+const { get, setnx, incr } = require("../../models/repositories/cache.repo");
+const HistoryQuestionService = require("./extensions/history.service");
 const statusMapping = {
   private: "archive",
   public: "publish",
@@ -64,11 +65,21 @@ class QuestionService {
   }
 
   static async updateQuestion(payload) {
-    const { id, userId } = payload;
+    const { id, userId, questionRecord } = payload;
     validateUpdateQuestionPayload(id, userId);
     const userRecord = await findUserById(userId);
     if (!userRecord) throw new NotFoundError("User not found!");
     const questionData = await updateQuestionInDB(id, payload);
+    await HistoryQuestionService.upsertHistoryQuestion({
+      questionId: id,
+      userId,
+      metadata: {
+        title: questionRecord.title,
+        content: questionRecord.content,
+        topicId: questionRecord.topicId,
+        shortTag: questionRecord.shortTag,
+      },
+    });
     return questionData;
   }
 

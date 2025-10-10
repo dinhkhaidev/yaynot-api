@@ -4,6 +4,7 @@ const {
 const { getSelectData, getUnselectData } = require("../../utils");
 const careQuestionModel = require("../careQuestion.model");
 const questionModel = require("../question.model");
+const questionHistoryModel = require("../questionHistory.model");
 
 const createQuestionInDB = async (payload) => {
   return await questionModel.create(payload);
@@ -123,9 +124,25 @@ const unCareQuestionInDB = async ({ userId, questionId }) => {
     }
   );
 };
-const getListCareQuestionByUser = async ({ userId }) => {
+const getListCareQuestionByUserInDB = async ({ userId }) => {
   //handle sort, cursor,...
   return await careQuestionModel.find({ userId }).lean();
+};
+const findHistoryQuestionByQuestionId = async (questionId) => {
+  return await questionHistoryModel.find({ questionId }).lean();
+};
+const createHistoryQuestionInDB = async ({
+  questionId,
+  userId,
+  metadata,
+  version,
+}) => {
+  return await questionHistoryModel.create({
+    questionId,
+    userId,
+    metadata,
+    version,
+  });
 };
 module.exports = {
   createQuestionInDB,
@@ -141,5 +158,7 @@ module.exports = {
   changeVisibilityQuestionInDB,
   careQuestionInDB,
   unCareQuestionInDB,
-  getListCareQuestionByUser,
+  getListCareQuestionByUserInDB,
+  findHistoryQuestionByQuestionId,
+  createHistoryQuestionInDB,
 };

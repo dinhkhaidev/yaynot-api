@@ -105,4 +105,9 @@ router.get(
   "/me/care-questions",
   asyncHandle(QuestionController.getListCareQuestionByUser)
 );
+//history question
+router.get(
+  "/:questionId/history",
+  asyncHandle(QuestionController.getHistoryQuestion)
+);
 module.exports = router;

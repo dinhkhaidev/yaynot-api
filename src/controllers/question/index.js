@@ -1,6 +1,8 @@
 const { CREATED, OK } = require("../../core/success.response");
-const QuestionService = require("../../services/question.service");
+const QuestionService = require("../../services/question/question.service");
 const BookmarkService = require("../../services/bookmark.service");
+const HistoryQuestionService = require("../../services/question/extensions/history.service");
+const CareQuestionService = require("../../services/question/extensions/care.service");
 class QuestionController {
   //question methods
   createQuestion = async (req, res, next) => {
@@ -17,6 +19,7 @@ class QuestionController {
       message: "Update question successful!",
       metadata: await QuestionService.updateQuestion({
         ...req.body,
+        questionRecord: req.resource,
         id: req.params.id,
         userId: req.user.user_id,
       }),
@@ -134,7 +137,7 @@ class QuestionController {
   careQuestion = async (req, res, next) => {
     new CREATED({
       message: "Care question successful!",
-      metadata: await QuestionService.careQuestion({
+      metadata: await CareQuestionService.careQuestion({
         userId: req.user.user_id,
         questionId: req.params.questionId,
       }),
@@ -143,7 +146,7 @@ class QuestionController {
   uncareQuestion = async (req, res, next) => {
     new OK({
       message: "Uncare question successful!",
-      metadata: await QuestionService.uncareQuestion({
+      metadata: await CareQuestionService.uncareQuestion({
         userId: req.user.user_id,
         questionId: req.params.questionId,
       }),
@@ -152,7 +155,7 @@ class QuestionController {
   getListCareQuestionByUser = async (req, res, next) => {
     new OK({
       message: "Get list care question by user successful!",
-      metadata: await QuestionService.getListCareQuestionByUser({
+      metadata: await CareQuestionService.getListCareQuestionByUser({
         userId: req.user.user_id,
         ...req.query,
       }),
@@ -162,6 +165,15 @@ class QuestionController {
     new OK({
       message: "Count share question successful!",
       metadata: await QuestionService.countShareQuestion({
+        questionId: req.params.questionId,
+      }),
+    }).send(res);
+  };
+  //history question
+  getHistoryQuestion = async (req, res, next) => {
+    new OK({
+      message: "Get history question successful!",
+      metadata: await HistoryQuestionService.getHistoryQuestion({
         questionId: req.params.questionId,
       }),
     }).send(res);
