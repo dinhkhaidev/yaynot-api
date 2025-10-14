@@ -10,9 +10,29 @@ const { sendEmailVerify } = require("./services/email.service");
 const asyncViewCronjob = require("./cronjob/question/asyncView.cron");
 const asyncDataCronjob = require("./cronjob/question/asyncData.cron");
 const { keyFlushShareQuestion } = require("./utils/cacheRedis");
+const { initRedis } = require("./databases/init.redis");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
-require("./configs/redis.config");
+// require("./configs/redis.config");
+initRedis()
+  .then(() => {
+    console.log("Redis initialized successfully, starting cron jobs...");
+    //cronjob async data
+    asyncViewCronjob({
+      patternKeyViewQuestion: "question:*:view",
+      mode: "start",
+    });
+    asyncDataCronjob({
+      patternKey: "question:*:share",
+      mode: "start",
+      keyFlushFunc: keyFlushShareQuestion,
+      fieldData: "shareCount",
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to initialize Redis:", error);
+  });
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -23,14 +43,6 @@ app.use((req, res, next) => {
   res.header("X-Frame-Options", "DENY");
   res.header("X-XSS-Protection", "1; mode=block");
   next();
-});
-//cronjob async data
-asyncViewCronjob({ patternKeyViewQuestion: "question:*:view", mode: "start" });
-asyncDataCronjob({
-  patternKey: "question:*:share",
-  mode: "start",
-  keyFlushFunc: keyFlushShareQuestion,
-  fieldData: "shareCount",
 });
 
 //routes

@@ -11,7 +11,12 @@ class Mongodb {
   }
   async connect() {
     try {
-      await mongoose.connect(stringUrl);
+      await mongoose.connect(stringUrl, {
+        maxPoolSize:
+          process.env.NODE_ENV === "developer"
+            ? parseInt(process.env.POOL_SIZE_MONGODB_DEV)
+            : parseInt(process.env.POOL_SIZE_MONGODB_PRODUCTION),
+      });
       console.log("Connect mongodb success!");
     } catch (error) {
       console.log("Not connect to mongodb!", error);

@@ -1,4 +1,6 @@
-const redis = require("../configs/redis.config");
+// const redis = require("../configs/redis.config");
+const { getRedis } = require("../databases/init.redis");
+const redis = getRedis();
 const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
   findVoteByUserAndQuestionInDB,
