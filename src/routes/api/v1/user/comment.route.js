@@ -1,19 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const NestedCommentController = require("../../controllers/nestedComment/index");
-const asyncHandle = require("../../helpers/asyncHandle");
-const { validate } = require("../../middlewares/validate");
+const NestedCommentController = require("../../../../controllers/nestedComment/index");
+const asyncHandle = require("../../../../helpers/asyncHandle");
+const { validate } = require("../../../../middlewares/validate");
+const { checkOwnership } = require("../../../../middlewares/checkOwnership");
+const { nestedComment } = require("../../../../models/nestedComment.model");
 const {
   createCommentSchema,
-} = require("../../validations/Joi/comment.validation");
-const { checkOwnership } = require("../../middlewares/checkOwnership");
-const { nestedComment } = require("../../models/nestedComment.model");
+} = require("../../../../validations/Joi/comment.validation");
+
 router.post(
   "/",
   validate(createCommentSchema),
   asyncHandle(NestedCommentController.createComment)
 );
 router.get("/", asyncHandle(NestedCommentController.getListComment));
+
 router.patch(
   "/",
   checkOwnership({
@@ -24,6 +26,7 @@ router.patch(
   }),
   asyncHandle(NestedCommentController.updateComment)
 );
+
 router.delete(
   "/",
   checkOwnership({
@@ -34,6 +37,7 @@ router.delete(
   }),
   asyncHandle(NestedCommentController.deleteComment)
 );
+
 router.post(
   "/:commentId/like",
   asyncHandle(NestedCommentController.likeComment)
@@ -46,4 +50,5 @@ router.get(
   "/:commentId/likes",
   asyncHandle(NestedCommentController.getListLikeComment)
 );
+
 module.exports = router;

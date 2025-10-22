@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const asyncHandle = require("../../helpers/asyncHandle");
-const UserProfileController = require("../../controllers/userProfile/index");
+const asyncHandle = require("../../../../helpers/asyncHandle");
+const UserProfileController = require("../../../../controllers/userProfile/index");
+const { validate } = require("../../../../middlewares/validate");
 const {
   createUserProfileSchema,
   updateAvatarSchema,
-} = require("../../validations/Joi/userProfile.validation");
-const { validate } = require("../../middlewares/validate");
+} = require("../../../../validations/Joi/userProfile.validation");
+
 router.patch(
   "/",
   validate(createUserProfileSchema),
@@ -18,4 +19,5 @@ router.patch(
   validate(updateAvatarSchema),
   asyncHandle(UserProfileController.updateAvatar)
 );
+
 module.exports = router;

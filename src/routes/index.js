@@ -1,19 +1,6 @@
 const express = require("express");
-const { authentication } = require("../auth/authUtil");
-const loggerMiddleware = require("../middlewares/logger.middleware");
 const router = express.Router();
-router.use("/auth", require("./access/index"));
-router.use(loggerMiddleware());
-router.use("/tests", require("./test/index"));
-router.use(authentication);
-router.use("/questions", require("./question/index"));
-router.use("/comments", require("./nestedComment/index"));
-router.use("/votes", require("./vote/index"));
-router.use("/profiles", require("./userProfile/index"));
-router.use("/uploads", require("./upload/index"));
-router.use("/follows", require("./follow/index"));
-router.use("/chats", require("./chat/index"));
-router.use("/notifications", require("./notification/index"));
-router.use("/rbac", require("./rbac/index"));
-router.use("/email", require("./email/index"));
+
+router.use("/api", require("./api/index"));
+
 module.exports = router;

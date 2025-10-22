@@ -1,15 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const AccessController = require("../../controllers/access/index");
-const asyncHandle = require("../../helpers/asyncHandle");
-const { validate } = require("../../middlewares/validate");
+const AccessController = require("../../../../controllers/access/index");
+const asyncHandle = require("../../../../helpers/asyncHandle");
+const { validate } = require("../../../../middlewares/validate");
 const {
   createUserSchema,
   loginUserSchema,
   logoutUserSchema,
-} = require("../../validations/Joi/user.validation");
-const { authentication } = require("../../auth/authUtil");
-const loggerMiddleware = require("../../middlewares/logger.middleware");
+} = require("../../../../validations/Joi/user.validation");
+const { authentication } = require("../../../../auth/authUtil");
+const loggerMiddleware = require("../../../../middlewares/logger.middleware");
+
 router.post(
   "/register",
   validate(createUserSchema),
@@ -20,9 +21,10 @@ router.post(
   validate(loginUserSchema),
   asyncHandle(AccessController.login)
 );
-//middleware check auth
+
 router.use(authentication);
 router.use(loggerMiddleware());
+
 router.post(
   "/logout",
   validate(logoutUserSchema),
@@ -30,4 +32,5 @@ router.post(
 );
 router.post("/verify", asyncHandle(AccessController.verifyOtp));
 router.post("/refresh-token", asyncHandle(AccessController.handleToken));
+
 module.exports = router;

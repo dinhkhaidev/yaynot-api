@@ -1,21 +1,25 @@
 const express = require("express");
 const router = express.Router();
-const QuestionController = require("../../controllers/question/index");
-const asyncHandle = require("../../helpers/asyncHandle");
+const QuestionController = require("../../../../controllers/question/index");
+const asyncHandle = require("../../../../helpers/asyncHandle");
+const { validate } = require("../../../../middlewares/validate");
+const { checkOwnership } = require("../../../../middlewares/checkOwnership");
+const questionModel = require("../../../../models/question.model");
 const {
   createQuestionSchema,
   updateQuestionSchema,
   visibilitySchema,
-} = require("../../validations/Joi/question.validation");
-const { validate } = require("../../middlewares/validate");
-const { checkOwnership } = require("../../middlewares/checkOwnership");
-const questionModel = require("../../models/question.model");
-const { bookmarkSchema } = require("../../validations/Joi/bookmark.validation");
+} = require("../../../../validations/Joi/question.validation");
+const {
+  bookmarkSchema,
+} = require("../../../../validations/Joi/bookmark.validation");
+
 router.post(
   "/",
   validate(createQuestionSchema),
   asyncHandle(QuestionController.createQuestion)
 );
+
 router.post(
   "/:id",
   validate(updateQuestionSchema),
@@ -27,9 +31,11 @@ router.post(
   }),
   asyncHandle(QuestionController.updateQuestion)
 );
+
 router.get("/", asyncHandle(QuestionController.getListQuestion));
 router.get("/drafts", asyncHandle(QuestionController.getAllDraftQuestion));
 router.get("/:questionId", asyncHandle(QuestionController.getQuestionById));
+
 router.patch(
   "/:questionId",
   checkOwnership({
@@ -40,20 +46,12 @@ router.patch(
   }),
   asyncHandle(QuestionController.softDeleteQuestion)
 );
-router.delete(
-  "/:questionId",
-  checkOwnership({
-    model: questionModel,
-    param: "params",
-    resultId: "questionId",
-    ownerField: "userId",
-  }),
-  asyncHandle(QuestionController.hardDeleteQuestion)
-);
+
 router.get(
   "/publish/:questionId",
   asyncHandle(QuestionController.getAllPublishQuestion)
 );
+
 router.post(
   "/status/:questionId",
   checkOwnership({
@@ -64,6 +62,7 @@ router.post(
   }),
   asyncHandle(QuestionController.changeQuestionStatus)
 );
+
 router.post(
   "/visibility/:questionId",
   validate(visibilitySchema),
@@ -75,6 +74,7 @@ router.post(
   }),
   asyncHandle(QuestionController.changeVisibilityQuestion)
 );
+
 router.post(
   "/:questionId/bookmark",
   validate(bookmarkSchema, "params"),
@@ -86,7 +86,6 @@ router.delete(
   asyncHandle(QuestionController.unbookmarkQuestion)
 );
 router.get("/me/bookmarks", asyncHandle(QuestionController.getListBookmark));
-//count data with cache redis
 router.post(
   "/:questionId/view",
   asyncHandle(QuestionController.countViewQuestion)
@@ -95,7 +94,6 @@ router.post(
   "/:questionId/share",
   asyncHandle(QuestionController.countShareQuestion)
 );
-//care question
 router.post("/:questionId/care", asyncHandle(QuestionController.careQuestion));
 router.delete(
   "/:questionId/uncare",
@@ -105,9 +103,9 @@ router.get(
   "/me/care-questions",
   asyncHandle(QuestionController.getListCareQuestionByUser)
 );
-//history question
 router.get(
   "/:questionId/history",
   asyncHandle(QuestionController.getHistoryQuestion)
 );
+
 module.exports = router;

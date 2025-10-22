@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 });
 
 //routes
-app.use("/v1", require("./routes/index"));
+app.use("/", require("./routes/index"));
 app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
 //swagger
 app.get("/swagger-output.json", (req, res) => {

@@ -1,17 +1,12 @@
 const express = require("express");
-const asyncHandle = require("../../helpers/asyncHandle");
 const router = express.Router();
-const NotificationController = require("../../controllers/notification/index");
-const { validate } = require("../../middlewares/validate");
+const NotificationController = require("../../../../controllers/notification/index");
+const asyncHandle = require("../../../../helpers/asyncHandle");
+const { validate } = require("../../../../middlewares/validate");
 const {
   markAndDeleteNotificationSchema,
-  pushNotificationSchema,
-} = require("../../validations/Joi/notification.validation");
-router.post(
-  "/",
-  validate(pushNotificationSchema),
-  asyncHandle(NotificationController.pushNotification)
-); //check rbac (Admin send ALL)
+} = require("../../../../validations/Joi/notification.validation");
+
 router.get("/", asyncHandle(NotificationController.getListNotification));
 router.patch(
   "/marked/:notificationId",
@@ -23,4 +18,5 @@ router.delete(
   validate(markAndDeleteNotificationSchema),
   asyncHandle(NotificationController.deleteUserNotification)
 );
+
 module.exports = router;
