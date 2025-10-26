@@ -44,12 +44,11 @@ const rabbitmqConfig = require("../../configs/rabbitmq.config");
   await channel.assertExchange(exchangeDlxNoti, "direct", {
     durable: isProduction, //production must => durable:true
   });
-  await channel.assertQueue(queueDlxNoti.dlx, {
+  await channel.assertQueue(queueDlxNoti, {
     durable: isProduction,
   });
   await channel.bindQueue(queueDlxNoti, exchangeDlxNoti, keyDlxNoti);
   //close
   console.log("Setup rabbitmq config successful and close.");
-  // await channel.close();
-  // await connect.close();
+  await channel.close();
 })();

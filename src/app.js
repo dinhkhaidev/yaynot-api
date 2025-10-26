@@ -13,6 +13,7 @@ const { keyFlushShareQuestion } = require("./utils/cacheRedis");
 const { initRedis } = require("./databases/init.redis");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
+require("./message-queue/rabbitmq/setupRabbitmq");
 // require("./configs/redis.config");
 initRedis()
   .then(() => {

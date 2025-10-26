@@ -6,48 +6,52 @@ const connectRabbitMQ = require("../connectRabbitmq");
 const { default: mongoose } = require("mongoose");
 const { BadRequestError } = require("../../../core/error.response");
 //db mock
-mongoose
-  .connect("mongodb://localhost:27018/YayNot", {
-    // bufferCommands: true, // Default is true
-    // bufferMaxEntries: 0, // Set to 0 to disable buffering, or a higher number for more entries
-  })
-  .then(() => console.log("Database connected!"))
-  .catch((err) => console.error("Database connection error:", err));
+// mongoose
+//   .connect("mongodb://localhost:27018/YayNot", {
+//     // bufferCommands: true, // Default is true
+//     // bufferMaxEntries: 0, // Set to 0 to disable buffering, or a higher number for more entries
+//   })
+//   .then(() => console.log("Database connected!"))
+//   .catch((err) => console.error("Database connection error:", err));
 const notificationConsumer = async () => {
   const result = await connectRabbitMQ();
   const { channel, connection } = result;
   try {
-    const queueNoti = rabbitmqConfig.queue.notification;
+    const configType = rabbitmqConfig("notification");
+    const queueNoti = configType.queue.main;
     console.log(`RabbitMQ: Waiting for messages in ${queueNoti}...`);
     await channel.prefetch(3);
     channel.consume(
       queueNoti,
       async (msg) => {
         try {
-          let random = Math.random() * 10;
-          console.log("random", random);
-          if (random < 8) {
-            throw new Error("errr");
-          }
           const data = JSON.parse(msg.content.toString());
-          console.log("msg", data);
-          //create noti
-          // await NotificationService.pushNotificationFactory(data);
-          // const ioChatNamespace = io.of("/notification");
-          // const text = data.message;
-          // //send to socketio
-          // ioChatNamespace.to(`user_${data.userId}`).emit(text);
+          console.log("[CONSUMER] Processing notification:", data);
+
+          //Create and send notification
+          await NotificationService.pushNotificationFactory(data);
+          const ioChatNamespace = io.of("/notification");
+          const text = data.message;
+          //send to socketio
+          ioChatNamespace.to(`user_${data.receiveId}`).emit(text);
           channel.ack(msg);
+          console.log("[CONSUMER] Notification processed successfully");
         } catch (error) {
-          console.log("error!");
+          console.error(
+            "[CONSUMER] Error processing notification:",
+            error.message
+          );
+          // nack(msg, false, false): reject without requeue
+          // This will send the message to retry queue via DLX
           channel.nack(msg, false, false);
         }
       },
       { noAck: false }
     );
   } catch (error) {
+    console.error("Error in notification consumer:", error.message);
     // channel.nack(msg, false, false);
   }
 };
 module.exports = { notificationConsumer };
-notificationConsumer();
+// notificationConsumer();

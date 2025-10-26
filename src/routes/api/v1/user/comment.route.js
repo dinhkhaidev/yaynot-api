@@ -50,5 +50,8 @@ router.get(
   "/:commentId/likes",
   asyncHandle(NestedCommentController.getListLikeComment)
 );
-
+router.patch(
+  "/:commentId/pin",
+  asyncHandle(NestedCommentController.pinnedComment)
+);
 module.exports = router;

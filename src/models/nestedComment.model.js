@@ -11,6 +11,10 @@ const commentSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "question",
     },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
     userId: { type: mongoose.Types.ObjectId, ref: "user", required: true },
     like: { type: Number, default: 0 },
     isAnonymous: { type: Boolean, default: false },

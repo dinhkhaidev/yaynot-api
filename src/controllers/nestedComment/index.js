@@ -58,5 +58,17 @@ class NestedCommentController {
       }),
     }).send(res);
   };
+  togglePinnedComment = async (req, res, next) => {
+    const { status } = req.body;
+    new OK({
+      message: status
+        ? "Pinned comment successful!"
+        : "Unpinned comment successful!",
+      metadata: await CommentService.changeStatusPinnedComment({
+        commentId: req.params.commentId,
+        status,
+      }),
+    }).send(res);
+  };
 }
 module.exports = new NestedCommentController();

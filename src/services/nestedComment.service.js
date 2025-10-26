@@ -79,6 +79,7 @@ class CommentService {
     );
     return createComment;
   }
+  //get all comment and get replies of comment
   static async getListComment({
     questionId,
     commentParentId = null,
@@ -108,7 +109,7 @@ class CommentService {
     if (!commentRecord) throw new NotFoundError("Comment not found!");
     if (content === commentRecord.content)
       throw new BadRequestError("Content is existed!");
-    return await updateCommentInDB(commentId, content);
+    return await updateCommentInDB(commentId, { content });
   }
   static async deleteComment({ questionId, commentId }) {
     await validateFindQuestionById(questionId);
@@ -169,6 +170,17 @@ class CommentService {
       sort
     );
     return listCommentLike;
+  }
+  static async changeStatusPinnedComment({ commentId, status }) {
+    await commentServiceValidate(commentId);
+    const commentRecord = await findCommentInDB(commentId);
+    if (!commentRecord) throw new NotFoundError("Comment not found!");
+    if (!status) {
+      throw new BadRequestError("Status is required!");
+    }
+    if (commentRecord.isPinned === status)
+      throw new BadRequestError("Status is existed!");
+    return await updateCommentInDB(commentId, { isPinned: status });
   }
 }
 module.exports = CommentService;

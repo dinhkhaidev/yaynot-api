@@ -43,11 +43,13 @@ const getListParentNestedCommentInDB = async (questionId) => {
     commentParentId: null,
   });
 };
-const updateCommentInDB = async (commentId, content) => {
-  return await nestedComment.updateOne({
-    _id: commentId,
-    content: content,
-  });
+const updateCommentInDB = async (commentId, data) => {
+  return await nestedComment.updateOne(
+    {
+      _id: commentId,
+    },
+    { data }
+  );
 };
 const deleteCommentInDB = async (questionId, left, right) => {
   return await nestedComment.deleteMany({

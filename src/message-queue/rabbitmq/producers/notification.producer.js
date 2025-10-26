@@ -12,7 +12,8 @@ const notificationProducer = async (data) => {
     const { channel, connection } = result;
     //validate data
     const { error, value } = notificationMQSchema.validate(data);
-    const queueNoti = rabbitmqConfig.queue.notification;
+    const configType = rabbitmqConfig("notification");
+    const queueNoti = configType.queue.main;
     channel.sendToQueue(queueNoti, Buffer.from(JSON.stringify(value)), {
       headers: {
         "x-origin-queue": queueNoti,
@@ -34,11 +35,11 @@ const notificationProducer = async (data) => {
   }
 };
 module.exports = { notificationProducer };
-notificationProducer({
-  title: "test",
-  content: "test content",
-  type: "message",
-  senderId: "6862581564c4f74e37bed3a4",
-  receiveId: "6862581c64c4f74e37bed3a8",
-  message: "6862581c64c4f74e37bed3a8 đã gửi cho bạn tin nhắn!",
-});
+// notificationProducer({
+//   title: "test",
+//   content: "test content",
+//   type: "message",
+//   senderId: "6862581564c4f74e37bed3a4",
+//   receiveId: "6862581c64c4f74e37bed3a8",
+//   message: "6862581c64c4f74e37bed3a8 đã gửi cho bạn tin nhắn!",
+// });

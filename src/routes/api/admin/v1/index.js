@@ -18,6 +18,7 @@ const voteRoute = require("./vote.route");
 const rbacRoute = require("./rbac.route");
 const notificationRoute = require("./notification.route");
 const emailRoute = require("./email.route");
+const reportRoute = require("./report.route");
 
 router.use(authentication);
 router.use(checkAdminRole);
@@ -28,5 +29,6 @@ router.use("/votes", voteRoute);
 router.use("/rbac", rbacRoute);
 router.use("/notifications", notificationRoute);
 router.use("/emails", emailRoute);
+router.use("/reports", reportRoute);
 
 module.exports = router;
