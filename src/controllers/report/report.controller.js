@@ -1,14 +1,6 @@
 const { CREATED, OK } = require("../../core/success.response");
-const ReportService = require("../../services/report.service");
-
-/**
- * Report Controller - Handle user report requests
- */
+const ReportService = require("../../services/old/report.service.old");
 class ReportController {
-  /**
-   * Tạo report mới
-   * POST /api/v1/report
-   */
   createReport = async (req, res, next) => {
     new CREATED({
       message: "Report created successfully",
@@ -18,22 +10,12 @@ class ReportController {
       }),
     }).send(res);
   };
-
-  /**
-   * Lấy danh sách reports của user
-   * GET /api/v1/report/my-reports
-   */
   getMyReports = async (req, res, next) => {
     new OK({
       message: "Get user reports successfully",
       metadata: await ReportService.getUserReports(req.user.user_id, req.query),
     }).send(res);
   };
-
-  /**
-   * Lấy chi tiết 1 report
-   * GET /api/v1/report/:id
-   */
   getReportById = async (req, res, next) => {
     new OK({
       message: "Get report details successfully",
@@ -44,11 +26,6 @@ class ReportController {
       ),
     }).send(res);
   };
-
-  /**
-   * Cancel/Delete report
-   * DELETE /api/v1/report/:id
-   */
   cancelReport = async (req, res, next) => {
     new OK({
       message: "Report cancelled successfully",

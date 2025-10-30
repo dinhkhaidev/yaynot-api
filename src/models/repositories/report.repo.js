@@ -4,28 +4,16 @@ const reportStatus = require("../../constants/reportStatus");
 /**
  * Repository layer for Report operations
  */
-
 class ReportRepository {
-  /**
-   * Tạo report mới
-   */
   static async createReport(reportData) {
     return await Report.create(reportData);
   }
-
-  /**
-   * Tìm report theo ID
-   */
   static async findReportById(reportId) {
     return await Report.findById(reportId)
       .populate("reportedBy", "username email avatar")
       .populate("reviewedBy", "username email")
       .lean();
   }
-
-  /**
-   * Kiểm tra user đã report target này chưa (trong 24h)
-   */
   static async checkDuplicateReport(
     userId,
     targetType,
@@ -40,10 +28,6 @@ class ReportRepository {
       createdAt: { $gte: timeThreshold },
     }).lean();
   }
-
-  /**
-   * Đếm số lượng reports của một target
-   */
   static async countReportsByTarget(targetType, targetId, status = null) {
     const query = { targetType, targetId };
     if (status) {
@@ -51,10 +35,6 @@ class ReportRepository {
     }
     return await Report.countDocuments(query);
   }
-
-  /**
-   * Lấy danh sách reports của user
-   */
   static async getUserReports(userId, { page = 1, limit = 20, status = null }) {
     const query = { reportedBy: userId };
     if (status) {
@@ -80,7 +60,7 @@ class ReportRepository {
   }
 
   /**
-   * Lấy danh sách tất cả reports (Admin)
+   * get all reports (Admin)
    */
   static async getAllReports(filters = {}) {
     const {
@@ -128,10 +108,6 @@ class ReportRepository {
       },
     };
   }
-
-  /**
-   * Update report status và action
-   */
   static async updateReportStatus(reportId, updateData) {
     return await Report.findByIdAndUpdate(
       reportId,
@@ -142,17 +118,9 @@ class ReportRepository {
       { new: true }
     ).lean();
   }
-
-  /**
-   * Xóa report (soft delete hoặc hard delete)
-   */
   static async deleteReport(reportId) {
     return await Report.findByIdAndDelete(reportId);
   }
-
-  /**
-   * Lấy thống kê reports
-   */
   static async getReportStats() {
     const [statusStats, typeStats, totalPending] = await Promise.all([
       Report.aggregate([
@@ -175,6 +143,7 @@ class ReportRepository {
     ]);
 
     return {
+      //{ _id: "PENDING", count: _ },
       byStatus: statusStats.reduce((acc, item) => {
         acc[item._id] = item.count;
         return acc;
@@ -186,29 +155,20 @@ class ReportRepository {
       totalPending,
     };
   }
-
-  /**
-   * Lấy tất cả reports của một target
-   */
   static async getReportsByTarget(targetType, targetId) {
     return await Report.find({ targetType, targetId })
       .sort({ createdAt: -1 })
       .populate("reportedBy", "username email avatar")
       .lean();
   }
-
-  /**
-   * Tăng priority của tất cả reports cùng target
-   */
   static async increasePriorityForTarget(targetType, targetId) {
     return await Report.updateMany(
       { targetType, targetId, status: reportStatus.PENDING },
       { $inc: { priority: 1 } }
     );
   }
-
   /**
-   * Auto-resolve tất cả pending reports của một target
+   * Auto-resolve
    */
   static async autoResolveReportsByTarget(targetType, targetId, actionTaken) {
     return await Report.updateMany(

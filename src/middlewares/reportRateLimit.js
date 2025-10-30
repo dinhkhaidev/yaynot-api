@@ -1,11 +1,12 @@
 /**
- * Middleware để rate limit report creation
- * Ngăn spam reports
+ * Middleware for rate limit report creation
+ * Avoid spam reports
  */
 
+//test
 const rateLimit = {};
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 phút
-const MAX_REPORTS_PER_WINDOW = 5; // Tối đa 5 reports/phút
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REPORTS_PER_WINDOW = 5; // Max 5 reports per minutes
 
 const reportRateLimit = (req, res, next) => {
   const userId = req.user.user_id;
@@ -22,7 +23,7 @@ const reportRateLimit = (req, res, next) => {
   const userLimit = rateLimit[userId];
   const timeElapsed = now - userLimit.startTime;
 
-  // Reset nếu đã qua window
+  // Reset if throught time window
   if (timeElapsed > RATE_LIMIT_WINDOW) {
     rateLimit[userId] = {
       count: 1,
@@ -44,7 +45,7 @@ const reportRateLimit = (req, res, next) => {
   next();
 };
 
-// Cleanup old entries mỗi 5 phút
+// Cleanup old entries every 5 minutes
 setInterval(() => {
   const now = Date.now();
   Object.keys(rateLimit).forEach((userId) => {
