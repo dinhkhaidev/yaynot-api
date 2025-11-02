@@ -17,6 +17,7 @@ const {
   validateIdQuestionPayload,
 } = require("../validations/service/questionService.validate");
 const { acquireLock } = require("./lockRedis.service");
+const QuestionValidationRule = require("../domain/question/rules/questionValidation.rule");
 class VoteService {
   static async upsertVote({ questionId, voteType, userId }) {
     if (!userId) throw new NotFoundError("User ID is required!");
@@ -76,7 +77,7 @@ class VoteService {
   //handle detail vote of question
   static async getDetailVote({ questionId, myVote }) {
     validateIdQuestionPayload(questionId);
-    await validateFindQuestionById(questionId);
+    await QuestionValidationRule.validateQuestion({ questionId });
     const voteSummaryRecord = await getVoteSummaryByQuestionId(questionId);
     if (!voteSummaryRecord)
       throw new NotFoundError("Question not included vote!");

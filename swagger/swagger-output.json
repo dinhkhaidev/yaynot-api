@@ -6,7 +6,7 @@
     "description": "API documentation for YayNot social Q&A platform"
   },
   "host": "localhost:8888",
-  "basePath": "/v1",
+  "basePath": "/api/v1",
   "schemes": ["http"],
   "securityDefinitions": {
     "Bearer": {
@@ -367,6 +367,60 @@
         }
       }
     },
+    "/auth/verify": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify OTP",
+        "description": "Verify email with OTP code",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string",
+                  "description": "OTP code"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully"
+          },
+          "400": {
+            "description": "Bad Request - Invalid OTP"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/emails/resend": {
+      "post": {
+        "tags": ["Email"],
+        "summary": "Resend OTP",
+        "description": "Resend OTP verification email",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "OTP resent successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        }
+      }
+    },
     "/questions": {
       "post": {
         "tags": ["Questions"],
@@ -638,6 +692,305 @@
         }
       }
     },
+    "/questions/visibility/{questionId}": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Change question visibility",
+        "description": "Change question visibility (public, private, follower_only)",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "visibility": {
+                  "type": "string",
+                  "enum": ["public", "private", "follower_only"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question visibility changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Not owner"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/bookmark": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Bookmark a question",
+        "description": "Add a question to user's bookmarks",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question bookmarked successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Questions"],
+        "summary": "Remove bookmark from question",
+        "description": "Remove a question from user's bookmarks",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookmark removed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/me/bookmarks": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get user's bookmarked questions",
+        "description": "Retrieve all questions bookmarked by the current user",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookmarked questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/view": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Increment question view count",
+        "description": "Track a view on a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "View count incremented successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/share": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Increment question share count",
+        "description": "Track a share on a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Share count incremented successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/care": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Care about a question",
+        "description": "Mark a question as cared by the user to receive updates",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question cared successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/uncare": {
+      "delete": {
+        "tags": ["Questions"],
+        "summary": "Stop caring about a question",
+        "description": "Remove care from a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Care removed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/questions/me/care-questions": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get user's cared questions",
+        "description": "Retrieve all questions that the current user cares about",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cared questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/history": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get question edit history",
+        "description": "Retrieve the edit history of a question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question history retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
     "/comments": {
       "post": {
         "tags": ["Comments"],
@@ -829,6 +1182,37 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/comments/{commentId}/pin": {
+      "patch": {
+        "tags": ["Comments"],
+        "summary": "Pin comment",
+        "description": "Pin a comment to the top of the question",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment pinned successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Only question owner can pin comments"
+          },
+          "404": {
+            "description": "Comment not found"
           }
         }
       }
@@ -1299,6 +1683,165 @@
         }
       }
     },
+    "/reports": {
+      "post": {
+        "tags": ["Reports"],
+        "summary": "Create report",
+        "description": "Submit a report for inappropriate content",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["targetType", "targetId", "reportType", "reason"],
+              "properties": {
+                "targetType": {
+                  "type": "string",
+                  "enum": ["question", "comment", "user"],
+                  "description": "Type of content being reported"
+                },
+                "targetId": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{24}$",
+                  "description": "ID of the content being reported"
+                },
+                "reportType": {
+                  "type": "string",
+                  "enum": [
+                    "spam",
+                    "harassment",
+                    "inappropriate",
+                    "misinformation",
+                    "other"
+                  ],
+                  "description": "Type of report"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 500,
+                  "description": "Detailed reason for the report"
+                },
+                "additionalInfo": {
+                  "type": "string",
+                  "description": "Additional information"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Report created successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Too many requests - Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/reports/my-reports": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get my reports",
+        "description": "Get all reports submitted by the current user",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "enum": ["pending", "reviewing", "resolved", "rejected"]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/reports/{id}": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get report by ID",
+        "description": "Get detailed information about a specific report",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Reports"],
+        "summary": "Cancel report",
+        "description": "Cancel a pending report submitted by the user",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report cancelled successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Cannot cancel report"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
     "/rbac/resource": {
       "post": {
         "tags": ["RBAC"],
@@ -1355,6 +1898,731 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/admin/v1/reports": {
+      "get": {
+        "tags": ["Admin - Reports"],
+        "summary": "Get all reports (Admin)",
+        "description": "Get all reports with filters - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "enum": ["pending", "reviewing", "resolved", "rejected"]
+          },
+          {
+            "name": "targetType",
+            "in": "query",
+            "type": "string",
+            "enum": ["question", "comment", "user"]
+          },
+          {
+            "name": "reportType",
+            "in": "query",
+            "type": "string",
+            "enum": [
+              "spam",
+              "harassment",
+              "inappropriate",
+              "misinformation",
+              "other"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/reports/stats": {
+      "get": {
+        "tags": ["Admin - Reports"],
+        "summary": "Get report statistics (Admin)",
+        "description": "Get statistical data about reports - Admin only",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Statistics retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/reports/{id}": {
+      "get": {
+        "tags": ["Admin - Reports"],
+        "summary": "Get report detail (Admin)",
+        "description": "Get detailed information about a specific report - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/reports/{id}/review": {
+      "put": {
+        "tags": ["Admin - Reports"],
+        "summary": "Review report (Admin)",
+        "description": "Review and take action on a report - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["status", "actionTaken"],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["reviewing", "resolved", "rejected"]
+                },
+                "actionTaken": {
+                  "type": "string",
+                  "enum": ["hide", "delete", "warn", "ban", "none"]
+                },
+                "reviewNote": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report reviewed successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/reports/target/{targetType}/{targetId}": {
+      "get": {
+        "tags": ["Admin - Reports"],
+        "summary": "Get reports by target (Admin)",
+        "description": "Get all reports for a specific target - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "targetType",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": ["question", "comment", "user"]
+          },
+          {
+            "name": "targetId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/questions": {
+      "get": {
+        "tags": ["Admin - Questions"],
+        "summary": "Get all questions (Admin)",
+        "description": "Get all questions with filters - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "enum": ["draft", "publish", "archive"]
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "type": "string",
+            "enum": ["public", "private", "follower_only"]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/questions/{questionId}": {
+      "get": {
+        "tags": ["Admin - Questions"],
+        "summary": "Get question detail (Admin)",
+        "description": "Get detailed information about a question - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Admin - Questions"],
+        "summary": "Hard delete question (Admin)",
+        "description": "Permanently delete a question - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/questions/{questionId}/soft-delete": {
+      "patch": {
+        "tags": ["Admin - Questions"],
+        "summary": "Soft delete question (Admin)",
+        "description": "Mark question as deleted without removing from database - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question soft deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/questions/{questionId}/status": {
+      "post": {
+        "tags": ["Admin - Questions"],
+        "summary": "Change question status (Admin)",
+        "description": "Change question status - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["publish", "draft", "archive"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question status changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/questions/{questionId}/visibility": {
+      "post": {
+        "tags": ["Admin - Questions"],
+        "summary": "Change question visibility (Admin)",
+        "description": "Change question visibility - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "visibility": {
+                  "type": "string",
+                  "enum": ["public", "private", "follower_only"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question visibility changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/questions/{questionId}/history": {
+      "get": {
+        "tags": ["Admin - Questions"],
+        "summary": "Get question history (Admin)",
+        "description": "Get edit history of a question - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question history retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Question not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/comments": {
+      "get": {
+        "tags": ["Admin - Comments"],
+        "summary": "Get all comments (Admin)",
+        "description": "Get all comments with filters - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "query",
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Admin - Comments"],
+        "summary": "Delete comment (Admin)",
+        "description": "Delete a comment - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "commentId": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{24}$"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          },
+          "404": {
+            "description": "Comment not found"
+          }
+        }
+      }
+    },
+    "/admin/v1/comments/{commentId}/likes": {
+      "get": {
+        "tags": ["Admin - Comments"],
+        "summary": "Get comment likes (Admin)",
+        "description": "Get list of users who liked the comment - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment likes retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/votes/{questionId}": {
+      "get": {
+        "tags": ["Admin - Votes"],
+        "summary": "Get vote details (Admin)",
+        "description": "Get vote details for a question - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote details retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/votes/{voteId}": {
+      "delete": {
+        "tags": ["Admin - Votes"],
+        "summary": "Delete vote (Admin)",
+        "description": "Delete a vote - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "voteId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/notifications": {
+      "post": {
+        "tags": ["Admin - Notifications"],
+        "summary": "Send push notification (Admin)",
+        "description": "Send push notification to users - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Notification"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification sent successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Admin - Notifications"],
+        "summary": "Get all notifications (Admin)",
+        "description": "Get all notifications in the system - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notifications retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
+          }
+        }
+      }
+    },
+    "/admin/v1/emails/template": {
+      "post": {
+        "tags": ["Admin - Emails"],
+        "summary": "Create email template (Admin)",
+        "description": "Create new email template - Admin only",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["name", "subject", "content"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Template name"
+                },
+                "subject": {
+                  "type": "string",
+                  "description": "Email subject"
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Email HTML content"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Email template created successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin only"
           }
         }
       }

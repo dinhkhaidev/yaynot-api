@@ -27,6 +27,7 @@ const {
   commentServiceValidate,
 } = require("../validations/service/commentService.validate");
 const { voteSummaryModel } = require("../models/vote.model");
+const QuestionValidationRule = require("../domain/question/rules/questionValidation.rule");
 
 class CommentService {
   static async createComment({
@@ -41,8 +42,8 @@ class CommentService {
       questionId,
       userId,
     });
-    const { status } = await validateFindQuestionById(questionId, {
-      returnRecord: true,
+    const { status } = await QuestionValidationRule.validateQuestion({
+      questionId,
     });
     if (status !== "publish")
       throw new ForbiddenError("Can't access to this question!");
@@ -86,7 +87,7 @@ class CommentService {
     limit = 50,
     page = 0,
   }) {
-    await validateFindQuestionById(questionId);
+    await QuestionValidationRule.validateQuestion({ questionId });
     let rightValue, leftValue;
     if (commentParentId) {
       const commentParentRecord = await findCommentParentInDB(commentParentId);
@@ -104,7 +105,7 @@ class CommentService {
     }
   }
   static async updateComment({ questionId, commentId, content }) {
-    await validateFindQuestionById(questionId);
+    await QuestionValidationRule.validateQuestion({ questionId });
     const commentRecord = await findCommentInDB(commentId);
     if (!commentRecord) throw new NotFoundError("Comment not found!");
     if (content === commentRecord.content)
@@ -112,7 +113,7 @@ class CommentService {
     return await updateCommentInDB(commentId, { content });
   }
   static async deleteComment({ questionId, commentId }) {
-    await validateFindQuestionById(questionId);
+    await QuestionValidationRule.validateQuestion({ questionId });
     const commentRecord = await findCommentInDB(commentId);
     if (!commentRecord) throw new NotFoundError("Comment not found!");
     const { left, right } = commentRecord;

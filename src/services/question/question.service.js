@@ -34,23 +34,41 @@ const {
 } = require("../../utils/cacheRedis");
 const { get, setnx, incr } = require("../../models/repositories/cache.repo");
 const HistoryQuestionService = require("./extensions/history.service");
+
+const {
+  QuestionEntity,
+  QuestionValidationRule,
+  QuestionStatusRule,
+  QuestionVisibilityRule,
+  QuestionContent,
+  QuestionMetrics,
+} = require("../../domain/question");
+const QuestionDomainService = require("../../domain/question/QuestionDomainRules.simple");
+
 const statusMapping = {
   private: "archive",
   public: "publish",
 };
 class QuestionService {
   static async createQuestion({ title, content, topicId, userId, tags }) {
-    if (!userId) throw new NotFoundError("User ID is required!");
-    const userRecord = await findUserById(userId);
-    if (!userRecord) throw new NotFoundError("User not found!");
-    const newQuestion = await createQuestionInDB({
-      title,
-      content,
+    const { content: validatedContent } =
+      await QuestionDomainService.validateQuestionCreation({
+        title,
+        content,
+        userId,
+      });
+
+    const questionEntity = QuestionEntity.createNew({
+      title: validatedContent.title,
+      content: validatedContent.content,
       topicId,
       userId,
       shortTag: tags,
     });
+
+    const newQuestion = await createQuestionInDB(questionEntity.toDatabase());
     if (!newQuestion) throw new BadRequestError("Can't create question!");
+
     if (tags && Array.isArray(tags)) {
       await Promise.all(
         tags.map(async (tag) => {
@@ -61,26 +79,37 @@ class QuestionService {
         })
       );
     }
-    return newQuestion;
+
+    return QuestionEntity.fromDatabase(newQuestion).toDTO();
   }
 
   static async updateQuestion(payload) {
-    const { id, userId, questionRecord } = payload;
-    validateUpdateQuestionPayload(id, userId);
-    const userRecord = await findUserById(userId);
-    if (!userRecord) throw new NotFoundError("User not found!");
-    const questionData = await updateQuestionInDB(id, payload);
+    const { id, userId } = payload;
+
+    const { questionEntity, content } =
+      await QuestionDomainService.validateQuestionUpdate(id, userId, payload);
+
+    const oldData = {
+      title: questionEntity.title,
+      content: questionEntity.content,
+      topicId: questionEntity.topicId,
+      shortTag: questionEntity.shortTag,
+    };
+
+    const updateData = {
+      ...payload,
+      ...(content && { title: content.title, content: content.content }),
+    };
+
+    const questionData = await updateQuestionInDB(id, updateData);
+
     await HistoryQuestionService.upsertHistoryQuestion({
       questionId: id,
       userId,
-      metadata: {
-        title: questionRecord.title,
-        content: questionRecord.content,
-        topicId: questionRecord.topicId,
-        shortTag: questionRecord.shortTag,
-      },
+      metadata: oldData,
     });
-    return questionData;
+
+    return QuestionEntity.fromDatabase(questionData).toDTO();
   }
 
   static async getListQuestion({
@@ -108,23 +137,30 @@ class QuestionService {
   }
 
   static async getQuestionById(questionId) {
-    validateIdQuestionPayload(questionId);
-    const questionRecord = await findQuestionById(questionId);
-    if (!questionRecord) throw new NotFoundError("Question not found!");
-    //enrich data from view redis
-    return await this.enrichQuestionsWithViewCount(questionRecord);
+    const questionRecord = await QuestionValidationRule.validateQuestion({
+      questionId,
+    });
+
+    const questionEntity = QuestionEntity.fromDatabase(questionRecord);
+
+    return await this.enrichQuestionsWithViewCount(questionEntity.toDTO());
   }
 
-  static async softDeleteQuestion(questionId) {
-    validateIdQuestionPayload(questionId);
-    await validateFindQuestionById(questionId);
+  static async softDeleteQuestion(questionId, userId) {
+    const questionEntity = await QuestionDomainService.validateQuestionDeletion(
+      questionId,
+      userId
+    );
+
+    questionEntity.softDelete();
     const deleteQuestion = await softDeleteQuestionInDB(questionId);
-    return deleteQuestion;
+
+    return QuestionEntity.fromDatabase(deleteQuestion).toDTO();
   }
 
-  static async hardDeleteQuestion(questionId) {
-    validateIdQuestionPayload(questionId);
-    await validateFindQuestionById(questionId);
+  static async hardDeleteQuestion(questionId, userId) {
+    await QuestionDomainService.validateQuestionDeletion(questionId, userId);
+
     const deleteQuestion = await hardDeleteQuestionInDB(questionId);
     return deleteQuestion;
   }
@@ -136,7 +172,8 @@ class QuestionService {
     cursor,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
   }) {
-    validateIdQuestionPayload(id);
+    QuestionValidationRule.validateQuestionId(id);
+
     const filter = {
       userId: id,
       status: "draft",
@@ -150,8 +187,11 @@ class QuestionService {
       cursor,
       select,
     });
+
     if (result.data && Array.isArray(result.data)) {
-      result.data = await this.enrichQuestionsWithViewCount(result.data);
+      const entities = QuestionEntity.fromDatabaseArray(result.data);
+      const dtos = entities.map((entity) => entity.toDTO());
+      result.data = await this.enrichQuestionsWithViewCount(dtos);
     }
     return result;
   }
@@ -163,7 +203,8 @@ class QuestionService {
     cursor,
     select = ["userId", "topicId", "isAnonymous", "isDeleted", "__v"],
   }) {
-    validateIdQuestionPayload(id);
+    QuestionValidationRule.validateQuestionId(id);
+
     const filter = {
       userId: id,
       status: "publish",
@@ -177,20 +218,22 @@ class QuestionService {
       cursor,
       select,
     });
+
     if (result.data && Array.isArray(result.data)) {
-      result.data = await this.enrichQuestionsWithViewCount(result.data);
+      const entities = QuestionEntity.fromDatabaseArray(result.data);
+      const dtos = entities.map((entity) => entity.toDTO());
+      result.data = await this.enrichQuestionsWithViewCount(dtos);
     }
     return result;
   }
 
   static async changeQuestionStatusFactory({ resource, payload }) {
     const { questionId, newStatus } = payload;
-    if (resource && resource.status === newStatus)
-      throw new BadRequestError(
-        `No changes applied. Visibility is already ${newStatus}!`
-      );
-    if (!Object.values(statusQuestion).includes(newStatus))
-      throw new NotFoundError(`Type question ${newStatus} not exist!`);
+
+    const questionEntity = await QuestionDomainService.validateStatusChange(
+      questionId,
+      newStatus
+    );
 
     const questionStatusMap = {
       publish: QuestionService.publishQuestionStatus,
@@ -199,6 +242,7 @@ class QuestionService {
     };
     const handle = questionStatusMap[newStatus];
     if (!handle) throw new BadRequestError("Incorrect status question!");
+
     return await handle(questionId);
   }
 
@@ -217,17 +261,20 @@ class QuestionService {
     await TagService.publicTagStatus({ questionId, type: false });
     return await archiveForQuestionInDB(questionId);
   }
-  static async changeVisibilityQuestion({ resource, payload }) {
+  static async changeVisibilityQuestion({ resource, payload, userId }) {
     const { questionId, visibility } = payload;
-    if (resource.status === "draft") {
+
+    const questionEntity = await QuestionDomainService.validateVisibilityChange(
+      questionId,
+      userId,
+      visibility
+    );
+
+    if (questionEntity.isDraft()) {
       throw new BadRequestError(
         "You must publish this question before changing visibility."
       );
     }
-    if (resource.visibility === visibility)
-      throw new BadRequestError(
-        `No changes applied. Visibility is already ${visibility}!`
-      );
 
     if (visibility === "private") {
       await this.changeQuestionStatusFactory({
@@ -235,58 +282,61 @@ class QuestionService {
         payload: { questionId, newStatus: statusMapping.private },
       });
       return await changeVisibilityQuestionInDB(questionId, visibility);
-    } else if (resource.status === "archive") {
+    } else if (questionEntity.isArchived()) {
       await this.changeQuestionStatusFactory({
         resource,
         payload: { questionId, newStatus: statusMapping.public },
       });
     }
-    return await changeVisibilityQuestionInDB(questionId, visibility);
+
+    const result = await changeVisibilityQuestionInDB(questionId, visibility);
+    return QuestionEntity.fromDatabase(result).toDTO();
   }
   static async countViewQuestion({ questionId }) {
-    const foundQuestion = await validateFindQuestionById(questionId, {
-      returnRecord: true,
+    const questionRecord = await QuestionValidationRule.validateQuestion({
+      questionId,
     });
-    if (
-      foundQuestion.status === "draft" ||
-      foundQuestion.visibility === "private" ||
-      foundQuestion.moderationStatus === "ban" ||
-      foundQuestion.isDeleted
-    ) {
+
+    const questionEntity = QuestionEntity.fromDatabase(questionRecord);
+
+    if (!questionEntity.isActive()) {
       throw new BadRequestError("Question not valid!");
     }
+
     const keyQuestion = keyViewQuestion(questionId);
     const keyFlush = keyFlushViewQuestion(questionId);
     const cached = await get(keyQuestion);
+
     if (!cached) {
       const questionFound = await findQuestionById(questionId);
       await setnx(keyQuestion, questionFound.view, 1800);
       await setnx(keyFlush, questionFound.view, 3600);
     }
+
     const newCount = await incr(keyQuestion);
     return newCount;
   }
   static async countShareQuestion({ questionId }) {
-    const foundQuestion = await validateFindQuestionById(questionId, {
-      returnRecord: true,
+    const questionRecord = await QuestionValidationRule.validateQuestion({
+      questionId,
     });
-    if (
-      foundQuestion.status === "draft" ||
-      foundQuestion.visibility === "private" ||
-      foundQuestion.moderationStatus === "ban" ||
-      foundQuestion.isDeleted
-    ) {
+
+    const questionEntity = QuestionEntity.fromDatabase(questionRecord);
+
+    if (!questionEntity.isActive()) {
       throw new BadRequestError("Question not valid!");
     }
+
     const keyQuestion = keyShareQuestion(questionId);
-    console.log("keyQuestion", keyQuestion);
     const keyFlush = keyFlushShareQuestion(questionId);
     const cached = await get(keyQuestion);
+
     if (!cached) {
       const questionFound = await findQuestionById(questionId);
       await setnx(keyQuestion, questionFound.shareCount, 1800);
       await setnx(keyFlush, questionFound.shareCount, 3600);
     }
+
     const newCount = await incr(keyQuestion);
     return newCount;
   }
@@ -321,20 +371,23 @@ class QuestionService {
     if (!questions) return questions;
     const isArray = Array.isArray(questions);
     const questionArray = isArray ? questions : [questions];
+
     const enrichedQuestions = await Promise.all(
       questionArray.map(async (question) => {
         if (!question) return question;
         const questionObj = question.toObject ? question.toObject() : question;
         const viewCount = await this.getViewCount(
-          questionObj._id.toString(),
-          questionObj.view || 0
+          questionObj._id?.toString() || questionObj.id?.toString(),
+          questionObj.view || questionObj.viewCount || 0
         );
         return {
           ...questionObj,
           view: viewCount,
+          viewCount: viewCount,
         };
       })
     );
+
     return isArray ? enrichedQuestions : enrichedQuestions[0];
   }
 }
