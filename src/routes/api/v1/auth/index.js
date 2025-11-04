@@ -10,7 +10,8 @@ const {
 } = require("../../../../validations/Joi/user.validation");
 const { authentication } = require("../../../../auth/authUtil");
 const loggerMiddleware = require("../../../../middlewares/logger.middleware");
-
+const { limitAuth } = require("../../../../configs/rateLimit.config");
+router.use(limitAuth);
 router.post(
   "/register",
   validate(createUserSchema),
