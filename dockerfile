@@ -9,6 +9,7 @@ COPY . .
 FROM node:24-alpine3.21 AS runner
 #ENV NODE_ENV=production
 #ENV PORT=3000
+RUN apk add --no-cache curl
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=builder /app ./
 EXPOSE 8888

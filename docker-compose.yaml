@@ -1,23 +1,86 @@
+version: "3.9"
+
+volumes:
+  mongo_data:
+  redis_data:
+  rabbitmq_data:
+
 services:
   backend:
     build: .
     depends_on:
-      - redis
-      - mongodb
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - URL_MONGODB=mongodb://mongodb:27017/YayNot
-
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    # environment:
+    #   - REDIS_HOST=redis
+    #   - REDIS_PORT=6379
+    #   - URL_MONGODB=mongodb://mongodb:27017/YayNot
+    env_file:
+      - .env.production
+      #best practices: file location should in config admin of OS.
+      #(Store config in the environment, not in the code.)
+    restart: always
     ports:
       - 8888:8888
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget --spider -q http://localhost:8888/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - backend_yaynot
 
   redis:
-    image: redis:8.0.2
-    ports:
-      - 6381:6379
+    image: redis:7.4.1
+    # ports:
+    #   - 6381:6379
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - backend_yaynot
+    volumes:
+      - redis_data:/data/cache_data
 
   mongodb:
     image: mongo:8.0
     ports:
       - 27019:27017
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mongo_data:/data/database
+    networks:
+      - backend_yaynot
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports:
+      # - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - backend_yaynot
+    volumes:
+      - rabbitmq_data:/data/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  backend_yaynot:
+    driver: bridge

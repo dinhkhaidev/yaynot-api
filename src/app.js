@@ -46,14 +46,15 @@ app.use((req, res, next) => {
   next();
 });
 
-//routes
-app.use("/", require("./routes/index"));
-app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
 //swagger
 app.get("/swagger-output.json", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.send(swaggerDocument);
 });
+
+//routes
+app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
+app.use("/", require("./routes/index"));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {

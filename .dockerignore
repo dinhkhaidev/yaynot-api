@@ -1,2 +1,12 @@
 # .env
 /node_modules
+# npm-debug.log
+# Dockerfile
+# docker-compose.yml
+# .env
+# .git
+# .gitignore
+# test/
+# md-docs/
+# coverage/
+# .env.production
