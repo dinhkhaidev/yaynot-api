@@ -9,7 +9,7 @@ const { limitUser } = require("../../configs/rateLimit.config");
 
 router.use("/v1/auth", authRoutes);
 router.use(limitUser);
-router.use(loggerMiddleware());
+// router.use(loggerMiddleware());
 router.use("/v1", userRoutes);
 router.use("/admin/v1", adminRoutes);
 
