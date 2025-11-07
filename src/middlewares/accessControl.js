@@ -1,6 +1,6 @@
 import { AccessControl } from "accesscontrol";
 
-let grantList = [
+const grantList = [
   {
     role: "admin",
     resource: "video",

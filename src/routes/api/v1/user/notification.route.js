@@ -11,12 +11,12 @@ router.get("/", asyncHandle(NotificationController.getListNotification));
 router.patch(
   "/marked/:notificationId",
   validate(markAndDeleteNotificationSchema),
-  asyncHandle(NotificationController.markedNotification)
+  asyncHandle(NotificationController.markedNotification),
 );
 router.delete(
   "/:notificationId",
   validate(markAndDeleteNotificationSchema),
-  asyncHandle(NotificationController.deleteUserNotification)
+  asyncHandle(NotificationController.deleteUserNotification),
 );
 
 module.exports = router;

@@ -10,3 +10,59 @@
 # md-docs/
 # coverage/
 # .env.production
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Testing
+coverage
+.nyc_output
+*.test.js
+test/
+
+# Development
+.env.*
+.env.local
+.env.*.local
+.vscode
+.idea
+
+# Logs
+logs
+*.log
+src/logs/
+
+# Documentation
+md-docs/
+docs/
+README.md
+*.md
+
+# Git
+.git
+.gitignore
+.github/
+
+# Deployment configs
+.vercel/
+.railway/
+vercel.json
+railway.json
+nixpacks.toml
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Scripts
+setup-symlinks.ps1
+remove-symlinks.ps1
+
+# Temporary
+tmp/
+temp/
+*.tmp
+.DS_Store

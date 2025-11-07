@@ -20,10 +20,10 @@ const { acquireLock } = require("./lockRedis.service");
 const QuestionValidationRule = require("../domain/question/rules/questionValidation.rule");
 class VoteService {
   static async upsertVote({ questionId, voteType, userId }) {
-    if (!userId) throw new NotFoundError("User ID is required!");
+    if (!userId) {throw new NotFoundError("User ID is required!");}
     const voteRecord = await findVoteByUserAndQuestionInDB(userId, questionId);
     if (voteRecord && voteRecord.voteType === voteType)
-      throw new BadRequestError("Vote is existed!");
+    {throw new BadRequestError("Vote is existed!");}
     // const newVote = await acquireLock({ questionId, voteType, userId });
     let key;
     try {
@@ -57,12 +57,12 @@ class VoteService {
     } catch (error) {
       throw new Error("Distribute lock error!");
     } finally {
-      if (key) await redis.del(key);
+      if (key) {await redis.del(key);}
     }
   }
   static async deleteVote(voteId) {
     const voteRecord = await findVoteById(voteId);
-    if (!voteRecord) throw new NotFoundError("Vote not found!");
+    if (!voteRecord) {throw new NotFoundError("Vote not found!");}
     const deleteVote = await deleteVoteInDB(voteId);
     const voteTypeIncrease = voteRecord.voteType
       ? "voteYesCount"
@@ -80,8 +80,8 @@ class VoteService {
     await QuestionValidationRule.validateQuestion({ questionId });
     const voteSummaryRecord = await getVoteSummaryByQuestionId(questionId);
     if (!voteSummaryRecord)
-      throw new NotFoundError("Question not included vote!");
-    let voteSummary = { ...voteSummaryRecord };
+    {throw new NotFoundError("Question not included vote!");}
+    const voteSummary = { ...voteSummaryRecord };
     const { voteYesCount, voteNoCount } = voteSummaryRecord;
     //hanlde topcomment ...
     voteSummary.voteYesPercentage =

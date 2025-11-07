@@ -20,21 +20,21 @@ router.get("/stats", asyncHandle(reportAdminController.getReportStats));
 // Lấy reports của một target
 router.get(
   "/target/:targetType/:targetId",
-  asyncHandle(reportAdminController.getReportsByTarget)
+  asyncHandle(reportAdminController.getReportsByTarget),
 );
 
 // Lấy tất cả reports với filters
 router.get(
   "/",
   validate(getAdminReportsSchema, "query"),
-  asyncHandle(reportAdminController.getAllReports)
+  asyncHandle(reportAdminController.getAllReports),
 );
 
 // Lấy chi tiết 1 report
 router.get(
   "/:id",
   validate(reportIdParamSchema, "params"),
-  asyncHandle(reportAdminController.getReportById)
+  asyncHandle(reportAdminController.getReportById),
 );
 
 // Review report
@@ -42,7 +42,7 @@ router.put(
   "/:id/review",
   validate(reportIdParamSchema, "params"),
   validate(reviewReportSchema, "body"),
-  asyncHandle(reportAdminController.reviewReport)
+  asyncHandle(reportAdminController.reviewReport),
 );
 
 module.exports = router;

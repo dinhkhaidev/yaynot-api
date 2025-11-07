@@ -14,7 +14,7 @@ const unfollowUserInDB = async ({ followerId, followingId }) => {
 };
 const getListFollowerById = async ({ followId, cursor, sort }) => {
   const query = { followerId: followId };
-  if (cursor) query._id = { $lt: cursor };
+  if (cursor) {query._id = { $lt: cursor };}
   const sortBy = sort ? sort : { _id: -1 };
   const limit = 20;
   const followerList = await followModel
@@ -26,7 +26,7 @@ const getListFollowerById = async ({ followId, cursor, sort }) => {
 };
 const getListFollowingById = async ({ followId, cursor, sort }) => {
   const query = { followingId: followId };
-  if (cursor) query._id = { $lt: cursor };
+  if (cursor) {query._id = { $lt: cursor };}
   const sortBy = sort ? sort : { _id: -1 };
   const limit = 20;
   const followingList = await followModel

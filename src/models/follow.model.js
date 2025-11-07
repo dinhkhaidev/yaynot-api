@@ -9,7 +9,7 @@ const followSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 followSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
 followSchema.index({ followerId: 1, _id: -1 });

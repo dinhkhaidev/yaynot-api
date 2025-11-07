@@ -10,13 +10,13 @@ const createConventionSchema = Joi.object({
       if (type === "private") {
         if (value[0] === value[1]) {
           return helpers.message(
-            "Participal must contain exactly 2 members another."
+            "Participal must contain exactly 2 members another.",
           );
         }
 
         if (value.length !== 2) {
           return helpers.message(
-            "Participal must contain exactly 2 members for private type."
+            "Participal must contain exactly 2 members for private type.",
           );
         }
       }

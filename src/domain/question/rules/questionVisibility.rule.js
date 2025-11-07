@@ -7,8 +7,8 @@ class QuestionVisibilityRule {
     if (!validVisibilities.includes(visibility)) {
       throw new BadRequestError(
         `Invalid visibility: ${visibility}. Must be one of: ${validVisibilities.join(
-          ", "
-        )}`
+          ", ",
+        )}`,
       );
     }
   }
@@ -30,7 +30,7 @@ class QuestionVisibilityRule {
 
     if (!this.canChangeVisibility(question, newVisibility)) {
       throw new BadRequestError(
-        `Cannot change visibility from ${question.visibility} to ${newVisibility}`
+        `Cannot change visibility from ${question.visibility} to ${newVisibility}`,
       );
     }
   }

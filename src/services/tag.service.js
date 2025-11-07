@@ -32,7 +32,7 @@ class TagService {
       .findOne({ name: slug, isPublish: true })
       .select(" -isDeleted -isFlag -isPublish -__v");
     if (!tagRecord)
-      throw new NotFoundError("Tag not exists. Let create with new hashtag!");
+    {throw new NotFoundError("Tag not exists. Let create with new hashtag!");}
     const skip = page * limit;
     const tagMappings = await tagQuestionModel
       .find({ tagId: tagRecord._id })

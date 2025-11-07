@@ -20,7 +20,7 @@ const getListConventionsUserInDB = async ({ userId, limit = 10, cursor }) => {
   const query = {
     participants: { $in: userId },
   };
-  if (cursor) query._id = { $lt: cursor };
+  if (cursor) {query._id = { $lt: cursor };}
   const conventionList = await conventionModel
     .find(query)
     .sort({ updatedAt: -1 })
@@ -33,7 +33,7 @@ const getConventionMessagesInDB = async ({ convoId, limit = 15, cursor }) => {
   const query = {
     convoId,
   };
-  if (cursor) query._id = { $lt: cursor };
+  if (cursor) {query._id = { $lt: cursor };}
   const messageList = await messageModel
     .find(query)
     .sort({ updatedAt: -1 })
@@ -45,7 +45,7 @@ const getConventionMessagesInDB = async ({ convoId, limit = 15, cursor }) => {
 const updateLastMessage = async ({ convoId, content, senderId }) => {
   return await conventionModel.findOneAndUpdate(
     { _id: convoId },
-    { $set: { lastMessage: { content, senderId, createdAt: Date.now() } } }
+    { $set: { lastMessage: { content, senderId, createdAt: Date.now() } } },
   );
 };
 const deleteMessageInDB = async (messageId) => {
@@ -59,7 +59,7 @@ const searchMessageInDB = async ({ keyword, convoId, cursor, limit = 20 }) => {
     content: { $regex: keyword },
     convoId,
   };
-  if (cursor) query._id = { $lt: cursor };
+  if (cursor) {query._id = { $lt: cursor };}
   const messageList = await messageModel
     .find(query)
     .limit(limit)

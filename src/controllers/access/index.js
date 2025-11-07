@@ -31,7 +31,7 @@ class AccessController {
       metadata: await AccessService.handleToken(
         req.user,
         req.keyToken,
-        req.header(header.REFRESH_TOKEN)
+        req.header(header.REFRESH_TOKEN),
       ),
     }).send(res);
   };

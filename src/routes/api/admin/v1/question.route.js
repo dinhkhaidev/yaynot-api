@@ -11,24 +11,24 @@ router.get("/", asyncHandle(QuestionController.getListQuestion));
 router.get("/:questionId", asyncHandle(QuestionController.getQuestionById));
 router.patch(
   "/:questionId/soft-delete",
-  asyncHandle(QuestionController.softDeleteQuestion)
+  asyncHandle(QuestionController.softDeleteQuestion),
 );
 router.delete(
   "/:questionId",
-  asyncHandle(QuestionController.hardDeleteQuestion)
+  asyncHandle(QuestionController.hardDeleteQuestion),
 );
 router.post(
   "/:questionId/status",
-  asyncHandle(QuestionController.changeQuestionStatus)
+  asyncHandle(QuestionController.changeQuestionStatus),
 );
 router.post(
   "/:questionId/visibility",
   validate(visibilitySchema),
-  asyncHandle(QuestionController.changeVisibilityQuestion)
+  asyncHandle(QuestionController.changeVisibilityQuestion),
 );
 router.get(
   "/:questionId/history",
-  asyncHandle(QuestionController.getHistoryQuestion)
+  asyncHandle(QuestionController.getHistoryQuestion),
 );
 
 module.exports = router;

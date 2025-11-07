@@ -12,7 +12,7 @@ const checkPublishedQuestion = (param = "body") => {
         questionId,
       });
       if (status !== "publish")
-        throw new ForbiddenError("Question is not published!");
+      {throw new ForbiddenError("Question is not published!");}
       next();
     } catch (error) {
       next(error);

@@ -18,15 +18,17 @@ const findQuestionById = async (id) => {
 const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
   const sortBy = sort ? sort : { _id: -1 };
   const query = { userId: id, moderationStatus: "ok", isDeleted: false };
-  if (cursor) query._id = { $lt: cursor };
-  questonList = await questionModel
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
+  const questionList = await questionModel // Fixed typo: questonList → questionList
     .find(query)
     .sort(sortBy)
     .limit(limit)
     .select(getUnselectData(select))
     .lean();
 
-  return buildResultCursorBased(questonList, limit);
+  return buildResultCursorBased(questionList, limit); // Fixed typo
 };
 const softDeleteQuestionInDB = async (id, statusDelete) => {
   return await questionModel.findByIdAndUpdate(
@@ -52,8 +54,10 @@ const getAllStatusQuestionInDB = async ({
 const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
   const sortBy = sort ? sort : { _id: -1 };
   const query = filter;
-  if (cursor) query._id = { $lt: cursor };
-  questionList = await questionModel
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
+  const questionList = await questionModel // Fixed typo: added const
     .find(query)
     .sort(sortBy)
     .limit(limit)

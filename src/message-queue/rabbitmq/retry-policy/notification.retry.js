@@ -11,15 +11,15 @@ const notificationRetry = async () => {
     const RETRY_LIMIT = 3;
     await channel.prefetch(1);
     channel.consume(retryQueue, async (msg) => {
-      if (!msg) return;
+      if (!msg) {return;}
       const notification = JSON.parse(msg.content.toString());
       const headers = msg.properties.headers || {};
-      let retries = headers["x-retries"] || 0;
+      const retries = headers["x-retries"] || 0;
       try {
         //Check if exceeded retry limit
         if (retries >= RETRY_LIMIT) {
           console.log(
-            `[DLQ] Exceeded retry limit (${retries}/${RETRY_LIMIT}). Moving notification for user: ${notification.receiveId}`
+            `[DLQ] Exceeded retry limit (${retries}/${RETRY_LIMIT}). Moving notification for user: ${notification.receiveId}`,
           );
           //Send message to Dead Letter Queue
           channel.sendToQueue(deadQueue, msg.content, {
@@ -36,12 +36,12 @@ const notificationRetry = async () => {
         }
         const newRetries = retries + 1;
         console.log(
-          `[RETRY] Attempt ${newRetries}/${RETRY_LIMIT} for notification to: ${notification.receiveId}`
+          `[RETRY] Attempt ${newRetries}/${RETRY_LIMIT} for notification to: ${notification.receiveId}`,
         );
         const originQueue = headers["x-origin-queue"];
         if (!originQueue) {
           console.error(
-            `[RETRY] Missing origin queue for: ${notification.receiveId}`
+            `[RETRY] Missing origin queue for: ${notification.receiveId}`,
           );
           // Send to DLQ if no origin queue
           channel.sendToQueue(deadQueue, msg.content, {
@@ -69,7 +69,7 @@ const notificationRetry = async () => {
       } catch (error) {
         console.error(
           `[ERROR] Failed to process retry for ${notification.receiveId}:`,
-          error
+          error,
         );
         channel.nack(msg, false, true); //Requeue to avoid lost message
       }

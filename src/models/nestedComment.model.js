@@ -22,7 +22,7 @@ const commentSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 const commentLikeSchema = new mongoose.Schema(
   {
@@ -36,7 +36,7 @@ const commentLikeSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: "comment_likes",
-  }
+  },
 );
 commentSchema.index({ userId: 1 });
 commentSchema.index({ questionId: 1, commentParentId: 1 });

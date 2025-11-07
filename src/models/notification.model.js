@@ -17,7 +17,7 @@ const notificationSchema = new mongoose.Schema(
   {
     collection: COLLECTION_NAME,
     timestamps: true,
-  }
+  },
 );
 //noti for user with table field id
 const userNotificationSchema = new mongoose.Schema(
@@ -29,7 +29,7 @@ const userNotificationSchema = new mongoose.Schema(
   {
     collection: "user_notifications",
     timestamps: true,
-  }
+  },
 );
 userNotificationSchema.index({ userId: 1 });
 userNotificationSchema.index({ notificationId: 1, userId: 1 });
@@ -37,6 +37,6 @@ module.exports = {
   notificationModel: mongoose.model(DOCUMENT_NAME, notificationSchema),
   userNotificationModel: mongoose.model(
     "userNotification",
-    userNotificationSchema
+    userNotificationSchema,
   ),
 };

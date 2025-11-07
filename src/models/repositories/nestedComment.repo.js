@@ -4,7 +4,7 @@ const {
 const { nestedComment, commentLike } = require("../nestedComment.model");
 
 const createCommentInDB = async (payload) => {
-  return await commentModel.create({ payload });
+  return await nestedComment.create({ payload }); // Fixed: commentModel → nestedComment
 };
 const findCommentInDB = async (commentId) => {
   return await nestedComment.findById(commentId);
@@ -63,7 +63,9 @@ const findCommentLikeByUserCommentId = async ({ userId, commentId }) => {
 };
 const getListCommentLikeInDB = async (cursor, commentId, sort) => {
   const query = { commentId };
-  if (cursor) query._id = { $lt: cursor };
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
   const sortBy = sort ? sort : { _id: -1 };
   const limit = 20;
   const commentLikeList = await commentLike

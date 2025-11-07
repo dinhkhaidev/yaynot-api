@@ -1,5 +1,5 @@
 .vscode
-package-lock.json
+# package-lock.json
 node_modules
 src/tests
 .env
@@ -7,4 +7,4 @@ test
 src/logs/result/
 /md-docs
 src/services/old
-.env.production
+.env.*

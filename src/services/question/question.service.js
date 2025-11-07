@@ -67,7 +67,7 @@ class QuestionService {
     });
 
     const newQuestion = await createQuestionInDB(questionEntity.toDatabase());
-    if (!newQuestion) throw new BadRequestError("Can't create question!");
+    if (!newQuestion) {throw new BadRequestError("Can't create question!");}
 
     if (tags && Array.isArray(tags)) {
       await Promise.all(
@@ -76,7 +76,7 @@ class QuestionService {
             name: tag.trim().toLowerCase(),
             questionId: newQuestion._id,
           });
-        })
+        }),
       );
     }
 
@@ -126,11 +126,11 @@ class QuestionService {
       cursor,
       select,
     });
-    if (!listQuestion) throw new BadRequestError("Can not get list question!");
+    if (!listQuestion) {throw new BadRequestError("Can not get list question!");}
     //enrich data from view redis
     if (listQuestion.data && Array.isArray(listQuestion.data)) {
       listQuestion.data = await this.enrichQuestionsWithViewCount(
-        listQuestion.data
+        listQuestion.data,
       );
     }
     return listQuestion;
@@ -149,7 +149,7 @@ class QuestionService {
   static async softDeleteQuestion(questionId, userId) {
     const questionEntity = await QuestionDomainService.validateQuestionDeletion(
       questionId,
-      userId
+      userId,
     );
 
     questionEntity.softDelete();
@@ -232,7 +232,7 @@ class QuestionService {
 
     const questionEntity = await QuestionDomainService.validateStatusChange(
       questionId,
-      newStatus
+      newStatus,
     );
 
     const questionStatusMap = {
@@ -241,7 +241,7 @@ class QuestionService {
       archive: QuestionService.archiveStatus,
     };
     const handle = questionStatusMap[newStatus];
-    if (!handle) throw new BadRequestError("Incorrect status question!");
+    if (!handle) {throw new BadRequestError("Incorrect status question!");}
 
     return await handle(questionId);
   }
@@ -267,12 +267,12 @@ class QuestionService {
     const questionEntity = await QuestionDomainService.validateVisibilityChange(
       questionId,
       userId,
-      visibility
+      visibility,
     );
 
     if (questionEntity.isDraft()) {
       throw new BadRequestError(
-        "You must publish this question before changing visibility."
+        "You must publish this question before changing visibility.",
       );
     }
 
@@ -368,24 +368,24 @@ class QuestionService {
    * @returns {Promise<Object|Array>} question with updated view count
    */
   static async enrichQuestionsWithViewCount(questions) {
-    if (!questions) return questions;
+    if (!questions) {return questions;}
     const isArray = Array.isArray(questions);
     const questionArray = isArray ? questions : [questions];
 
     const enrichedQuestions = await Promise.all(
       questionArray.map(async (question) => {
-        if (!question) return question;
+        if (!question) {return question;}
         const questionObj = question.toObject ? question.toObject() : question;
         const viewCount = await this.getViewCount(
           questionObj._id?.toString() || questionObj.id?.toString(),
-          questionObj.view || questionObj.viewCount || 0
+          questionObj.view || questionObj.viewCount || 0,
         );
         return {
           ...questionObj,
           view: viewCount,
           viewCount: viewCount,
         };
-      })
+      }),
     );
 
     return isArray ? enrichedQuestions : enrichedQuestions[0];

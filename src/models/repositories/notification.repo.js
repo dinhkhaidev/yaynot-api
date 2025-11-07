@@ -11,8 +11,10 @@ const createNotification = async (payload) => {
 };
 const getListNotificationByUserIdInDB = async ({ userId, cursor }) => {
   const query = { userId };
-  if (cursor) query._id = { $lt: cursor };
-  const sortBy = sort ? sort : { createdAt: -1 };
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
+  const sortBy = { createdAt: -1 }; // Fixed: removed undefined 'sort' variable
   const limit = 20;
   const listNoti = await userNotificationModel
     .find({ userId })

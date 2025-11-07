@@ -10,7 +10,7 @@ const {
 router.post(
   "/",
   validate(pushNotificationSchema),
-  asyncHandle(NotificationController.pushNotification)
+  asyncHandle(NotificationController.pushNotification),
 );
 router.get("/", asyncHandle(NotificationController.getListNotification));
 

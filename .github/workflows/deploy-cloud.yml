@@ -1,0 +1,9 @@
+name: "CI/CD Deploy Cloud - YaynotAPI"
+on:
+  #run when click workflow
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Cloud
+    runs-on: ubuntu-latest

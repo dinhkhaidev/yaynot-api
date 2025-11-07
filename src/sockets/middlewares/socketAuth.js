@@ -7,8 +7,8 @@ const socketAuth = (socket, next) => {
     const publicKey = socket.handshake.auth.publicKey;
     const payload = decodeToken(token, publicKey);
     if (!payload)
-      //   return next(new Error("Access token expired or invalid!"));
-      return next(new Error("Unauthorized"));
+    //   return next(new Error("Access token expired or invalid!"));
+    {return next(new Error("Unauthorized"));}
     console.log("Socket JWT success!");
     socket.user = payload;
     next();

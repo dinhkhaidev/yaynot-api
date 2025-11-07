@@ -7,7 +7,7 @@ const checkVotedUser = require("../../../../middlewares/vote/checkVotedUser");
 router.get(
   "/:questionId",
   checkVotedUser,
-  asyncHandle(VoteController.getDetailVote)
+  asyncHandle(VoteController.getDetailVote),
 );
 router.delete("/:voteId", asyncHandle(VoteController.deleteVote));
 

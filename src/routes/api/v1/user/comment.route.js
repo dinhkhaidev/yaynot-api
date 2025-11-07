@@ -12,7 +12,7 @@ const {
 router.post(
   "/",
   validate(createCommentSchema),
-  asyncHandle(NestedCommentController.createComment)
+  asyncHandle(NestedCommentController.createComment),
 );
 router.get("/", asyncHandle(NestedCommentController.getListComment));
 
@@ -24,7 +24,7 @@ router.patch(
     resultId: "commentId",
     ownerField: "userId",
   }),
-  asyncHandle(NestedCommentController.updateComment)
+  asyncHandle(NestedCommentController.updateComment),
 );
 
 router.delete(
@@ -35,23 +35,23 @@ router.delete(
     resultId: "commentId",
     ownerField: "userId",
   }),
-  asyncHandle(NestedCommentController.deleteComment)
+  asyncHandle(NestedCommentController.deleteComment),
 );
 
 router.post(
   "/:commentId/like",
-  asyncHandle(NestedCommentController.likeComment)
+  asyncHandle(NestedCommentController.likeComment),
 );
 router.delete(
   "/:commentId/like",
-  asyncHandle(NestedCommentController.unlikeComment)
+  asyncHandle(NestedCommentController.unlikeComment),
 );
 router.get(
   "/:commentId/likes",
-  asyncHandle(NestedCommentController.getListLikeComment)
+  asyncHandle(NestedCommentController.getListLikeComment),
 );
 router.patch(
   "/:commentId/pin",
-  asyncHandle(NestedCommentController.pinnedComment)
+  asyncHandle(NestedCommentController.pinnedComment),
 );
 module.exports = router;

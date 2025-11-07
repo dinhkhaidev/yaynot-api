@@ -14,7 +14,7 @@ const voteSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 const voteSummarySchema = new mongoose.Schema(
   {
@@ -30,7 +30,7 @@ const voteSummarySchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: "vote_summaries",
-  }
+  },
 );
 voteSchema.index({ questionId: 1, userId: 1 }, { unique: true });
 voteSummarySchema.index({ questionId: 1 });

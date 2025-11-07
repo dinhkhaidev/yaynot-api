@@ -16,13 +16,13 @@ const checkOwnership = ({
     try {
       const id = req[param]?.[resultId];
       if (!id || !isObjectId(id))
-        throw new BadRequestError(
-          "Missing field id or invalid value for check ownership!"
-        );
+      {throw new BadRequestError(
+        "Missing field id or invalid value for check ownership!",
+      );}
       const result = await model.findById(id);
-      if (!result) throw new NotFoundError(`${model.modelName} not found!`);
+      if (!result) {throw new NotFoundError(`${model.modelName} not found!`);}
       if (result[ownerField].toString() !== req.user.user_id)
-        throw new ForbiddenError("You do not own this resource");
+      {throw new ForbiddenError("You do not own this resource");}
       req.resource = result;
       next();
     } catch (error) {

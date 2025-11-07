@@ -10,12 +10,12 @@ const {
 router.post(
   "/",
   validate(followUserSchema),
-  asyncHandle(FollowController.followUser)
+  asyncHandle(FollowController.followUser),
 );
 router.delete(
   "/",
   validate(followUserSchema),
-  asyncHandle(FollowController.unfollowUser)
+  asyncHandle(FollowController.unfollowUser),
 );
 router.get("/followers", asyncHandle(FollowController.getListFollower));
 router.get("/followings", asyncHandle(FollowController.getListFollowing));

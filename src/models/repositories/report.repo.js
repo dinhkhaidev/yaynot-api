@@ -18,7 +18,7 @@ class ReportRepository {
     userId,
     targetType,
     targetId,
-    hoursAgo = 24
+    hoursAgo = 24,
   ) {
     const timeThreshold = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
     return await Report.findOne({
@@ -75,14 +75,14 @@ class ReportRepository {
 
     const query = {};
 
-    if (status) query.status = status;
-    if (targetType) query.targetType = targetType;
-    if (reportType) query.reportType = reportType;
+    if (status) {query.status = status;}
+    if (targetType) {query.targetType = targetType;}
+    if (reportType) {query.reportType = reportType;}
 
     if (startDate || endDate) {
       query.createdAt = {};
-      if (startDate) query.createdAt.$gte = new Date(startDate);
-      if (endDate) query.createdAt.$lte = new Date(endDate);
+      if (startDate) {query.createdAt.$gte = new Date(startDate);}
+      if (endDate) {query.createdAt.$lte = new Date(endDate);}
     }
 
     const skip = (page - 1) * limit;
@@ -115,7 +115,7 @@ class ReportRepository {
         ...updateData,
         reviewedAt: new Date(),
       },
-      { new: true }
+      { new: true },
     ).lean();
   }
   static async deleteReport(reportId) {
@@ -164,7 +164,7 @@ class ReportRepository {
   static async increasePriorityForTarget(targetType, targetId) {
     return await Report.updateMany(
       { targetType, targetId, status: reportStatus.PENDING },
-      { $inc: { priority: 1 } }
+      { $inc: { priority: 1 } },
     );
   }
   /**
@@ -178,7 +178,7 @@ class ReportRepository {
         actionTaken,
         isAutoResolved: true,
         reviewedAt: new Date(),
-      }
+      },
     );
   }
 }

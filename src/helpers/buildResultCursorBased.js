@@ -1,5 +1,5 @@
 const buildResultCursorBased = (listData, limit) => {
-  let cursorBased = {};
+  const cursorBased = {};
   cursorBased.data = listData;
   const lengthQuestionList = listData.length;
   cursorBased.nextCursor = listData[lengthQuestionList - 1]?._id;

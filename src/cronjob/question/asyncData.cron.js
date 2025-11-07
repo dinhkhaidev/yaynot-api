@@ -22,7 +22,7 @@ const asyncDataCronjob = async ({
             const keyFlush = (await cacheRepo.get(keyFlushValue)) || keyView;
             await questionModel.updateOne(
               { _id: key.split(":")[1] },
-              { $inc: { [fieldData]: parseInt(keyView - keyFlush, 10) || 0 } }
+              { $inc: { [fieldData]: parseInt(keyView - keyFlush, 10) || 0 } },
             );
             await cacheRepo.set(keyFlushValue, keyView, 3600);
           }
@@ -30,13 +30,13 @@ const asyncDataCronjob = async ({
       } catch (error) {
         console.error(
           "[NODE-CRON] [ERROR] Error in asyncDataCronjob:",
-          error.message
+          error.message,
         );
       }
     },
     {
       timezone: "Asia/Ho_Chi_Minh",
-    }
+    },
   );
   if (mode === "start" && typeof task[mode] === "function") {
     console.log(`Cronjob ${fieldData} start `);

@@ -9,7 +9,7 @@ class QuestionStatusRule {
 
     if (currentStatus === newStatus) {
       throw new BadRequestError(
-        `No changes applied. Status is already ${newStatus}!`
+        `No changes applied. Status is already ${newStatus}!`,
       );
     }
   }
@@ -50,7 +50,7 @@ class QuestionStatusRule {
 
     if (!validationMap[newStatus]) {
       throw new BadRequestError(
-        `Question cannot be transitioned to ${newStatus} status`
+        `Question cannot be transitioned to ${newStatus} status`,
       );
     }
   }

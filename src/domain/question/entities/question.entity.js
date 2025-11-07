@@ -251,8 +251,8 @@ class QuestionEntity {
   }
 
   updateContent(title, content) {
-    if (title) this.title = title.trim();
-    if (content) this.content = content.trim();
+    if (title) {this.title = title.trim();}
+    if (content) {this.content = content.trim();}
     this.updatedAt = new Date();
   }
 
@@ -327,7 +327,7 @@ class QuestionEntity {
   }
 
   static fromDatabase(dbRecord) {
-    if (!dbRecord) return null;
+    if (!dbRecord) {return null;}
 
     return new QuestionEntity({
       id: dbRecord._id,
@@ -354,7 +354,7 @@ class QuestionEntity {
   }
 
   static fromDatabaseArray(dbRecords) {
-    if (!Array.isArray(dbRecords)) return [];
+    if (!Array.isArray(dbRecords)) {return [];}
     return dbRecords.map((record) => QuestionEntity.fromDatabase(record));
   }
 

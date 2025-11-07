@@ -15,7 +15,7 @@ const tagSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 const tagQuestionMapSchema = new mongoose.Schema(
   {
@@ -35,7 +35,7 @@ const tagQuestionMapSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: "tags_questions",
-  }
+  },
 );
 // tagSchema.pre("save", function (next) {
 //   if (this.isModified("name")) {

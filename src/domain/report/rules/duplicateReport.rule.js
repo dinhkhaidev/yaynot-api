@@ -9,7 +9,7 @@ class DuplicateReportRule {
   validateNoDuplicate(existingReport) {
     if (existingReport) {
       throw new BadRequestError(
-        `You have already reported this content within the last ${this.duplicateCheckHours} hours`
+        `You have already reported this content within the last ${this.duplicateCheckHours} hours`,
       );
     }
   }

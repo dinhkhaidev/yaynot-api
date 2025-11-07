@@ -14,7 +14,7 @@ router.post(
   validate(uploadImageParamSchema, "params"),
   validate(uploadImageQuerySchema, "query"),
   uploadMemory.single("image"),
-  asyncHandle(UploadController.uploadImageByType)
+  asyncHandle(UploadController.uploadImageByType),
 );
 
 module.exports = router;

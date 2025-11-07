@@ -13,7 +13,7 @@ class ReportAdminController {
       metadata: await ReportService.getReportById(
         req.params.id,
         req.user.user_id,
-        true // isAdmin = true
+        true, // isAdmin = true
       ),
     }).send(res);
   };
@@ -23,7 +23,7 @@ class ReportAdminController {
       metadata: await ReportService.reviewReport(
         req.params.id,
         req.body,
-        req.user.user_id
+        req.user.user_id,
       ),
     }).send(res);
   };
@@ -38,7 +38,7 @@ class ReportAdminController {
       message: "Get reports by target successfully",
       metadata: await ReportService.getReportsByTarget(
         req.params.targetType,
-        req.params.targetId
+        req.params.targetId,
       ),
     }).send(res);
   };

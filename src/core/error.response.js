@@ -22,7 +22,7 @@ class ErrorResponse extends Error {
 class BadRequestError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.BAD_REQUEST,
-    status = StatusCodes.BAD_REQUEST
+    status = StatusCodes.BAD_REQUEST,
   ) {
     super(message, status);
   }
@@ -30,7 +30,7 @@ class BadRequestError extends ErrorResponse {
 class NotFoundError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.NOT_FOUND,
-    status = StatusCodes.NOT_FOUND
+    status = StatusCodes.NOT_FOUND,
   ) {
     super(message, status);
   }
@@ -38,7 +38,7 @@ class NotFoundError extends ErrorResponse {
 class AuthFailureError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.UNAUTHORIZED,
-    status = StatusCodes.UNAUTHORIZED
+    status = StatusCodes.UNAUTHORIZED,
   ) {
     super(message, status);
   }
@@ -46,7 +46,7 @@ class AuthFailureError extends ErrorResponse {
 class ForbiddenError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.FORBIDDEN,
-    status = StatusCodes.FORBIDDEN
+    status = StatusCodes.FORBIDDEN,
   ) {
     super(message, status);
   }
@@ -54,7 +54,7 @@ class ForbiddenError extends ErrorResponse {
 class RequestTimeoutError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.REQUEST_TIMEOUT,
-    status = StatusCodes.REQUEST_TIMEOUT
+    status = StatusCodes.REQUEST_TIMEOUT,
   ) {
     super(message, status);
   }

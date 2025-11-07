@@ -11,13 +11,13 @@ const {
 router.patch(
   "/",
   validate(createUserProfileSchema),
-  asyncHandle(UserProfileController.upsertUserProfile)
+  asyncHandle(UserProfileController.upsertUserProfile),
 );
 router.get("/", asyncHandle(UserProfileController.getInfoProfile));
 router.patch(
   "/avatar",
   validate(updateAvatarSchema),
-  asyncHandle(UserProfileController.updateAvatar)
+  asyncHandle(UserProfileController.updateAvatar),
 );
 
 module.exports = router;

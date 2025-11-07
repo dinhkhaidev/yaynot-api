@@ -19,9 +19,9 @@ class UploadService {
           public_id: publicId,
         },
         (error, result) => {
-          if (error) return reject(error);
+          if (error) {return reject(error);}
           resolve(result);
-        }
+        },
       );
 
       streamifier.createReadStream(buffer).pipe(uploadStream);

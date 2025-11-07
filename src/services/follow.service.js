@@ -20,28 +20,28 @@ const {
 class FollowSerivice {
   static async followUser({ followerId, followingId }) {
     const userRecord = await findUserById(followingId);
-    if (!userRecord) throw new NotFoundError("User incorrect!");
+    if (!userRecord) {throw new NotFoundError("User incorrect!");}
     if (followerId === followingId)
-      throw new ForbiddenError("User can't follow themselves!");
+    {throw new ForbiddenError("User can't follow themselves!");}
     const followUserRecord = await findFollowUserInDB({
       followerId,
       followingId,
     });
     if (followUserRecord)
-      throw new BadRequestError("You are already following this user!");
+    {throw new BadRequestError("You are already following this user!");}
     const followUserData = await followUserInDB({ followerId, followingId });
     await updateFollowCount({ followerId, followingId });
     return followUserData;
   }
   static async unfollowUser({ followerId, followingId }) {
     const userRecord = await findUserById(followingId);
-    if (!userRecord) throw new NotFoundError("User incorrect!");
+    if (!userRecord) {throw new NotFoundError("User incorrect!");}
     const followUserRecord = await findFollowUserInDB({
       followerId,
       followingId,
     });
     if (!followUserRecord)
-      throw new BadRequestError("You are not following this user!");
+    {throw new BadRequestError("You are not following this user!");}
     const unfollowUserData = await unfollowUserInDB({
       followerId,
       followingId,
@@ -51,9 +51,9 @@ class FollowSerivice {
   }
   static async getListFollowByAction({ followId, cursor, sort, action }) {
     if (action === "follower")
-      return await getListFollowerById({ followId, cursor, sort });
+    {return await getListFollowerById({ followId, cursor, sort });}
     if (action === "following")
-      return await getListFollowingById({ followId, cursor, sort });
+    {return await getListFollowingById({ followId, cursor, sort });}
   }
 }
 module.exports = FollowSerivice;

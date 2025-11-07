@@ -41,21 +41,21 @@ const decodeToken = (token, publicKey) => {
 const authentication = asyncHandle(async (req, res, next) => {
   const userId = req.header(header.USER_ID);
   if (!userId || !isObjectId(userId))
-    throw new BadRequestError("Invalid or missing userId!");
+  {throw new BadRequestError("Invalid or missing userId!");}
   const accessToken = req.header(header.AUTHORIZATION);
-  if (!accessToken) throw new AuthFailureError("Missing access token!");
+  if (!accessToken) {throw new AuthFailureError("Missing access token!");}
   const isTokenBlackListed = await findTokenBlackList(accessToken);
   if (isTokenBlackListed) {
     throw new AuthFailureError(
-      "Access token has been revoked. Please re-login."
+      "Access token has been revoked. Please re-login.",
     );
   }
   const userKeyTokenRecord = await findKeyTokenByUserId(userId);
-  if (!userKeyTokenRecord) throw new NotFoundError("UserId not found!");
+  if (!userKeyTokenRecord) {throw new NotFoundError("UserId not found!");}
 
   const decodedToken = decodeToken(accessToken, userKeyTokenRecord.publicKey);
   if (!decodedToken)
-    throw new BadRequestError("Access token expired or invalid!");
+  {throw new BadRequestError("Access token expired or invalid!");}
   req.keyToken = userKeyTokenRecord;
   req.user = decodedToken;
   return next();

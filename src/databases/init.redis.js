@@ -1,34 +1,39 @@
 const Redis = require("ioredis");
-let client = {},
-  statusConnectRedis = {
-    CONNECT: "connect",
-    READY: "ready",
-    ERROR: "error",
-    CLOSE: "close",
-  };
-// const handleEvents = (event) => {
-//   event.on(statusConnectRedis.CONNECT, () => console.log("Redis connected"));
-//   event.on(statusConnectRedis.READY, () => console.log("Redis ready"));
-//   event.on(statusConnectRedis.ERROR, (err) =>
-//     console.error("Redis error:", err.message)
-//   );
-//   event.on(statusConnectRedis.CLOSE, () =>
-//     console.log("Redis connection closed")
-//   );
-// };
+
+let client = null;
+let connectionPromise = null;
+
+const statusConnectRedis = {
+  CONNECT: "connect",
+  READY: "ready",
+  ERROR: "error",
+  CLOSE: "close",
+};
+
 const initRedis = () => {
-  return new Promise((resolve, reject) => {
-    const instanceRedis = new Redis({
-      port: process.env.REDIS_PORT || 6379, // Redis port
-      host: process.env.REDIS_HOST || "redis",
-      username: process.env.REDIS_USERNAME || "",
-      password: process.env.REDIS_PASSWORD || "",
-      retryStrategy: (times) => Math.min(times * 50, 2000),
-    });
+  // Return existing promise if already connecting/connected
+  if (connectionPromise) {
+    return connectionPromise;
+  }
 
-    client.instanceRedis = instanceRedis;
+  connectionPromise = new Promise((resolve, reject) => {
+    const redisConfig = process.env.REDIS_URL
+      ? process.env.REDIS_URL
+      : {
+          port: process.env.REDIS_PORT || 6379,
+          host: process.env.REDIS_HOST || "redis",
+          username: process.env.REDIS_USERNAME || "",
+          password: process.env.REDIS_PASSWORD || "",
+          retryStrategy: (times) => Math.min(times * 50, 2000),
+          maxRetriesPerRequest: 3,
+          enableReadyCheck: false,
+          enableOfflineQueue: false,
+          lazyConnect: true,
+        };
 
-    // Handle connection events
+    const instanceRedis = new Redis(redisConfig);
+    client = instanceRedis;
+
     instanceRedis.on(statusConnectRedis.READY, () => {
       console.log("Redis ready");
       resolve(instanceRedis);
@@ -36,18 +41,41 @@ const initRedis = () => {
 
     instanceRedis.on(statusConnectRedis.ERROR, (err) => {
       console.error("Redis error:", err.message);
-      reject(err);
     });
 
     instanceRedis.on(statusConnectRedis.CONNECT, () => {
-      console.log("Redis connected");
+      console.log("Redis connecting...");
     });
 
     instanceRedis.on(statusConnectRedis.CLOSE, () => {
-      console.log("Redis connection closed");
+      console.log("Redis closed");
+      client = null;
+      connectionPromise = null;
     });
+
+    // Connect once
+    if (instanceRedis.status === "wait" || instanceRedis.status === "end") {
+      instanceRedis.connect().catch(reject);
+    } else {
+      console.log(`Redis status: ${instanceRedis.status}, skipping connect()`);
+      // If already connecting/connected, resolve when ready
+      instanceRedis.once(statusConnectRedis.READY, () =>
+        resolve(instanceRedis)
+      );
+    }
   });
+
+  return connectionPromise;
 };
+
 const getRedis = () => client;
-const closeRedis = () => {};
+
+const closeRedis = async () => {
+  if (client) {
+    await client.quit();
+    client = null;
+    connectionPromise = null;
+  }
+};
+
 module.exports = { initRedis, getRedis, closeRedis };

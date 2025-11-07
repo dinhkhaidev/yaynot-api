@@ -6,7 +6,7 @@ const asyncHandle = require("../../../../helpers/asyncHandle");
 router.get("/conventions", asyncHandle(ChatController.getListConventionsUser));
 router.get(
   "/:convoId/messages",
-  asyncHandle(ChatController.getConventionMessages)
+  asyncHandle(ChatController.getConventionMessages),
 );
 router.get("/:convoId/find", asyncHandle(ChatController.searchMessage));
 

@@ -1,6 +1,7 @@
 const { getListRole } = require("../controllers/rbac");
 const { AuthFailureError } = require("../core/error.response");
-const { ac } = require("./accessControl");
+const { ac: _ac } = require("./accessControl"); // Renamed to avoid conflict
+const AccessControl = require("accesscontrol"); // Import AccessControl class
 
 module.exports = (action, resource) => {
   return async (req, res, next) => {

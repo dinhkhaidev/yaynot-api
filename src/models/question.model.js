@@ -40,7 +40,7 @@ const questionSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 questionSchema.index({ userId: 1 });
 module.exports = mongoose.model(DOCUMENT_NAME, questionSchema);

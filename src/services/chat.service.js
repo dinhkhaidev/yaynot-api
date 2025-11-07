@@ -21,7 +21,7 @@ class ChatService {
       participants: { $all: participants, $size: 2 },
     };
     const chatRecord = await findConventionInDB(query);
-    if (chatRecord) throw new BadRequestError("Convention existed!");
+    if (chatRecord) {throw new BadRequestError("Convention existed!");}
     return createConventionInDB({ name, type, participants });
   }
   static async createMessage({
@@ -32,7 +32,7 @@ class ChatService {
     receiveId,
   }) {
     const userRecord = await findUserProfileById(receiveId);
-    if (!userRecord) throw new BadRequestError("Receive id invalid!");
+    if (!userRecord) {throw new BadRequestError("Receive id invalid!");}
     if (!convoId) {
       const payload = { type: "private", participants: [senderId, receiveId] };
       const { _id } = await ChatService.createConvention(payload);
@@ -46,7 +46,7 @@ class ChatService {
       return newMessage;
     } else {
       const conventionRecord = await findConventionByIdInDB(convoId);
-      if (!conventionRecord) throw new NotFoundError("Convention not existed!");
+      if (!conventionRecord) {throw new NotFoundError("Convention not existed!");}
       const newMessage = await createMessageInDB({
         content,
         attachment,
@@ -68,12 +68,12 @@ class ChatService {
     };
     const conventionRecord = await findConventionInDB(query);
     if (!conventionRecord)
-      throw new NotFoundError("Convention invalid or not existed!");
+    {throw new NotFoundError("Convention invalid or not existed!");}
     return await getConventionMessagesInDB({ convoId, cursor });
   }
   static async deleteMessage({ messageId }) {
     const messageRecord = await findMessageInDB(messageId);
-    if (!messageRecord) throw new NotFoundError("Message not existed!");
+    if (!messageRecord) {throw new NotFoundError("Message not existed!");}
     return await deleteMessageInDB(messageId);
   }
   static async searchMessage({ keyword, convoId, userId }) {
@@ -84,7 +84,7 @@ class ChatService {
     };
     const conventionRecord = await findConventionInDB(query);
     if (!conventionRecord)
-      throw new NotFoundError("Convention invalid or not existed!");
+    {throw new NotFoundError("Convention invalid or not existed!");}
     return await searchMessageInDB({ keyword, convoId });
   }
 }

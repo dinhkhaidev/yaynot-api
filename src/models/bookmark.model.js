@@ -10,7 +10,7 @@ const bookmarkSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 bookmarkSchema.index({ userId: 1, questionId: 1 });
 module.exports = mongoose.model(DOCUMENT_NAME, bookmarkSchema);

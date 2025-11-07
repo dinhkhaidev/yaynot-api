@@ -24,9 +24,9 @@ class AutoModerationRule {
   calculateSeverity(reportCount) {
     const threshold = this.config.autoHideThreshold;
 
-    if (reportCount >= threshold * 2) return "critical";
-    if (reportCount >= threshold) return "high";
-    if (reportCount >= threshold * 0.7) return "medium";
+    if (reportCount >= threshold * 2) {return "critical";}
+    if (reportCount >= threshold) {return "high";}
+    if (reportCount >= threshold * 0.7) {return "medium";}
     return "low";
   }
 

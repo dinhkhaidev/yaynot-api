@@ -13,22 +13,46 @@ const { keyFlushShareQuestion } = require("./utils/cacheRedis");
 const { initRedis } = require("./databases/init.redis");
 // const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
-require("./message-queue/rabbitmq/setupRabbitmq");
+
+// Detect deployment environment
+// IS_SERVERLESS=true for Vercel (no cron jobs, no RabbitMQ consumers)
+// IS_SERVERLESS=false or undefined for Railway/VPS (full features)
+
+const isServerless =
+  process.env.IS_SERVERLESS === "true" || process.env.VERCEL === "1";
+
+// Conditionally load RabbitMQ and cron jobs (NOT for Vercel serverless)
+if (!isServerless) {
+  require("./message-queue/rabbitmq/setupRabbitmq");
+  console.log("RabbitMQ: Consumers enabled (Railway/VPS mode)");
+} else {
+  console.log(
+    "RabbitMQ: Producers only (Serverless mode - consumers disabled)"
+  );
+}
+
 // require("./configs/redis.config");
 initRedis()
   .then(() => {
-    console.log("Redis initialized successfully, starting cron jobs...");
-    //cronjob async data
-    asyncViewCronjob({
-      patternKeyViewQuestion: "question:*:view",
-      mode: "start",
-    });
-    asyncDataCronjob({
-      patternKey: "question:*:share",
-      mode: "start",
-      keyFlushFunc: keyFlushShareQuestion,
-      fieldData: "shareCount",
-    });
+    console.log("Redis initialized successfully");
+
+    // Only start cron jobs in non-serverless environments
+    if (!isServerless) {
+      console.log("Starting cron jobs... (Railway/VPS mode)");
+      //cronjob async data
+      asyncViewCronjob({
+        patternKeyViewQuestion: "question:*:view",
+        mode: "start",
+      });
+      asyncDataCronjob({
+        patternKey: "question:*:share",
+        mode: "start",
+        keyFlushFunc: keyFlushShareQuestion,
+        fieldData: "shareCount",
+      });
+    } else {
+      console.log("Cron jobs disabled (Serverless mode)");
+    }
   })
   .catch((error) => {
     console.error("Failed to initialize Redis:", error);

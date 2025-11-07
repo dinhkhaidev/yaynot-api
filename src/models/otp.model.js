@@ -11,7 +11,7 @@ const otpModel = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 otpModel.index({ email: 1 }, { unique: true });
 otpModel.index({ otp: -1 }, { unique: true });

@@ -12,7 +12,7 @@ class KeyTokenService {
 
   static async pushTokenToBlackList(token) {
     const foundToken = await KeyTokenService.findTokenBlackList(token);
-    if (foundToken) throw new BadRequestError("Token existed!");
+    if (foundToken) {throw new BadRequestError("Token existed!");}
     return await blackListModel.create({ token });
   }
 

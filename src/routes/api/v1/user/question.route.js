@@ -17,7 +17,7 @@ const {
 router.post(
   "/",
   validate(createQuestionSchema),
-  asyncHandle(QuestionController.createQuestion)
+  asyncHandle(QuestionController.createQuestion),
 );
 
 router.post(
@@ -29,7 +29,7 @@ router.post(
     resultId: "id",
     ownerField: "userId",
   }),
-  asyncHandle(QuestionController.updateQuestion)
+  asyncHandle(QuestionController.updateQuestion),
 );
 
 router.get("/", asyncHandle(QuestionController.getListQuestion));
@@ -44,12 +44,12 @@ router.patch(
     resultId: "questionId",
     ownerField: "userId",
   }),
-  asyncHandle(QuestionController.softDeleteQuestion)
+  asyncHandle(QuestionController.softDeleteQuestion),
 );
 
 router.get(
   "/publish/:questionId",
-  asyncHandle(QuestionController.getAllPublishQuestion)
+  asyncHandle(QuestionController.getAllPublishQuestion),
 );
 
 router.post(
@@ -60,7 +60,7 @@ router.post(
     resultId: "questionId",
     ownerField: "userId",
   }),
-  asyncHandle(QuestionController.changeQuestionStatus)
+  asyncHandle(QuestionController.changeQuestionStatus),
 );
 
 router.post(
@@ -72,40 +72,40 @@ router.post(
     resultId: "questionId",
     ownerField: "userId",
   }),
-  asyncHandle(QuestionController.changeVisibilityQuestion)
+  asyncHandle(QuestionController.changeVisibilityQuestion),
 );
 
 router.post(
   "/:questionId/bookmark",
   validate(bookmarkSchema, "params"),
-  asyncHandle(QuestionController.bookmarkQuestion)
+  asyncHandle(QuestionController.bookmarkQuestion),
 );
 router.delete(
   "/:questionId/bookmark",
   validate(bookmarkSchema, "params"),
-  asyncHandle(QuestionController.unbookmarkQuestion)
+  asyncHandle(QuestionController.unbookmarkQuestion),
 );
 router.get("/me/bookmarks", asyncHandle(QuestionController.getListBookmark));
 router.post(
   "/:questionId/view",
-  asyncHandle(QuestionController.countViewQuestion)
+  asyncHandle(QuestionController.countViewQuestion),
 );
 router.post(
   "/:questionId/share",
-  asyncHandle(QuestionController.countShareQuestion)
+  asyncHandle(QuestionController.countShareQuestion),
 );
 router.post("/:questionId/care", asyncHandle(QuestionController.careQuestion));
 router.delete(
   "/:questionId/uncare",
-  asyncHandle(QuestionController.uncareQuestion)
+  asyncHandle(QuestionController.uncareQuestion),
 );
 router.get(
   "/me/care-questions",
-  asyncHandle(QuestionController.getListCareQuestionByUser)
+  asyncHandle(QuestionController.getListCareQuestionByUser),
 );
 router.get(
   "/:questionId/history",
-  asyncHandle(QuestionController.getHistoryQuestion)
+  asyncHandle(QuestionController.getHistoryQuestion),
 );
 
 module.exports = router;

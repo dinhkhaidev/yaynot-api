@@ -17,7 +17,7 @@ router.post(
   "/",
   validate(upsertVoteSchema),
   checkPublishedQuestion(),
-  asyncHandle(VoteController.upsertVote)
+  asyncHandle(VoteController.upsertVote),
 );
 
 router.delete(
@@ -28,13 +28,13 @@ router.delete(
     resultId: "voteId",
     ownerField: "userId",
   }),
-  asyncHandle(VoteController.deleteVote)
+  asyncHandle(VoteController.deleteVote),
 );
 
 router.get(
   "/:questionId",
   checkVotedUser,
-  asyncHandle(VoteController.getDetailVote)
+  asyncHandle(VoteController.getDetailVote),
 );
 
 module.exports = router;

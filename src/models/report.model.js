@@ -72,7 +72,7 @@ const reportSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 reportSchema.index({ status: 1, createdAt: -1 });
 reportSchema.index({ targetType: 1, targetId: 1 });

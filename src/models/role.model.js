@@ -31,6 +31,6 @@ const roleSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  }
+  },
 );
 module.exports = mongoose.model(DOCUMENT_NAME, roleSchema);

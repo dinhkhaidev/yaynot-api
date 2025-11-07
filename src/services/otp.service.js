@@ -14,7 +14,7 @@ const newOtpToken = async (email) => {
 const checkOtpToken = async (otp) => {
   const foundOtp = await otpModel.findOne({ otp });
   if (!foundOtp || foundOtp.otp !== otp)
-    throw new BadRequestError("OTP incorrect!");
+  {throw new BadRequestError("OTP incorrect!");}
   return foundOtp;
 };
 module.exports = {

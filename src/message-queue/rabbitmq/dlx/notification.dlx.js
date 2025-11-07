@@ -10,7 +10,7 @@ const notificationDlx = async () => {
     await channel.prefetch(1);
     console.log(`[DLX] Waiting for failed messages in ${dlxQueue}...`);
     channel.consume(dlxQueue, async (msg) => {
-      if (!msg) return;
+      if (!msg) {return;}
       try {
         const notification = JSON.parse(msg.content.toString());
         const headers = msg.properties.headers || {};
@@ -18,13 +18,13 @@ const notificationDlx = async () => {
         const reason = headers["x-reason"] || "Unknown";
         const failedAt = headers["x-failed-at"] || new Date().toISOString();
 
-        console.log(`[DLX] ⚠️ Processing permanently failed notification:`);
+        console.log("[DLX] ⚠️ Processing permanently failed notification:");
         console.log(`  - Receiver: ${notification.receiveId}`);
         console.log(`  - Type: ${notification.type}`);
         console.log(`  - Retries: ${retries}`);
         console.log(`  - Reason: ${reason}`);
         console.log(`  - Failed at: ${failedAt}`);
-        console.log(`  - Content:`, notification);
+        console.log("  - Content:", notification);
 
         // TODO: Implement permanent failure handling
         // Options:
@@ -50,9 +50,9 @@ const notificationDlx = async () => {
         //   reason
         // });
         channel.ack(msg);
-        console.log(`[DLX] Message acknowledged and logged`);
+        console.log("[DLX] Message acknowledged and logged");
       } catch (error) {
-        console.error(`[DLX] Error processing DLX message:`, error);
+        console.error("[DLX] Error processing DLX message:", error);
         // Dont requeue - this is the final destination
         channel.ack(msg);
       }

@@ -18,22 +18,22 @@ router.post(
   "/",
   reportRateLimit,
   validate(createReportSchema, "body"),
-  asyncHandle(reportController.createReport)
+  asyncHandle(reportController.createReport),
 );
 router.get(
   "/my-reports",
   validate(getUserReportsSchema, "query"),
-  asyncHandle(reportController.getMyReports)
+  asyncHandle(reportController.getMyReports),
 );
 router.get(
   "/:id",
   validate(reportIdParamSchema, "params"),
-  asyncHandle(reportController.getReportById)
+  asyncHandle(reportController.getReportById),
 );
 router.delete(
   "/:id",
   validate(reportIdParamSchema, "params"),
-  asyncHandle(reportController.cancelReport)
+  asyncHandle(reportController.cancelReport),
 );
 
 module.exports = router;

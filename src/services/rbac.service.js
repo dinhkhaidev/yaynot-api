@@ -12,13 +12,13 @@ class RbacService {
   static async createRole(payload) {
     const { name, description = "role", slug, grants = [] } = payload;
     const roleRecord = await findNameRole(name);
-    if (roleRecord) throw new BadRequestError("Role existed!");
+    if (roleRecord) {throw new BadRequestError("Role existed!");}
     return await createRoleInDB({ name, description, slug, grants });
   }
   static async createResource(payload) {
     const { name, description = "resource", slug } = payload;
     const roleRecord = await findNameRole(name);
-    if (roleRecord) throw new BadRequestError("Resource existed!");
+    if (roleRecord) {throw new BadRequestError("Resource existed!");}
     return await createResourceInDB({ name, description, slug });
   }
   static async resourceList() {

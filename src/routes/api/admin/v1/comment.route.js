@@ -7,7 +7,7 @@ router.get("/", asyncHandle(NestedCommentController.getListComment));
 router.delete("/", asyncHandle(NestedCommentController.deleteComment));
 router.get(
   "/:commentId/likes",
-  asyncHandle(NestedCommentController.getListLikeComment)
+  asyncHandle(NestedCommentController.getListLikeComment),
 );
 
 module.exports = router;

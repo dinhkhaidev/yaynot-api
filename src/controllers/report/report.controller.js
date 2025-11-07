@@ -22,7 +22,7 @@ class ReportController {
       metadata: await ReportService.getReportById(
         req.params.id,
         req.user.user_id,
-        false // isAdmin = false
+        false, // isAdmin = false
       ),
     }).send(res);
   };
@@ -31,7 +31,7 @@ class ReportController {
       message: "Report cancelled successfully",
       metadata: await ReportService.cancelReport(
         req.params.id,
-        req.user.user_id
+        req.user.user_id,
       ),
     }).send(res);
   };

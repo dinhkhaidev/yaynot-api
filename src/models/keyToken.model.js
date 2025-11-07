@@ -12,7 +12,7 @@ const keyTokenSchema = new mongoose.Schema(
   {
     collection: COLLECTION_NAME,
     timestamps: true,
-  }
+  },
 );
 const blackListSchema = new mongoose.Schema(
   {
@@ -27,7 +27,7 @@ const blackListSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: "blacklists",
-  }
+  },
 );
 keyTokenSchema.index({ user_id: 1 }, { unique: true });
 blackListSchema.index({ token: 1 });

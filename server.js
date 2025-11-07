@@ -3,7 +3,7 @@ const app = require("./src/app");
 const port = process.env.PORT || 9999;
 app.listen(port, () => {
   console.log(
-    `Yaynot app listening on port ${port} in ${process.env.NODE_ENV} mode.`
+    `Yaynot app listening on port ${port} in ${process.env.NODE_ENV} mode.`,
   );
 });
 process.on("SIGINT", () => {

@@ -15,21 +15,22 @@ router.use(limitAuth);
 router.post(
   "/register",
   validate(createUserSchema),
-  asyncHandle(AccessController.signUp)
+  asyncHandle(AccessController.signUp),
 );
 router.post(
   "/login",
   validate(loginUserSchema),
-  asyncHandle(AccessController.login)
+  asyncHandle(AccessController.login),
 );
 
 router.use(authentication);
+//turn off log
 router.use(loggerMiddleware());
 
 router.post(
   "/logout",
   validate(logoutUserSchema),
-  asyncHandle(AccessController.logout)
+  asyncHandle(AccessController.logout),
 );
 router.post("/verify", asyncHandle(AccessController.verifyOtp));
 router.post("/refresh-token", asyncHandle(AccessController.handleToken));

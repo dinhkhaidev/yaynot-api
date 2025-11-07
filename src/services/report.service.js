@@ -27,7 +27,7 @@ class ReportServiceRefactored {
       userId,
       type,
       targetId,
-      24
+      24,
     );
 
     const reportEntity = new ReportEntity({
@@ -47,7 +47,7 @@ class ReportServiceRefactored {
     const reportCount = await ReportRepository.countReportsByTarget(
       type,
       targetId,
-      reportStatus.PENDING
+      reportStatus.PENDING,
     );
 
     reportEntity.reportCount = reportCount;
@@ -90,7 +90,7 @@ class ReportServiceRefactored {
 
     const targetContent = await TargetValidationRule.getTargetContent(
       report.targetType,
-      report.targetId
+      report.targetId,
     );
 
     return {
@@ -127,7 +127,7 @@ class ReportServiceRefactored {
   static async reviewReport(
     reportId,
     { status, actionTaken: action, reviewNote },
-    adminId
+    adminId,
   ) {
     const report = await ReportRepository.findReportById(reportId);
 
@@ -153,7 +153,7 @@ class ReportServiceRefactored {
           actionTaken: action,
           reviewNote,
           reviewedBy: adminId,
-        }
+        },
       );
 
       if (status === reportStatus.RESOLVED) {
