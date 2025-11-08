@@ -1,5 +1,5 @@
 const { CREATED, OK } = require("../../core/success.response");
-const ReportService = require("../../services/old/report.service.old");
+const ReportService = require("../../services/report.service");
 class ReportController {
   createReport = async (req, res, next) => {
     new CREATED({
