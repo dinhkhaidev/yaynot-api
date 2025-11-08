@@ -66,6 +66,7 @@ jobs:
     name: Deploy to Railway
     needs: build
     runs-on: ubuntu-latest
+    environment: production # to use Environment Secrets
 
     steps:
       - name: Checkout source code
