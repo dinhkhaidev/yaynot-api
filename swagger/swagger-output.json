@@ -5,9 +5,9 @@
     "title": "YayNot API",
     "description": "API documentation for YayNot social Q&A platform"
   },
-  "host": "https://yaynot-api.vercel.app",
+  "host": "yaynot-api.vercel.app",
   "basePath": "/api/v1",
-  "schemes": ["http"],
+  "schemes": ["https"],
   "securityDefinitions": {
     "Bearer": {
       "type": "apiKey",
