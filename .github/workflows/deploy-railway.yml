@@ -19,6 +19,9 @@ on:
 
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  # Optional: Add these if using account token instead of project token
+  # RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+  # RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
 
 jobs:
   # Check if Vercel deployment was successful
