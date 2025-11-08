@@ -6,10 +6,10 @@ const { getRedis } = require("../../databases/init.redis");
 
 class CacheRepo {
   getRedisInstance() {
-    const { instanceRedis } = getRedis();
+    const instanceRedis = getRedis();
     if (!instanceRedis) {
       throw new Error(
-        "Redis instance is not initialized. Make sure initRedis() is called before using cache operations.",
+        "Redis instance is not initialized. Make sure initRedis() is called before using cache operations."
       );
     }
     return instanceRedis;
