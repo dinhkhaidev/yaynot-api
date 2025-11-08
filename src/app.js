@@ -76,11 +76,12 @@ app.get("/swagger-output.json", (req, res) => {
   res.send(swaggerDocument);
 });
 
+// Swagger UI - MUST be before main routes
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 //routes
 app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
 app.use("/", require("./routes/index"));
-
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {
   const error = new Error("Route not found!");
   error.status = 404;
