@@ -31,9 +31,10 @@ if (!isServerless) {
   );
 }
 
-// require("./configs/redis.config");
-initRedis()
-  .then(() => {
+// Initialize Redis and start cron jobs
+(async () => {
+  try {
+    await initRedis();
     console.log("Redis initialized successfully");
 
     // Only start cron jobs in non-serverless environments
@@ -50,13 +51,15 @@ initRedis()
         keyFlushFunc: keyFlushShareQuestion,
         fieldData: "shareCount",
       });
+      console.log("Cron jobs started");
     } else {
-      console.log("Cron jobs disabled (Serverless mode)");
+      console.log("ℹCron jobs disabled (Serverless mode)");
     }
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("Failed to initialize Redis:", error);
-  });
+    // Don't exit - API can still work without Redis cache
+  }
+})();
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -76,8 +79,36 @@ app.get("/swagger-output.json", (req, res) => {
   res.send(swaggerDocument);
 });
 
-// Swagger UI - MUST be before main routes
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Swagger UI - Serve HTML with CDN for Vercel compatibility
+app.get("/api-docs", (req, res) => {
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YayNot API Documentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        url: '/swagger-output.json',
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+      });
+    };
+  </script>
+</body>
+</html>
+  `;
+  res.send(html);
+});
 
 //routes
 app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
