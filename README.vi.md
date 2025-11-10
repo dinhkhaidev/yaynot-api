@@ -1,43 +1,43 @@
 # YayNot API
 
-> **English** | [Tiếng Việt](README.vi.md)
+> [English](README.md) | **Tiếng Việt**
 
-**YayNot** is a social Q&A platform with real-time chat, notifications, voting, and content moderation features.
+**YayNot** là nền tảng mạng xã hội Q&A (Hỏi đáp) với tính năng real-time chat, notification, voting và content moderation.
 
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)](https://www.mongodb.com/atlas)
 [![Redis](https://img.shields.io/badge/Redis-Cloud-red)](https://redis.io/)
 [![RabbitMQ](https://img.shields.io/badge/RabbitMQ-CloudAMQP-orange)](https://www.cloudamqp.com/)
 
-## 📋 Table of Contents
+## 📋 Mục lục
 
-- [Features](#-features)
-- [Architecture](#-architecture)
+- [Tính năng](#-tính-năng)
+- [Kiến trúc](#-kiến-trúc)
 - [Tech Stack](#-tech-stack)
-- [Installation](#-installation)
+- [Cài đặt](#-cài-đặt)
 - [Deployment](#-deployment)
 - [API Documentation](#-api-documentation)
-- [Project Structure](#-project-structure)
+- [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
 - [Environment Variables](#-environment-variables)
 - [Scripts](#-scripts)
 
 ---
 
-## ✨ Features
+## ✨ Tính năng
 
 ### Core Features
 
 - **Authentication & Authorization**
 
   - JWT-based authentication (Access Token + Refresh Token)
-  - Email verification with OTP
+  - Email verification với OTP
   - Role-based access control (RBAC)
-  - Rate limiting for security
+  - Rate limiting cho security
 
 - **Question Management**
 
-  - Create, edit, delete questions
-  - Draft mode and publish workflow
+  - Tạo, sửa, xóa câu hỏi
+  - Draft mode và publish workflow
   - Visibility control (public/private/followers only)
   - Question history tracking
   - Bookmark, view count, share tracking
@@ -52,18 +52,18 @@
 
 - **Voting System**
 
-  - Upvote/Downvote for questions
+  - Upvote/Downvote cho questions
   - Vote analytics
 
 - **Social Features**
 
   - Follow/Unfollow users
-  - User profiles with avatar, bio, links
+  - User profiles với avatar, bio, links
   - Activity feed
 
 - **Real-time Features**
 
-  - Socket.io for real-time chat
+  - Socket.io cho chat real-time
   - Live notifications
   - Presence indicators
 
@@ -90,7 +90,7 @@
 - **Cron Jobs**
 
   - Async view count updates
-  - Periodic data sync from Redis → MongoDB
+  - Periodic data sync từ Redis → MongoDB
   - Scheduled cleanup tasks
 
 - **Caching (Redis)**
@@ -101,7 +101,7 @@
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Kiến trúc
 
 ### Hybrid Deployment Architecture
 
@@ -135,15 +135,15 @@
 - ✅ JWT authentication
 - ✅ Database queries (MongoDB + Redis)
 - ✅ Message producers (RabbitMQ)
-- ❌ NO cron jobs
-- ❌ NO message consumers
+- ❌ KHÔNG có cron jobs
+- ❌ KHÔNG có message consumers
 
 **Railway (Worker - IS_SERVERLESS=false):**
 
 - ✅ RabbitMQ consumers
 - ✅ Cron jobs (view sync, data flush)
 - ✅ Background tasks
-- ❌ NO HTTP endpoints (optional)
+- ❌ KHÔNG có HTTP endpoints (optional)
 
 ---
 
@@ -196,14 +196,14 @@
 
 ---
 
-## 🚀 Installation
+## 🚀 Cài đặt
 
 ### Prerequisites
 
 ```bash
 node >= 20.x
 npm >= 10.x
-docker & docker-compose (optional - for local dev)
+docker & docker-compose (tùy chọn - cho local dev)
 ```
 
 ### 1. Clone Repository
@@ -213,55 +213,55 @@ git clone https://github.com/khaicoderproject/yaynot-api.git
 cd yaynot-api
 ```
 
-### 2. Install Dependencies
+### 2. Cài Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Environment Setup
+### 3. Thiết lập Environment
 
-Create `.env` file from template:
+Tạo file `.env` từ template:
 
 ```bash
-# Copy and edit
+# Copy và chỉnh sửa
 cp .env.example .env
 ```
 
-See [Environment Variables](#-environment-variables) for details.
+Xem [Environment Variables](#-environment-variables) để biết chi tiết.
 
-### 4. Local Development
+### 4. Chạy Local Development
 
-**Option A: Docker Compose (Recommended)**
+**Option A: Docker Compose (Khuyến nghị)**
 
 ```bash
-# Start all services (MongoDB, Redis, RabbitMQ, Backend)
+# Khởi động tất cả services (MongoDB, Redis, RabbitMQ, Backend)
 docker-compose up -d
 
-# View logs
+# Xem logs
 docker-compose logs -f backend
 
-# Stop services
+# Tắt services
 docker-compose down
 ```
 
 **Option B: Local Node.js**
 
 ```bash
-# Requires MongoDB, Redis, RabbitMQ running separately
+# Cần MongoDB, Redis, RabbitMQ chạy riêng
 npm run dev
 
-# Or run socket server separately
+# Hoặc chạy socket server riêng
 npm run socket
 ```
 
-### 5. Initialize Database (Optional)
+### 5. Khởi tạo Database (Tùy chọn)
 
 ```bash
 npm run initdb
 ```
 
-### 6. Access Application
+### 6. Truy cập Application
 
 - **API:** http://localhost:8888
 - **Health Check:** http://localhost:8888/health
@@ -285,11 +285,11 @@ npm i -g vercel
 vercel link
 ```
 
-**3. Add Environment Variables on Vercel Dashboard:**
+**3. Thêm Environment Variables trên Vercel Dashboard:**
 
-- Go to **Settings → Environment Variables**
-- Add all variables from `.env.production` (see below)
-- **Important:** Set `IS_SERVERLESS=true`
+- Vào **Settings → Environment Variables**
+- Add tất cả variables từ `.env.production`
+- **Quan trọng:** Set `IS_SERVERLESS=true`
 
 **4. Deploy:**
 
@@ -297,28 +297,28 @@ vercel link
 vercel --prod
 ```
 
-**Or automatically via GitHub Actions:**
+**Hoặc tự động qua GitHub Actions:**
 
-- Push code to `main` branch
-- Workflow `.github/workflows/deploy-vercel.yml` runs automatically
+- Push code lên `main` branch
+- Workflow `.github/workflows/deploy-vercel.yml` tự động chạy
 
 ### Railway (Workers)
 
-**1. Create Railway Project:**
+**1. Tạo Railway Project:**
 
-- Go to [railway.app](https://railway.app)
-- Create new project
+- Vào [railway.app](https://railway.app)
+- Tạo project mới
 - Connect GitHub repo
 
-**2. Add Environment Variables:**
+**2. Thêm Environment Variables:**
 
 - Set `IS_SERVERLESS=false`
 - Add MongoDB, Redis, RabbitMQ URLs
 
 **3. Deploy:**
 
-- Railway automatically builds from `Dockerfile`
-- Or trigger via workflow: `.github/workflows/deploy-railway.yml`
+- Railway tự động build từ `Dockerfile`
+- Hoặc trigger qua workflow: `.github/workflows/deploy-railway.yml`
 
 ### Docker (Self-hosted)
 
@@ -345,30 +345,30 @@ docker-compose -f docker-compose.yaml up -d
 
 ### Swagger UI
 
-Access **Swagger docs** at:
+Truy cập **Swagger docs** tại:
 
 - **Local:** http://localhost:8888/api-docs
 - **Production:** https://yaynot-api.vercel.app/api-docs
 
-### API Endpoints Overview
+### Tổng quan API Endpoints
 
-| Module            | Endpoint                  | Methods                                  |
-| ----------------- | ------------------------- | ---------------------------------------- |
-| **Auth**          | `/api/v1/auth/*`          | Register, Login, Logout, Refresh, Verify |
-| **Questions**     | `/api/v1/questions/*`     | CRUD, Publish, Bookmark, View, Share     |
-| **Comments**      | `/api/v1/comments/*`      | CRUD, Like, Pin                          |
-| **Votes**         | `/api/v1/votes/*`         | Upvote, Downvote                         |
-| **Users**         | `/api/v1/profiles/*`      | Update profile, Avatar                   |
-| **Follow**        | `/api/v1/follows/*`       | Follow, Unfollow, Followers, Followings  |
-| **Upload**        | `/api/v1/uploads/:type`   | Image upload (avatar, post, thumb)       |
-| **Chat**          | `/api/v1/chats/*`         | Conversations, Messages                  |
-| **Notifications** | `/api/v1/notifications/*` | List, Mark read, Delete                  |
-| **Reports**       | `/api/v1/reports/*`       | Submit, View reports                     |
-| **Admin**         | `/api/admin/v1/*`         | Moderation, Statistics                   |
+| Module            | Endpoint                  | Methods                                    |
+| ----------------- | ------------------------- | ------------------------------------------ |
+| **Auth**          | `/api/v1/auth/*`          | Register, Login, Logout, Refresh, Verify   |
+| **Questions**     | `/api/v1/questions/*`     | CRUD, Publish, Bookmark, View, Share       |
+| **Comments**      | `/api/v1/comments/*`      | CRUD, Like, Pin                            |
+| **Votes**         | `/api/v1/votes/*`         | Upvote, Downvote                           |
+| **Users**         | `/api/v1/profiles/*`      | Cập nhật profile, Avatar                   |
+| **Follow**        | `/api/v1/follows/*`       | Follow, Unfollow, Followers, Followings    |
+| **Upload**        | `/api/v1/uploads/:type`   | Upload ảnh (avatar, post, thumb)           |
+| **Chat**          | `/api/v1/chats/*`         | Conversations, Messages                    |
+| **Notifications** | `/api/v1/notifications/*` | Danh sách, Đánh dấu đã đọc, Xóa            |
+| **Reports**       | `/api/v1/reports/*`       | Gửi báo cáo, Xem báo cáo                   |
+| **Admin**         | `/api/admin/v1/*`         | Kiểm duyệt, Thống kê                       |
 
 ### Authentication
 
-Most endpoints require **JWT token** in header:
+Hầu hết endpoints yêu cầu **JWT token** trong header:
 
 ```http
 Authorization: Bearer <your_access_token>
@@ -376,7 +376,7 @@ Authorization: Bearer <your_access_token>
 
 ---
 
-## 📁 Project Structure
+## 📁 Cấu trúc thư mục
 
 ```
 yaynot-api/
@@ -441,7 +441,8 @@ yaynot-api/
 ├── railway.json           # Railway config
 ├── server.js              # Entry point
 ├── package.json
-└── README.md
+├── README.md              # English docs
+└── README.vi.md           # Vietnamese docs
 ```
 
 ---
@@ -453,14 +454,14 @@ yaynot-api/
 ```bash
 # Server
 PORT=8888
-NODE_ENV=production  # or developer
+NODE_ENV=production  # hoặc developer
 
 # MongoDB
 URL_MONGODB=mongodb+srv://user:pass@cluster.mongodb.net/YayNot
 
 # Redis
 REDIS_URL=redis://user:pass@host:port
-# OR individual configs:
+# HOẶC cấu hình riêng lẻ:
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_USERNAME=default
@@ -485,7 +486,7 @@ API_KEY=your-api-key
 API_SECRET=your-api-secret
 
 # Deployment Mode
-IS_SERVERLESS=false  # true for Vercel, false for Railway/local
+IS_SERVERLESS=false  # true cho Vercel, false cho Railway/local
 
 # Rate Limiting
 WINDOW_MS_AUTH=10
@@ -504,7 +505,7 @@ POOL_SIZE_MONGODB_PRODUCTION=100
 
 ```bash
 IS_SERVERLESS=true
-VERCEL=1  # Auto-set by Vercel
+VERCEL=1  # Tự động set bởi Vercel
 ```
 
 ### Railway-specific
@@ -519,22 +520,22 @@ IS_SERVERLESS=false
 
 ```bash
 # Development
-npm run dev          # Start with nodemon (auto-reload)
-npm run socket       # Start socket server only
+npm run dev          # Khởi động với nodemon (auto-reload)
+npm run socket       # Chỉ chạy socket server
 
 # Production
-npm start            # Start server (node server.js)
+npm start            # Khởi động server (node server.js)
 
 # Database
-npm run initdb       # Initialize database with seed data
+npm run initdb       # Khởi tạo database với seed data
 
 # Testing
-npm test             # Run Jest tests
+npm test             # Chạy Jest tests
 
 # Linting
-npm run lint         # Check code style
-npm run lint:fix     # Auto-fix lint errors
-npm run lint:errors  # Show only errors (ignore warnings)
+npm run lint         # Kiểm tra code style
+npm run lint:fix     # Tự động sửa lỗi lint
+npm run lint:errors  # Chỉ hiện errors (bỏ qua warnings)
 ```
 
 ---
@@ -542,10 +543,10 @@ npm run lint:errors  # Show only errors (ignore warnings)
 ## 🧪 Testing
 
 ```bash
-# Run all tests
+# Chạy tất cả tests
 npm test
 
-# Run specific test file
+# Chạy test file cụ thể
 npm test -- src/test/auth.test.js
 
 # Watch mode
@@ -554,9 +555,9 @@ npm test -- --watch
 
 ---
 
-## 📖 Additional Documentation
+## 📖 Tài liệu bổ sung
 
-See more docs in `md-docs/` folder:
+Xem thêm docs trong thư mục `md-docs/`:
 
 - **API Structure:** `API_STRUCTURE.md`
 - **Domain Layer:** `DOMAIN_LAYER_INDEX.md`
@@ -566,43 +567,43 @@ See more docs in `md-docs/` folder:
 
 ---
 
-## 🤝 Contributing
+## 🤝 Đóng góp
 
 1. Fork repo
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+2. Tạo feature branch (`git checkout -b feature/TinhNangTuyetVoi`)
+3. Commit changes (`git commit -m 'Thêm tính năng tuyệt vời'`)
+4. Push to branch (`git push origin feature/TinhNangTuyetVoi`)
+5. Mở Pull Request
 
 ---
 
 ## 📝 License
 
-This project is licensed under the ISC License.
+Project này được cấp phép theo ISC License.
 
 ---
 
-## 👥 Authors
+## 👥 Tác giả
 
 - **Đinh Như Khải** - [@dinhkhaidev](https://github.com/dinhkhaidev)
 
 ---
 
-## 🙏 Acknowledgments
+## 🙏 Cảm ơn
 
 - MongoDB Atlas
 - Redis Cloud
 - CloudAMQP
 - Vercel
 - Railway
-- All open-source libraries used in this project
+- Tất cả các thư viện open-source được sử dụng trong project
 
 ---
 
-## 📞 Support
+## 📞 Hỗ trợ
 
-If you have any issues, please create an [Issue](https://github.com/khaicoderproject/yaynot-api/issues) or contact via email.
+Nếu có vấn đề, hãy tạo [Issue](https://github.com/khaicoderproject/yaynot-api/issues) hoặc liên hệ qua email.
 
 ---
 
-**Built with ❤️ using Node.js, Express, MongoDB, Redis & RabbitMQ**
+**Được xây dựng với ❤️ sử dụng Node.js, Express, MongoDB, Redis & RabbitMQ**
