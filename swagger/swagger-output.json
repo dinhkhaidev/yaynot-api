@@ -6,7 +6,7 @@
     "description": "API documentation for YayNot social Q&A platform"
   },
   "host": "yaynot-api.vercel.app",
-  "basePath": "/api/v1",
+  "basePath": "/api",
   "schemes": ["https"],
   "securityDefinitions": {
     "AuthorizationHeader": {
@@ -280,7 +280,7 @@
     }
   },
   "paths": {
-    "/auth/register": {
+    "/v1/auth/register": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Register new user",
@@ -308,7 +308,7 @@
         }
       }
     },
-    "/auth/login": {
+    "/v1/auth/login": {
       "post": {
         "tags": ["Authentication"],
         "summary": "User login",
@@ -336,7 +336,7 @@
         }
       }
     },
-    "/auth/logout": {
+    "/v1/auth/logout": {
       "post": {
         "tags": ["Authentication"],
         "summary": "User logout",
@@ -365,7 +365,7 @@
         }
       }
     },
-    "/auth/refresh-token": {
+    "/v1/auth/refresh-token": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Refresh JWT token",
@@ -381,7 +381,7 @@
         }
       }
     },
-    "/auth/verify": {
+    "/v1/auth/verify": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Verify OTP",
@@ -416,7 +416,7 @@
         }
       }
     },
-    "/emails/resend": {
+    "/v1/emails/resend": {
       "post": {
         "tags": ["Email"],
         "summary": "Resend OTP",
@@ -435,7 +435,7 @@
         }
       }
     },
-    "/questions": {
+    "/v1/questions": {
       "post": {
         "tags": ["Questions"],
         "summary": "Create new question",
@@ -492,7 +492,7 @@
         }
       }
     },
-    "/questions/{id}": {
+    "/v1/questions/{id}": {
       "post": {
         "tags": ["Questions"],
         "summary": "Update question",
@@ -534,7 +534,7 @@
         }
       }
     },
-    "/questions/drafts": {
+    "/v1/questions/drafts": {
       "get": {
         "tags": ["Questions"],
         "summary": "Get draft questions",
@@ -550,7 +550,7 @@
         }
       }
     },
-    "/questions/{questionId}": {
+    "/v1/questions/{questionId}": {
       "get": {
         "tags": ["Questions"],
         "summary": "Get question by ID",
@@ -636,7 +636,7 @@
         }
       }
     },
-    "/questions/publish/{questionId}": {
+    "/v1/questions/publish/{questionId}": {
       "get": {
         "tags": ["Questions"],
         "summary": "Get published questions",
@@ -661,7 +661,7 @@
         }
       }
     },
-    "/questions/status/{questionId}": {
+    "/v1/questions/status/{questionId}": {
       "post": {
         "tags": ["Questions"],
         "summary": "Change question status",
@@ -706,7 +706,7 @@
         }
       }
     },
-    "/questions/visibility/{questionId}": {
+    "/v1/questions/visibility/{questionId}": {
       "post": {
         "tags": ["Questions"],
         "summary": "Change question visibility",
@@ -751,7 +751,7 @@
         }
       }
     },
-    "/questions/{questionId}/bookmark": {
+    "/v1/questions/{questionId}/bookmark": {
       "post": {
         "tags": ["Questions"],
         "summary": "Bookmark a question",
@@ -805,7 +805,7 @@
         }
       }
     },
-    "/questions/me/bookmarks": {
+    "/v1/questions/me/bookmarks": {
       "get": {
         "tags": ["Questions"],
         "summary": "Get user's bookmarked questions",
@@ -835,7 +835,7 @@
         }
       }
     },
-    "/questions/{questionId}/view": {
+    "/v1/questions/{questionId}/view": {
       "post": {
         "tags": ["Questions"],
         "summary": "Increment question view count",
@@ -863,7 +863,7 @@
         }
       }
     },
-    "/questions/{questionId}/share": {
+    "/v1/questions/{questionId}/share": {
       "post": {
         "tags": ["Questions"],
         "summary": "Increment question share count",
@@ -891,7 +891,7 @@
         }
       }
     },
-    "/questions/{questionId}/care": {
+    "/v1/questions/{questionId}/care": {
       "post": {
         "tags": ["Questions"],
         "summary": "Care about a question",
@@ -919,7 +919,7 @@
         }
       }
     },
-    "/questions/{questionId}/uncare": {
+    "/v1/questions/{questionId}/uncare": {
       "delete": {
         "tags": ["Questions"],
         "summary": "Stop caring about a question",
@@ -947,7 +947,7 @@
         }
       }
     },
-    "/questions/me/care-questions": {
+    "/v1/questions/me/care-questions": {
       "get": {
         "tags": ["Questions"],
         "summary": "Get user's cared questions",
@@ -977,7 +977,7 @@
         }
       }
     },
-    "/questions/{questionId}/history": {
+    "/v1/questions/{questionId}/history": {
       "get": {
         "tags": ["Questions"],
         "summary": "Get question edit history",
@@ -1005,7 +1005,7 @@
         }
       }
     },
-    "/comments": {
+    "/v1/comments": {
       "post": {
         "tags": ["Comments"],
         "summary": "Create comment",
@@ -1127,7 +1127,7 @@
         }
       }
     },
-    "/comments/{commentId}/like": {
+    "/v1/comments/{commentId}/like": {
       "post": {
         "tags": ["Comments"],
         "summary": "Like comment",
@@ -1175,7 +1175,7 @@
         }
       }
     },
-    "/comments/{commentId}/likes": {
+    "/v1/comments/{commentId}/likes": {
       "get": {
         "tags": ["Comments"],
         "summary": "Get comment likes",
@@ -1200,7 +1200,7 @@
         }
       }
     },
-    "/comments/{commentId}/pin": {
+    "/v1/comments/{commentId}/pin": {
       "patch": {
         "tags": ["Comments"],
         "summary": "Pin comment",
@@ -1231,7 +1231,7 @@
         }
       }
     },
-    "/votes": {
+    "/v1/votes": {
       "post": {
         "tags": ["Votes"],
         "summary": "Vote on question",
@@ -1260,7 +1260,7 @@
         }
       }
     },
-    "/votes/{voteId}": {
+    "/v1/votes/{voteId}": {
       "delete": {
         "tags": ["Votes"],
         "summary": "Delete vote",
@@ -1288,7 +1288,7 @@
         }
       }
     },
-    "/votes/{questionId}": {
+    "/v1/votes/{questionId}": {
       "get": {
         "tags": ["Votes"],
         "summary": "Get vote details",
@@ -1313,7 +1313,7 @@
         }
       }
     },
-    "/profiles": {
+    "/v1/profile": {
       "patch": {
         "tags": ["User Profile"],
         "summary": "Update user profile",
@@ -1356,7 +1356,7 @@
         }
       }
     },
-    "/profiles/avatar": {
+    "/v1/profile/avatar": {
       "patch": {
         "tags": ["User Profile"],
         "summary": "Update avatar",
@@ -1385,7 +1385,7 @@
         }
       }
     },
-    "/uploads/{type}": {
+    "/v1/uploads/{type}": {
       "post": {
         "tags": ["Upload"],
         "summary": "Upload image",
@@ -1435,7 +1435,7 @@
         }
       }
     },
-    "/follows": {
+    "/v1/follows": {
       "post": {
         "tags": ["Follow"],
         "summary": "Follow user",
@@ -1491,7 +1491,7 @@
         }
       }
     },
-    "/follows/followers": {
+    "/v1/follows/followers": {
       "get": {
         "tags": ["Follow"],
         "summary": "Get followers",
@@ -1507,7 +1507,7 @@
         }
       }
     },
-    "/follows/followings": {
+    "/v1/follows/followings": {
       "get": {
         "tags": ["Follow"],
         "summary": "Get followings",
@@ -1523,7 +1523,7 @@
         }
       }
     },
-    "/chats/conventions": {
+    "/v1/chats/conventions": {
       "get": {
         "tags": ["Chat"],
         "summary": "Get conversations",
@@ -1539,7 +1539,7 @@
         }
       }
     },
-    "/chats/{convoId}/messages": {
+    "/v1/chats/{convoId}/messages": {
       "get": {
         "tags": ["Chat"],
         "summary": "Get conversation messages",
@@ -1564,7 +1564,7 @@
         }
       }
     },
-    "/chats/{convoId}/find": {
+    "/v1/chats/{convoId}/find": {
       "get": {
         "tags": ["Chat"],
         "summary": "Search messages",
@@ -1595,7 +1595,7 @@
         }
       }
     },
-    "/notifications": {
+    "/v1/notifications": {
       "post": {
         "tags": ["Notifications"],
         "summary": "Send notification",
@@ -1641,7 +1641,7 @@
         }
       }
     },
-    "/notifications/marked/{notificationId}": {
+    "/v1/notifications/marked/{notificationId}": {
       "patch": {
         "tags": ["Notifications"],
         "summary": "Mark notification as read",
@@ -1669,7 +1669,7 @@
         }
       }
     },
-    "/notifications/{notificationId}": {
+    "/v1/notifications/{notificationId}": {
       "delete": {
         "tags": ["Notifications"],
         "summary": "Delete notification",
@@ -1697,7 +1697,7 @@
         }
       }
     },
-    "/reports": {
+    "/v1/reports": {
       "post": {
         "tags": ["Reports"],
         "summary": "Create report",
@@ -1763,7 +1763,7 @@
         }
       }
     },
-    "/reports/my-reports": {
+    "/v1/reports/my-reports": {
       "get": {
         "tags": ["Reports"],
         "summary": "Get my reports",
@@ -1799,7 +1799,7 @@
         }
       }
     },
-    "/reports/{id}": {
+    "/v1/reports/{id}": {
       "get": {
         "tags": ["Reports"],
         "summary": "Get report by ID",
