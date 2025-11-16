@@ -15,8 +15,8 @@ class SuccessResponse {
     reasonPhrases = ReasonStatusCode.OK,
   }) {
     (this.message = !message ? reasonPhrases : message),
-    (this.status = statusCode),
-    (this.metadata = metadata);
+      (this.status = statusCode),
+      (this.metadata = metadata);
   }
   send(res, headers = {}) {
     res.status(this.status).json(this);

@@ -83,7 +83,7 @@ class QuestionDomainService {
     });
 
     const questionEntity = QuestionEntity.fromDatabase(questionRecord);
-
+    console.log("userId", userId);
     questionEntity.validateOwnership(userId);
 
     questionEntity.validateNotDeleted();

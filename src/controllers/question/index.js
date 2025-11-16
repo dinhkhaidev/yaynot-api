@@ -37,13 +37,19 @@ class QuestionController {
   getQuestionById = async (req, res, next) => {
     new OK({
       message: "Get question by id successful!",
-      metadata: await QuestionService.getQuestionById(req.params.questionId),
+      metadata: await QuestionService.getQuestionById(
+        req.params.questionId,
+        req.user.user_id
+      ),
     }).send(res);
   };
   softDeleteQuestion = async (req, res, next) => {
     new OK({
       message: "Soft delete question successful!",
-      metadata: await QuestionService.softDeleteQuestion(req.params.questionId),
+      metadata: await QuestionService.softDeleteQuestion(
+        req.params.questionId,
+        req.user.user_id
+      ),
     }).send(res);
   };
   hardDeleteQuestion = async (req, res, next) => {

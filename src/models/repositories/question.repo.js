@@ -13,7 +13,8 @@ const updateQuestionInDB = async (id, payload) => {
   return await questionModel.findByIdAndUpdate(id, payload, { new: true });
 };
 const findQuestionById = async (id) => {
-  return await questionModel.findById(id).lean();
+  const query = { _id: id, isDeleted: false };
+  return await questionModel.findOne(query).lean();
 };
 const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
   const sortBy = sort ? sort : { _id: -1 };

@@ -8,13 +8,12 @@ class QuestionEntity {
     this.title = data.title;
     this.content = data.content;
     this.image = data.image || [];
-    this.visibility = data.visibility || "public";
-    this.status = data.status || "draft";
-    this.moderationStatus = data.moderationStatus || "pending";
+    this.visibility = "private";
+    this.status = "draft";
+    this.moderationStatus = "ok";
     this.isAnonymous = data.isAnonymous || false;
     this.isDeleted = data.isDeleted || false;
     this.userId = data.userId;
-    this.topicId = data.topicId;
     this.shortTag = data.shortTag || [];
     this.viewCount = data.viewCount || 0;
     this.shareCount = data.shareCount || 0;
@@ -251,8 +250,12 @@ class QuestionEntity {
   }
 
   updateContent(title, content) {
-    if (title) {this.title = title.trim();}
-    if (content) {this.content = content.trim();}
+    if (title) {
+      this.title = title.trim();
+    }
+    if (content) {
+      this.content = content.trim();
+    }
     this.updatedAt = new Date();
   }
 
@@ -280,7 +283,6 @@ class QuestionEntity {
       isAnonymous: this.isAnonymous,
       isDeleted: this.isDeleted,
       userId: this.userId,
-      topicId: this.topicId,
       shortTag: this.shortTag,
       viewCount: this.viewCount,
       shareCount: this.shareCount,
@@ -315,7 +317,6 @@ class QuestionEntity {
       isAnonymous: this.isAnonymous,
       isDeleted: this.isDeleted,
       userId: this.userId,
-      topicId: this.topicId,
       shortTag: this.shortTag,
       viewCount: this.viewCount,
       shareCount: this.shareCount,
@@ -327,7 +328,9 @@ class QuestionEntity {
   }
 
   static fromDatabase(dbRecord) {
-    if (!dbRecord) {return null;}
+    if (!dbRecord) {
+      return null;
+    }
 
     return new QuestionEntity({
       id: dbRecord._id,
@@ -340,7 +343,6 @@ class QuestionEntity {
       isAnonymous: dbRecord.isAnonymous,
       isDeleted: dbRecord.isDeleted,
       userId: dbRecord.userId,
-      topicId: dbRecord.topicId,
       shortTag: dbRecord.shortTag,
       viewCount: dbRecord.viewCount,
       shareCount: dbRecord.shareCount,
@@ -354,7 +356,9 @@ class QuestionEntity {
   }
 
   static fromDatabaseArray(dbRecords) {
-    if (!Array.isArray(dbRecords)) {return [];}
+    if (!Array.isArray(dbRecords)) {
+      return [];
+    }
     return dbRecords.map((record) => QuestionEntity.fromDatabase(record));
   }
 
@@ -362,8 +366,8 @@ class QuestionEntity {
     return new QuestionEntity({
       ...data,
       status: data.status || "draft",
-      visibility: data.visibility || "public",
-      moderationStatus: "pending",
+      visibility: data.visibility || "private",
+      moderationStatus: "ok",
       isAnonymous: data.isAnonymous || false,
       isDeleted: false,
       viewCount: 0,

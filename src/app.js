@@ -71,9 +71,13 @@ app.use((req, res, next) => {
   res.header("X-XSS-Protection", "1; mode=block");
   next();
 });
-
 //swagger
-app.get("/swagger-output.json", (req, res) => {
+const swaggerFileName =
+  process.env.NODE_ENV === "developer"
+    ? "swagger-output.local.json"
+    : "swagger-output.json";
+const swaggerDocument = require(`../swagger/${swaggerFileName}`);
+app.get(`/${swaggerFileName}`, (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.send(swaggerDocument);
 });
@@ -94,7 +98,7 @@ app.get("/api-docs", (req, res) => {
   <script>
     window.onload = () => {
       window.ui = SwaggerUIBundle({
-        url: '/swagger-output.json',
+        url: '/${swaggerFileName}',
         dom_id: '#swagger-ui',
         presets: [
           SwaggerUIBundle.presets.apis,

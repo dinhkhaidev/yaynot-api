@@ -10,6 +10,7 @@ const _ = require("lodash");
 const { cloudinary } = require("../configs/cloudinary.config");
 const { keyProfile } = require("../utils/cacheRedis");
 const cacheRepo = require("../models/repositories/cache.repo");
+const { getCache, setCache } = require("../infrastructures/cache/getCache");
 class UserProfileService {
   //handle when user want update profile
   static async upsertUserProfile(payload) {
@@ -35,19 +36,12 @@ class UserProfileService {
   }
   static async getInfoProfile({ user_id, name }) {
     const key = keyProfile(user_id);
-    const cached = await cacheRepo.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+    await getCache(key);
     const userProfileRecord = await findUserProfileInDB({ userId: user_id });
     if (!userProfileRecord) {
       return { username: name, name, follower: 0, following: 0 };
     }
-    await cacheRepo.set(
-      key,
-      JSON.stringify({ ...userProfileRecord, username: name }),
-      180,
-    );
+    await setCache(key, { ...userProfileRecord, username: name }, 120);
     return { ...userProfileRecord, username: name };
   }
   static async updateAvatar({ userId, url }) {

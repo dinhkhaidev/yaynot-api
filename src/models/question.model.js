@@ -6,7 +6,7 @@ const questionSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     content: { type: String, required: true },
-    image: { type: [String] },
+    image: { type: [String], default: [] },
     status: {
       type: String,
       enum: Object.values(statusQuestion),
@@ -19,7 +19,7 @@ const questionSchema = new mongoose.Schema(
     },
     moderationStatus: {
       type: String,
-      enum: ["ok", "warn", "ban"],
+      enum: ["ok", "pending", "flagged", "rejected"],
       default: "ok",
     },
     isAnonymous: { type: Boolean, default: false },
@@ -29,8 +29,12 @@ const questionSchema = new mongoose.Schema(
       required: true,
       ref: "user",
     },
-    view: { type: Number, default: 0 },
+    viewCount: { type: Number, default: 0 },
     shareCount: { type: Number, default: 0 },
+    voteCount: { type: Number, default: 0 },
+    commentCount: { type: Number, default: 0 },
+    bookmarkCount: { type: Number, default: 0 },
+    reportCount: { type: Number, default: 0 },
     shortTag: { type: [String], default: [] },
     //fast for query
     // voteYesCount: { type: Number, default: 0 },
@@ -40,7 +44,7 @@ const questionSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  },
+  }
 );
 questionSchema.index({ userId: 1 });
 module.exports = mongoose.model(DOCUMENT_NAME, questionSchema);
