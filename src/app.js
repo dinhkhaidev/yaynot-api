@@ -5,7 +5,6 @@ const logger = require("./configs/loggerWinston.config");
 const logCustom = require("./logger/logCustom");
 const { v4: uuidv4 } = require("uuid");
 const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require("../swagger/swagger-output.json");
 const { sendEmailVerify } = require("./services/email.service");
 const asyncViewCronjob = require("./cronjob/question/asyncView.cron");
 const asyncDataCronjob = require("./cronjob/question/asyncData.cron");

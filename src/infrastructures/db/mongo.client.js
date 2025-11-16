@@ -1,10 +1,7 @@
-//migrate to infra
-const mongodbInfra = require("../infrastructures/db/mongo.client");
-
 const mongoose = require("mongoose");
 const {
   db: { userMongodb, passwordMongodb },
-} = require("../configs/mongodb.config");
+} = require("../../configs/mongodb.config");
 const stringUrl = process.env.URL_MONGODB;
 
 //singleton
@@ -32,5 +29,5 @@ class Mongodb {
     return Mongodb.instance;
   }
 }
-// const mongodbInstance = Mongodb.getInstances();
-module.exports = mongodbInfra;
+const mongodbInstance = Mongodb.getInstances();
+module.exports = mongodbInstance;

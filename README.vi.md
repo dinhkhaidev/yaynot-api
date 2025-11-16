@@ -352,19 +352,19 @@ Truy cập **Swagger docs** tại:
 
 ### Tổng quan API Endpoints
 
-| Module            | Endpoint                  | Methods                                    |
-| ----------------- | ------------------------- | ------------------------------------------ |
-| **Auth**          | `/api/v1/auth/*`          | Register, Login, Logout, Refresh, Verify   |
-| **Questions**     | `/api/v1/questions/*`     | CRUD, Publish, Bookmark, View, Share       |
-| **Comments**      | `/api/v1/comments/*`      | CRUD, Like, Pin                            |
-| **Votes**         | `/api/v1/votes/*`         | Upvote, Downvote                           |
-| **Users**         | `/api/v1/profiles/*`      | Cập nhật profile, Avatar                   |
-| **Follow**        | `/api/v1/follows/*`       | Follow, Unfollow, Followers, Followings    |
-| **Upload**        | `/api/v1/uploads/:type`   | Upload ảnh (avatar, post, thumb)           |
-| **Chat**          | `/api/v1/chats/*`         | Conversations, Messages                    |
-| **Notifications** | `/api/v1/notifications/*` | Danh sách, Đánh dấu đã đọc, Xóa            |
-| **Reports**       | `/api/v1/reports/*`       | Gửi báo cáo, Xem báo cáo                   |
-| **Admin**         | `/api/admin/v1/*`         | Kiểm duyệt, Thống kê                       |
+| Module            | Endpoint                  | Methods                                  |
+| ----------------- | ------------------------- | ---------------------------------------- |
+| **Auth**          | `/api/v1/auth/*`          | Register, Login, Logout, Refresh, Verify |
+| **Questions**     | `/api/v1/questions/*`     | CRUD, Publish, Bookmark, View, Share     |
+| **Comments**      | `/api/v1/comments/*`      | CRUD, Like, Pin                          |
+| **Votes**         | `/api/v1/votes/*`         | Upvote, Downvote                         |
+| **Users**         | `/api/v1/profiles/*`      | Cập nhật profile, Avatar                 |
+| **Follow**        | `/api/v1/follows/*`       | Follow, Unfollow, Followers, Followings  |
+| **Upload**        | `/api/v1/uploads/:type`   | Upload ảnh (avatar, post, thumb)         |
+| **Chat**          | `/api/v1/chats/*`         | Conversations, Messages                  |
+| **Notifications** | `/api/v1/notifications/*` | Danh sách, Đánh dấu đã đọc, Xóa          |
+| **Reports**       | `/api/v1/reports/*`       | Gửi báo cáo, Xem báo cáo                 |
+| **Admin**         | `/api/admin/v1/*`         | Kiểm duyệt, Thống kê                     |
 
 ### Authentication
 

@@ -8,3 +8,4 @@ src/logs/result/
 src/services/old
 .env.*
 .vercel
+/swagger/swagger-output.local.json

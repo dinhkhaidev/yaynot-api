@@ -1,6 +1,3 @@
-//migrate to infra
-const redisInfra = require("../infrastructures/cache/redis.client");
-
 const Redis = require("ioredis");
 
 let client = null;
@@ -81,8 +78,4 @@ const closeRedis = async () => {
   }
 };
 
-module.exports = {
-  initRedis: redisInfra.initRedis,
-  getRedis: redisInfra.getRedis,
-  closeRedis: redisInfra.closeRedis,
-};
+module.exports = { initRedis, getRedis, closeRedis };
