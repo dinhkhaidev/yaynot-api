@@ -13,8 +13,9 @@
     "lint:errors": "eslint . --quiet"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Đinh Như Khải <khaidevcontact@gmail.com>",
+  "license": "UNLICENSED",
+  "private": true,
   "description": "",
   "dependencies": {
     "accesscontrol": "^2.2.1",

@@ -577,9 +577,13 @@ Xem thêm docs trong thư mục `md-docs/`:
 
 ---
 
-## 📝 License
+## 📝 Giấy phép
 
-Project này được cấp phép theo ISC License.
+Dự án này được cấp phép theo **Thỏa thuận Giấy phép Phần mềm Độc quyền** - vui lòng xem file [LICENSE](LICENSE) để biết đầy đủ các điều khoản và điều kiện.
+
+Bản quyền © 2025 Đinh Như Khải. Bảo lưu toàn bộ quyền.
+
+**Tóm tắt Giấy phép:** Phần mềm này miễn phí cho mục đích giáo dục và sử dụng cá nhân. Việc sờ dụng thương mại yêu cầu sự cho phép bằng văn bản từ chủ sở hữu bản quyền.
 
 ---
 

@@ -578,7 +578,11 @@ See more docs in `md-docs/` folder:
 
 ## 📝 License
 
-This project is licensed under the ISC License.
+This project is licensed under a **Proprietary Software License Agreement** - see the [LICENSE](LICENSE) file for complete terms and conditions.
+
+Copyright © 2025 Đinh Như Khải. All Rights Reserved.
+
+**License Summary:** This software is freely available for educational and personal use. Commercial utilization requires prior written authorization from the copyright holder.
 
 ---
 
