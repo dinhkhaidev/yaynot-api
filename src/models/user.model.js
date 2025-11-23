@@ -10,11 +10,15 @@ const userSchema = new mongoose.Schema(
     user_role: { type: String, enum: Object.values(userRole), default: "002" },
     user_isVerify: { type: Boolean, default: false },
     user_phone: { type: String },
-    user_status: { type: Boolean, default: true },
+    user_status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
   },
   {
     timestamps: true,
     collection: COLLECTION_NAME,
-  },
+  }
 );
 module.exports = mongoose.model(DOCUMENT_NAME, userSchema);

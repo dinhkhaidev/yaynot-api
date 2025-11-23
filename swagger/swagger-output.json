@@ -9,25 +9,16 @@
   "basePath": "/api",
   "schemes": ["https"],
   "securityDefinitions": {
-    "AuthorizationHeader": {
+    "bearerAuth": {
       "type": "apiKey",
+      "name": "Authorization",
       "in": "header",
-      "name": "authorization",
-      "description": "Enter your Authorization token (e.g., eytokenabc123)"
-    },
-    "XApiUserHeader": {
-      "type": "apiKey",
-      "in": "header",
-      "name": "x-api-user",
-      "description": "Enter the user identifier (e.g., user123)"
+      "description": "Enter your JWT token only (Bearer prefix will be added automatically)"
     }
   },
   "security": [
     {
-      "AuthorizationHeader": []
-    },
-    {
-      "XApiUserHeader": []
+      "bearerAuth": []
     }
   ],
   "definitions": {
@@ -341,7 +332,7 @@
         "tags": ["Authentication"],
         "summary": "User logout",
         "description": "Logout user and invalidate token",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -370,7 +361,7 @@
         "tags": ["Authentication"],
         "summary": "Refresh JWT token",
         "description": "Get new access token using refresh token",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Token refreshed successfully"
@@ -386,7 +377,7 @@
         "tags": ["Authentication"],
         "summary": "Verify OTP",
         "description": "Verify email with OTP code",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -421,7 +412,7 @@
         "tags": ["Email"],
         "summary": "Resend OTP",
         "description": "Resend OTP verification email",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "OTP resent successfully"
@@ -440,7 +431,7 @@
         "tags": ["Questions"],
         "summary": "Create new question",
         "description": "Create a new question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -467,7 +458,7 @@
         "tags": ["Questions"],
         "summary": "Get list of questions",
         "description": "Retrieve paginated list of questions",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -497,7 +488,7 @@
         "tags": ["Questions"],
         "summary": "Update question",
         "description": "Update existing question by ID",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
@@ -539,7 +530,7 @@
         "tags": ["Questions"],
         "summary": "Get draft questions",
         "description": "Get all draft questions for current user",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Draft questions retrieved successfully"
@@ -555,7 +546,7 @@
         "tags": ["Questions"],
         "summary": "Get question by ID",
         "description": "Retrieve specific question by ID",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -581,7 +572,7 @@
         "tags": ["Questions"],
         "summary": "Soft delete question",
         "description": "Soft delete question (mark as deleted)",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -610,7 +601,7 @@
         "tags": ["Questions"],
         "summary": "Hard delete question",
         "description": "Permanently delete question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -641,7 +632,7 @@
         "tags": ["Questions"],
         "summary": "Get published questions",
         "description": "Get all published questions",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -666,7 +657,7 @@
         "tags": ["Questions"],
         "summary": "Change question status",
         "description": "Change question status (publish, draft, archive)",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -711,7 +702,7 @@
         "tags": ["Questions"],
         "summary": "Change question visibility",
         "description": "Change question visibility (public, private, follower_only)",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -756,7 +747,7 @@
         "tags": ["Questions"],
         "summary": "Bookmark a question",
         "description": "Add a question to user's bookmarks",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -782,7 +773,7 @@
         "tags": ["Questions"],
         "summary": "Remove bookmark from question",
         "description": "Remove a question from user's bookmarks",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -810,7 +801,7 @@
         "tags": ["Questions"],
         "summary": "Get user's bookmarked questions",
         "description": "Retrieve all questions bookmarked by the current user",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -840,7 +831,7 @@
         "tags": ["Questions"],
         "summary": "Increment question view count",
         "description": "Track a view on a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -868,7 +859,7 @@
         "tags": ["Questions"],
         "summary": "Increment question share count",
         "description": "Track a share on a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -896,7 +887,7 @@
         "tags": ["Questions"],
         "summary": "Care about a question",
         "description": "Mark a question as cared by the user to receive updates",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -924,7 +915,7 @@
         "tags": ["Questions"],
         "summary": "Stop caring about a question",
         "description": "Remove care from a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -952,7 +943,7 @@
         "tags": ["Questions"],
         "summary": "Get user's cared questions",
         "description": "Retrieve all questions that the current user cares about",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -982,7 +973,7 @@
         "tags": ["Questions"],
         "summary": "Get question edit history",
         "description": "Retrieve the edit history of a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -1010,7 +1001,7 @@
         "tags": ["Comments"],
         "summary": "Create comment",
         "description": "Create a new comment on a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1037,7 +1028,7 @@
         "tags": ["Comments"],
         "summary": "Get comments",
         "description": "Get list of comments",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -1059,7 +1050,7 @@
         "tags": ["Comments"],
         "summary": "Update comment",
         "description": "Update existing comment",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1097,7 +1088,7 @@
         "tags": ["Comments"],
         "summary": "Delete comment",
         "description": "Delete existing comment",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1132,7 +1123,7 @@
         "tags": ["Comments"],
         "summary": "Like comment",
         "description": "Like a comment",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "commentId",
@@ -1155,7 +1146,7 @@
         "tags": ["Comments"],
         "summary": "Unlike comment",
         "description": "Remove like from comment",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "commentId",
@@ -1180,7 +1171,7 @@
         "tags": ["Comments"],
         "summary": "Get comment likes",
         "description": "Get list of users who liked the comment",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "commentId",
@@ -1205,7 +1196,7 @@
         "tags": ["Comments"],
         "summary": "Pin comment",
         "description": "Pin a comment to the top of the question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "commentId",
@@ -1236,7 +1227,7 @@
         "tags": ["Votes"],
         "summary": "Vote on question",
         "description": "Upvote or downvote a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1265,7 +1256,7 @@
         "tags": ["Votes"],
         "summary": "Delete vote",
         "description": "Remove vote from question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "voteId",
@@ -1293,7 +1284,7 @@
         "tags": ["Votes"],
         "summary": "Get vote details",
         "description": "Get vote details for a question",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -1318,7 +1309,7 @@
         "tags": ["User Profile"],
         "summary": "Update user profile",
         "description": "Update or create user profile",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1345,7 +1336,7 @@
         "tags": ["User Profile"],
         "summary": "Get user profile",
         "description": "Get current user profile information",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Profile retrieved successfully"
@@ -1361,7 +1352,7 @@
         "tags": ["User Profile"],
         "summary": "Update avatar",
         "description": "Update user avatar URL",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1390,7 +1381,7 @@
         "tags": ["Upload"],
         "summary": "Upload image",
         "description": "Upload image by type",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "consumes": ["multipart/form-data"],
         "parameters": [
           {
@@ -1440,7 +1431,7 @@
         "tags": ["Follow"],
         "summary": "Follow user",
         "description": "Follow another user",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1467,7 +1458,7 @@
         "tags": ["Follow"],
         "summary": "Unfollow user",
         "description": "Unfollow a user",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1496,7 +1487,7 @@
         "tags": ["Follow"],
         "summary": "Get followers",
         "description": "Get list of followers",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Followers retrieved successfully"
@@ -1512,7 +1503,7 @@
         "tags": ["Follow"],
         "summary": "Get followings",
         "description": "Get list of users being followed",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Followings retrieved successfully"
@@ -1528,7 +1519,7 @@
         "tags": ["Chat"],
         "summary": "Get conversations",
         "description": "Get list of user conversations",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Conversations retrieved successfully"
@@ -1544,7 +1535,7 @@
         "tags": ["Chat"],
         "summary": "Get conversation messages",
         "description": "Get messages from a specific conversation",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "convoId",
@@ -1569,7 +1560,7 @@
         "tags": ["Chat"],
         "summary": "Search messages",
         "description": "Search messages in a conversation",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "convoId",
@@ -1600,7 +1591,7 @@
         "tags": ["Notifications"],
         "summary": "Send notification",
         "description": "Send push notification (Admin only)",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1630,7 +1621,7 @@
         "tags": ["Notifications"],
         "summary": "Get notifications",
         "description": "Get list of user notifications",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Notifications retrieved successfully"
@@ -1646,7 +1637,7 @@
         "tags": ["Notifications"],
         "summary": "Mark notification as read",
         "description": "Mark notification as read",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "notificationId",
@@ -1674,7 +1665,7 @@
         "tags": ["Notifications"],
         "summary": "Delete notification",
         "description": "Delete a notification",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "notificationId",
@@ -1702,7 +1693,7 @@
         "tags": ["Reports"],
         "summary": "Create report",
         "description": "Submit a report for inappropriate content",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -1768,7 +1759,7 @@
         "tags": ["Reports"],
         "summary": "Get my reports",
         "description": "Get all reports submitted by the current user",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -1804,7 +1795,7 @@
         "tags": ["Reports"],
         "summary": "Get report by ID",
         "description": "Get detailed information about a specific report",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
@@ -1830,7 +1821,7 @@
         "tags": ["Reports"],
         "summary": "Cancel report",
         "description": "Cancel a pending report submitted by the user",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
@@ -1861,7 +1852,7 @@
         "tags": ["RBAC"],
         "summary": "Create resource",
         "description": "Create new RBAC resource",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "201": {
             "description": "Resource created successfully"
@@ -1875,7 +1866,7 @@
         "tags": ["RBAC"],
         "summary": "Get resources",
         "description": "Get list of RBAC resources",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Resources retrieved successfully"
@@ -1891,7 +1882,7 @@
         "tags": ["RBAC"],
         "summary": "Create role",
         "description": "Create new RBAC role",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "201": {
             "description": "Role created successfully"
@@ -1905,7 +1896,7 @@
         "tags": ["RBAC"],
         "summary": "Get roles",
         "description": "Get list of RBAC roles",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Roles retrieved successfully"
@@ -1921,7 +1912,7 @@
         "tags": ["Admin - Reports"],
         "summary": "Get all reports (Admin)",
         "description": "Get all reports with filters - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -1978,7 +1969,7 @@
         "tags": ["Admin - Reports"],
         "summary": "Get report statistics (Admin)",
         "description": "Get statistical data about reports - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Statistics retrieved successfully"
@@ -1997,7 +1988,7 @@
         "tags": ["Admin - Reports"],
         "summary": "Get report detail (Admin)",
         "description": "Get detailed information about a specific report - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
@@ -2028,7 +2019,7 @@
         "tags": ["Admin - Reports"],
         "summary": "Review report (Admin)",
         "description": "Review and take action on a report - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "id",
@@ -2085,7 +2076,7 @@
         "tags": ["Admin - Reports"],
         "summary": "Get reports by target (Admin)",
         "description": "Get all reports for a specific target - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "targetType",
@@ -2120,7 +2111,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Get all questions (Admin)",
         "description": "Get all questions with filters - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -2165,7 +2156,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Get question detail (Admin)",
         "description": "Get detailed information about a question - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2194,7 +2185,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Hard delete question (Admin)",
         "description": "Permanently delete a question - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2225,7 +2216,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Soft delete question (Admin)",
         "description": "Mark question as deleted without removing from database - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2256,7 +2247,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Change question status (Admin)",
         "description": "Change question status - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2301,7 +2292,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Change question visibility (Admin)",
         "description": "Change question visibility - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2346,7 +2337,7 @@
         "tags": ["Admin - Questions"],
         "summary": "Get question history (Admin)",
         "description": "Get edit history of a question - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2377,7 +2368,7 @@
         "tags": ["Admin - Comments"],
         "summary": "Get all comments (Admin)",
         "description": "Get all comments with filters - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2414,7 +2405,7 @@
         "tags": ["Admin - Comments"],
         "summary": "Delete comment (Admin)",
         "description": "Delete a comment - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -2452,7 +2443,7 @@
         "tags": ["Admin - Comments"],
         "summary": "Get comment likes (Admin)",
         "description": "Get list of users who liked the comment - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "commentId",
@@ -2480,7 +2471,7 @@
         "tags": ["Admin - Votes"],
         "summary": "Get vote details (Admin)",
         "description": "Get vote details for a question - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "questionId",
@@ -2508,7 +2499,7 @@
         "tags": ["Admin - Votes"],
         "summary": "Delete vote (Admin)",
         "description": "Delete a vote - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "voteId",
@@ -2536,7 +2527,7 @@
         "tags": ["Admin - Notifications"],
         "summary": "Send push notification (Admin)",
         "description": "Send push notification to users - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -2566,7 +2557,7 @@
         "tags": ["Admin - Notifications"],
         "summary": "Get all notifications (Admin)",
         "description": "Get all notifications in the system - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -2599,7 +2590,7 @@
         "tags": ["Admin - Emails"],
         "summary": "Create email template (Admin)",
         "description": "Create new email template - Admin only",
-        "security": [{ "AuthorizationHeader": [], "XApiUserHeader": [] }],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "body",

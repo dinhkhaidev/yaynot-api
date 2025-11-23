@@ -1,3 +1,4 @@
+const keyTokenModel = require("../../services/old/access-hmac/keyToken.model");
 const userModel = require("../user.model");
 
 const findUserByEmail = async (email) => {
@@ -9,4 +10,8 @@ const findUserById = async (id) => {
 const findListUserId = async (limit) => {
   return userModel.find().select("_id").cursor({ batchSize: limit });
 };
-module.exports = { findUserByEmail, findUserById, findListUserId };
+module.exports = {
+  findUserByEmail,
+  findUserById,
+  findListUserId,
+};

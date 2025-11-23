@@ -45,6 +45,7 @@ const {
   QuestionMetrics,
 } = require("../../domain/question");
 const QuestionDomainService = require("../../domain/question/QuestionDomainRules.simple");
+const { getCache } = require("../../infrastructures/cache/getCache");
 
 const statusMapping = {
   private: "archive",
@@ -143,10 +144,7 @@ class QuestionService {
 
   static async getQuestionById(questionId, userId) {
     const keyQuestion = keyQuestion(questionId);
-    const cached = await get(keyQuestion);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+    await getCache(keyQuestion);
     const questionRecord = await QuestionValidationRule.validateQuestion({
       questionId,
     });

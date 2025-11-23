@@ -1,3 +1,22 @@
+//auth
+const keyAuthPublicKey = (user_id) => {
+  return `auth:publicKey:${user_id}`;
+};
+
+const keyAuthKeyToken = (user_id) => {
+  return `auth:keyToken:${user_id}`;
+};
+
+const keyAuthBlacklist = (token) => {
+  // Use first 16 chars of token as key (unique enough)
+  return `auth:blacklist:${token.substring(0, 16)}`;
+};
+
+const keyAuthSession = (session_id) => {
+  return `auth:session:${session_id}`;
+};
+
+//profile
 const keyProfile = (user_id) => {
   return `user:${user_id}`;
 };
@@ -5,6 +24,7 @@ const keyProfile = (user_id) => {
 const keyProfilePrivate = (userWatch, userProfile) => {
   return `user:${userWatch}:${userProfile}:private`;
 };
+//question
 const keyViewQuestion = (question_id) => {
   return `question:${question_id}:view`;
 };
@@ -28,4 +48,8 @@ module.exports = {
   keyShareQuestion,
   keyFlushShareQuestion,
   keyQuestion,
+  keyAuthPublicKey,
+  keyAuthKeyToken,
+  keyAuthBlacklist,
+  keyAuthSession,
 };

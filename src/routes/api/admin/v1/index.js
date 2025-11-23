@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { authentication } = require("../../../../auth/authUtil");
+// const { authentication } = require("../../../../auth/authUtil");
 const userRole = require("../../../../constants/userRole");
 
 const checkAdminRole = (req, res, next) => {
@@ -19,6 +19,7 @@ const rbacRoute = require("./rbac.route");
 const notificationRoute = require("./notification.route");
 const emailRoute = require("./email.route");
 const reportRoute = require("./report.route");
+const { authentication } = require("../../../../auth/authUtil.hybrid");
 
 router.use(authentication);
 router.use(checkAdminRole);

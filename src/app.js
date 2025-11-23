@@ -104,6 +104,12 @@ app.get("/api-docs", (req, res) => {
           SwaggerUIBundle.presets.apis,
           SwaggerUIBundle.SwaggerUIStandalonePreset
         ],
+        requestInterceptor: (req) => {
+          if (req.headers.Authorization && !req.headers.Authorization.startsWith('Bearer ')) {
+            req.headers.Authorization = 'Bearer ' + req.headers.Authorization;
+          }
+          return req;
+        }
       });
     };
   </script>

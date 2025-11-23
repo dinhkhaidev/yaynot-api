@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { authentication } = require("../../../../auth/authUtil");
+// const { authentication } = require("../../../../auth/authUtil");
+const { authentication } = require("../../../../auth/authUtil.hybrid");
 
 const questionRoute = require("./question.route");
 const profileRoute = require("./profile.route");
