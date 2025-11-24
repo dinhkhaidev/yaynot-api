@@ -1,4 +1,3 @@
-const keyTokenModel = require("../../services/old/access-hmac/keyToken.model");
 const userModel = require("../user.model");
 
 const findUserByEmail = async (email) => {
