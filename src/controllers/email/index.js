@@ -10,11 +10,5 @@ class EmailController {
       metadata: await createTemplate(req.body),
     }).send(res);
   };
-  resendOtp = async (req, res, next) => {
-    new OK({
-      message: "Send otp successful!",
-      metadata: await sendEmailVerify({ email: req.user.email }),
-    }).send(res);
-  };
 }
 module.exports = new EmailController();

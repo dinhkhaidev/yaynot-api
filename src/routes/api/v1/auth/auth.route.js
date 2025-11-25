@@ -14,14 +14,29 @@ const {
 } = require("../../../../validations/Joi/user.validation");
 const { validate } = require("../../../../middlewares/validate");
 const { limitAuth } = require("../../../../configs/rateLimit.config");
+const {
+  limitVerifyOtp,
+} = require("../../../../infrastructures/rate-limit/rateLimit");
+//verify
+router.get(
+  "/verify-email",
+  limitVerifyOtp,
+  asyncHandle(authController.verifyEmail)
+);
+router.post(
+  "/verify-email",
+  limitVerifyOtp,
+  asyncHandle(authController.verifyOtp)
+);
+
 router.use(limitAuth);
+router.post("/verify", asyncHandle(authController.resendOtp));
+
 router.post(
   "/register",
   validate(createUserSchema),
   asyncHandle(authController.signUp)
 );
-
-router.post("/verify", asyncHandle(authController.verifyOtp));
 
 router.post(
   "/login",

@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const blake = require("blakejs");
 const { BadRequestError, AuthFailureError } = require("../core/error.response");
 const userModel = require("../models/user.model");
 const {
@@ -9,13 +10,18 @@ const {
   addToBlacklist,
   getSession,
   revokeAllUserSessions,
+  verifyToken,
 } = require("../auth/authUtil.hybrid");
 const { setCache, getCache } = require("../infrastructures/cache/getCache");
 const { keyAuthSession } = require("../infrastructures/cache/keyBuilder");
-const { sendEmailVerify } = require("./email.service");
+const {
+  sendEmailVerify,
+  sendEmailVerifyStateless,
+} = require("./email.service");
 const { findUserByEmail } = require("../models/repositories/access.repo");
-const { checkOtpToken } = require("./otp.service");
+const { checkOtpToken, checkOtpStateless } = require("./otp.service");
 const { deleteOtpByEmail } = require("../models/repositories/email.repo");
+const { SHA256 } = require("crypto-js");
 
 const saltRounds = 10;
 
@@ -45,11 +51,12 @@ class AuthService {
       throw new Error("User creation failed!");
     }
 
-    sendEmailVerify({ email: newUser.user_email, name: "email-verify" }).catch(
-      (err) => {
-        console.error("Failed to send verification email:", err);
-      }
-    );
+    sendEmailVerifyStateless({
+      email: newUser.user_email,
+      name: "email-verify",
+    }).catch((err) => {
+      console.error("Failed to send verification email:", err);
+    });
 
     // Auto login after registration
     const sessionId = crypto.randomUUID();
@@ -95,6 +102,56 @@ class AuthService {
     };
   }
 
+  static async verifyStatelessOtpLink({ token }) {
+    const decodedToken = verifyToken(token, process.env.OTP_TOKEN_SECRET);
+    const foundUser = await findUserByEmail(decodedToken.email);
+    if (!foundUser) {
+      throw new BadRequestError("User not found!");
+    }
+    if (foundUser.user_isVerify) {
+      throw new BadRequestError("Invalid verification link!");
+    }
+
+    if (decodedToken) {
+      const updateVerify = await userModel.updateOne(
+        { user_email: decodedToken.email },
+        { user_isVerify: true }
+      );
+
+      return updateVerify;
+    } else {
+      throw new BadRequestError("OTP incorrect!");
+    }
+  }
+
+  static async verifyStatelessOtpManual({ token, otp }) {
+    const decodedToken = verifyToken(token, process.env.OTP_TOKEN_SECRET);
+    const foundUser = await findUserByEmail(decodedToken.email);
+    if (!foundUser) {
+      throw new BadRequestError("User not found!");
+    }
+    if (foundUser.user_isVerify) {
+      throw new BadRequestError("Account has been verified!");
+    }
+
+    const saltVerify = process.env.SALT_VERIFY_EMAIL;
+    if (!saltVerify) {
+      throw new BadRequestError("SALT_VERIFY_EMAIL not found!");
+    }
+    const otpHash = blake.blake2bHex(otp + saltVerify);
+
+    const checkOtp = checkOtpStateless(decodedToken.otpHash, otpHash);
+    if (checkOtp) {
+      const updateVerify = await userModel.updateOne(
+        { user_email: decodedToken.email },
+        { user_isVerify: true }
+      );
+
+      return updateVerify;
+    } else {
+      throw new BadRequestError("OTP incorrect!");
+    }
+  }
   static async verifyUser({ email, otp }) {
     const foundUser = await findUserByEmail(email);
     if (!foundUser) {

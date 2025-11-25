@@ -1,4 +1,4 @@
-const { newOtpToken } = require("./otp.service");
+const { newOtpToken, generateOtpToken } = require("./otp.service");
 const { getTemplate } = require("../services/template.service");
 const { replaceHolderTemplate } = require("../utils/email");
 const { transporter } = require("../configs/nodemailer.config");
@@ -8,6 +8,11 @@ const {
 } = require("../models/repositories/email.repo");
 const { findUserByEmail } = require("../models/repositories/access.repo");
 const { BadRequestError } = require("../core/error.response");
+const jwt = require("jsonwebtoken");
+const { SHA256 } = require("crypto-js");
+const { JWT_CONFIG } = require("../configs/auth.config");
+const blake = require("blakejs");
+
 const sendEmailTransport = ({ from, to, subject, text, html }) => {
   const mailOptions = {
     from,
@@ -23,6 +28,7 @@ const sendEmailTransport = ({ from, to, subject, text, html }) => {
     }
   });
 };
+
 const sendEmailVerify = async ({ email, name = "email-verify" }) => {
   const foundUser = await findUserByEmail(email);
   if (foundUser.user_isVerify) {
@@ -46,4 +52,43 @@ const sendEmailVerify = async ({ email, name = "email-verify" }) => {
   });
   return email;
 };
-module.exports = { sendEmailVerify };
+
+const sendEmailVerifyStateless = async ({ email, name = "email-verify" }) => {
+  const foundUser = await findUserByEmail(email);
+  if (foundUser.user_isVerify) {
+    throw new BadRequestError("Account has been verified!");
+  }
+
+  const saltVerify = process.env.SALT_VERIFY_EMAIL;
+  if (!saltVerify) {
+    throw new BadRequestError("SALT_VERIFY_EMAIL not found!");
+  }
+  const otp = generateOtpToken();
+  const otpHash = blake.blake2bHex(otp + saltVerify);
+  const otpToken = jwt.sign(
+    {
+      email,
+      otpHash,
+    },
+    process.env.OTP_TOKEN_SECRET,
+    {
+      algorithm: JWT_CONFIG.ALGORITHM,
+      expiresIn: "15m",
+    }
+  );
+  const template = await getTemplate(name);
+  const params = {
+    link_verify: `${process.env.URL_MAIL_VERIFY}/?token=${otpToken}`,
+    otp_plain: `${otp}`,
+  };
+  const html = replaceHolderTemplate(template.html, params);
+  sendEmailTransport({
+    from: process.env.EMAIL_NODEMAILER,
+    to: email,
+    subject: "Verify your account!",
+    html,
+  });
+  return email;
+};
+
+module.exports = { sendEmailVerify, sendEmailVerifyStateless };

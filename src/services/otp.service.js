@@ -13,11 +13,21 @@ const newOtpToken = async (email) => {
 };
 const checkOtpToken = async (otp) => {
   const foundOtp = await otpModel.findOne({ otp });
-  if (!foundOtp || foundOtp.otp !== otp)
-  {throw new BadRequestError("OTP incorrect!");}
+  if (!foundOtp || foundOtp.otp !== otp) {
+    throw new BadRequestError("OTP incorrect!");
+  }
   return foundOtp;
 };
+
+const checkOtpStateless = (otpHash, otpDecodedHash) => {
+  if (otpHash.toString() !== otpDecodedHash.toString()) {
+    throw new BadRequestError("OTP incorrect!");
+  }
+  return true;
+};
 module.exports = {
+  generateOtpToken,
   newOtpToken,
   checkOtpToken,
+  checkOtpStateless,
 };

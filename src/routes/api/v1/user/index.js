@@ -11,7 +11,6 @@ const followRoute = require("./follow.route");
 const chatRoute = require("./chat.route");
 const notificationRoute = require("./notification.route");
 const uploadRoute = require("./upload.route");
-const emailRoute = require("./email.route");
 const reportRoute = require("./report.route");
 
 router.use(authentication);
@@ -24,7 +23,6 @@ router.use("/follows", followRoute);
 router.use("/chats", chatRoute);
 router.use("/notifications", notificationRoute);
 router.use("/uploads", uploadRoute);
-router.use("/emails", emailRoute);
 router.use("/reports", reportRoute);
 
 module.exports = router;

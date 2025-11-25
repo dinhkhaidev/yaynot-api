@@ -3,6 +3,8 @@ const windowMsAuth =
   (Number(process.env.WINDOW_MS_AUTH_MINUTES) || 10) * 60 * 1000;
 const windowMsUser =
   (Number(process.env.WINDOW_MS_USER_MINUTES) || 10) * 60 * 1000;
+const windowMsVerifyOtp =
+  (Number(process.env.WINDOW_MS_VERIFY_OTP_MINUTES) || 10) * 60 * 1000;
 
 const limitAuth = rateLimit({
   windowMs: windowMsAuth,
@@ -25,4 +27,15 @@ const limitUser = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
 });
-module.exports = { limitAuth, limitUser };
+
+const limitVerifyOtp = rateLimit({
+  windowMs: windowMsVerifyOtp,
+  max: Number(process.env.MAX_VERIFY_OTP, 10),
+  message: {
+    status: 429,
+    message: process.env.MESSAGE_VERIFY_OTP,
+  },
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+});
+module.exports = { limitAuth, limitUser, limitVerifyOtp };

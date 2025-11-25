@@ -2,6 +2,10 @@ const header = require("../../constants/header.js");
 const { BadRequestError, NotFoundError } = require("../../core/error.response");
 const { OK, CREATED } = require("../../core/success.response");
 const AuthService = require("../../services/auth.service.js");
+const {
+  sendEmailVerify,
+  sendEmailVerifyStateless,
+} = require("../../services/email.service.js");
 
 class AccessController {
   signUp = async (req, res, next) => {
@@ -50,12 +54,30 @@ class AccessController {
       }),
     }).send(res);
   };
+
+  resendOtp = async (req, res, next) => {
+    new OK({
+      message: "Send otp successful!",
+      metadata: await sendEmailVerifyStateless({ email: req.body.email }),
+    }).send(res);
+  };
+
+  //direct link
+  verifyEmail = async (req, res, next) => {
+    new OK({
+      message: "Verify otp successful!",
+      metadata: await AuthService.verifyStatelessOtpLink({
+        token: req.query.token,
+      }),
+    }).send(res);
+  };
+  //verify otp manual
   verifyOtp = async (req, res, next) => {
     new OK({
       message: "Verify otp successful!",
-      metadata: await AuthService.verifyUser({
-        email: req.user.email,
-        otp: req.query.otp,
+      metadata: await AuthService.verifyStatelessOtpManual({
+        otp: req.body.otp,
+        token: req.body.token,
       }),
     }).send(res);
   };
