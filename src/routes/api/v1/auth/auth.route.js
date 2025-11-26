@@ -29,7 +29,7 @@ router.post(
   asyncHandle(authController.verifyOtp)
 );
 
-// router.use(limitAuth);
+router.use(limitAuth);
 router.post("/verify", asyncHandle(authController.resendOtp));
 
 router.post(
