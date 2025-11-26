@@ -15,50 +15,28 @@ require("./databases/mongodb.database");
 
 // Detect deployment environment
 // IS_SERVERLESS=true for Vercel (no cron jobs, no RabbitMQ consumers)
-// IS_SERVERLESS=false or undefined for Railway/VPS (full features)
-
+// IS_SERVERLESS=false for Render/Railway (API only, workers run separately)
 const isServerless =
   process.env.IS_SERVERLESS === "true" || process.env.VERCEL === "1";
 
-// Conditionally load RabbitMQ and cron jobs (NOT for Vercel serverless)
-if (!isServerless) {
-  require("./message-queue/rabbitmq/setupRabbitmq");
-  console.log("RabbitMQ: Consumers enabled (Railway/VPS mode)");
-} else {
-  console.log(
-    "RabbitMQ: Producers only (Serverless mode - consumers disabled)"
-  );
-}
-
-// Initialize Redis and start cron jobs
+// Initialize Redis (required for all modes)
 (async () => {
   try {
     await initRedis();
     console.log("Redis initialized successfully");
-
-    // Only start cron jobs in non-serverless environments
-    if (!isServerless) {
-      console.log("Starting cron jobs... (Railway/VPS mode)");
-      //cronjob async data
-      asyncViewCronjob({
-        patternKeyViewQuestion: "question:*:view",
-        mode: "start",
-      });
-      asyncDataCronjob({
-        patternKey: "question:*:share",
-        mode: "start",
-        keyFlushFunc: keyFlushShareQuestion,
-        fieldData: "shareCount",
-      });
-      console.log("Cron jobs started");
-    } else {
-      console.log("ℹCron jobs disabled (Serverless mode)");
-    }
   } catch (error) {
     console.error("Failed to initialize Redis:", error);
-    // Don't exit - API can still work without Redis cache
   }
 })();
+
+// Note: RabbitMQ consumers and cron jobs are handled by separate worker process
+// See: src/workers/index.js (runs on Railway)
+if (isServerless) {
+  console.log("ℹ Mode: Serverless (Vercel) - API only");
+} else {
+  console.log("ℹ Mode: Long-running (Render) - API only");
+  console.log("ℹ Workers (cron jobs + RabbitMQ) run separately on Railway");
+}
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));

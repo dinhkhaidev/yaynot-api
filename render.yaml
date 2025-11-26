@@ -1,0 +1,51 @@
+# Render.com configuration - API Service only
+services:
+  - type: web
+    name: yaynot-api
+    env: node
+    region: singapore
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8888
+      - key: IS_SERVERLESS
+        value: false
+      - key: URL_MONGODB
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: URL_RABBITMQ
+        sync: false
+      - key: TTL_ACCESS_TOKEN
+        value: 1d
+      - key: TTL_REFRESH_TOKEN
+        value: 5 days
+      - key: CLOUD_NAME
+        sync: false
+      - key: API_KEY
+        sync: false
+      - key: API_SECRET
+        sync: false
+      - key: EMAIL_NODEMAILER
+        sync: false
+      - key: PASS_NODEMAILER
+        sync: false
+      - key: URL_MAIL_VERIFY
+        sync: false
+      - key: TTL_BLACKLIST
+        value: 180
+      - key: WINDOW_MS_AUTH
+        value: 10
+      - key: MAX_AUTH
+        value: 10
+      - key: WINDOW_MS_USER
+        value: 10
+      - key: MAX_USER
+        value: 100
+      - key: POOL_SIZE_MONGODB_PRODUCTION
+        value: 100
+    healthCheckPath: /health
