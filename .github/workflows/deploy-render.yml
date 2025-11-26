@@ -9,7 +9,39 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
+      - name: Validate Deploy Hook
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "❌ Error: RENDER_DEPLOY_HOOK_URL secret is not set"
+            echo "Please add the secret in GitHub Settings → Secrets → Actions"
+            exit 1
+          fi
+
       - name: Trigger Render Deploy
         run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          echo "🚀 Triggering Render deployment..."
+          response=$(curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            -w "\n%{http_code}" \
+            -s)
+
+          http_code=$(echo "$response" | tail -n1)
+
+          if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 201 ]; then
+            echo "✅ Deployment triggered successfully (HTTP $http_code)"
+          else
+            echo "❌ Deployment failed (HTTP $http_code)"
+            exit 1
+          fi
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "### 🚀 Render Deployment Triggered!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Deployment in progress" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform:** Render.com" >> $GITHUB_STEP_SUMMARY
+          echo "**Service:** yaynot-api" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check deployment status at: https://dashboard.render.com" >> $GITHUB_STEP_SUMMARY
