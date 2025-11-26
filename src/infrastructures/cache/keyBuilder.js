@@ -16,6 +16,10 @@ const keyAuthSession = (session_id) => {
   return `auth:session:${session_id}`;
 };
 
+const keyOtpToken = (email) => {
+  return `otp:token:${email}`;
+};
+
 //profile
 const keyProfile = (user_id) => {
   return `user:${user_id}`;
@@ -52,4 +56,5 @@ module.exports = {
   keyAuthKeyToken,
   keyAuthBlacklist,
   keyAuthSession,
+  keyOtpToken,
 };

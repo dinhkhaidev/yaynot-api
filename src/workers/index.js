@@ -29,8 +29,39 @@ async function startWorker() {
     const {
       notificationConsumer,
     } = require("../message-queue/rabbitmq/consumers/notification.consumer");
+    const {
+      emailConsumer,
+    } = require("../message-queue/rabbitmq/consumers/email.consumer");
+    const {
+      notificationRetry,
+    } = require("../message-queue/rabbitmq/retry-policy/notification.retry");
+    const {
+      emailRetry,
+    } = require("../message-queue/rabbitmq/retry-policy/email.retry");
+    const {
+      notificationDlx,
+    } = require("../message-queue/rabbitmq/dlx/notification.dlx");
+    const {
+      emailDlx,
+    } = require("../message-queue/rabbitmq/dlx/email.dlx");
+
     await notificationConsumer();
     console.log("Notification consumer started");
+
+    await emailConsumer();
+    console.log("Email consumer started");
+
+    await notificationRetry();
+    console.log("Notification retry handler started");
+
+    await emailRetry();
+    console.log("Email retry handler started");
+
+    await notificationDlx();
+    console.log("Notification DLX handler started");
+
+    await emailDlx();
+    console.log("Email DLX handler started");
 
     // Start cron jobs
     console.log("Starting cron jobs...");
@@ -53,6 +84,11 @@ async function startWorker() {
     console.log("Worker process started successfully!");
     console.log("Active services:");
     console.log("  - RabbitMQ Notification Consumer");
+    console.log("  - RabbitMQ Email Consumer");
+    console.log("  - RabbitMQ Notification Retry Handler");
+    console.log("  - RabbitMQ Email Retry Handler");
+    console.log("  - RabbitMQ Notification DLX Handler");
+    console.log("  - RabbitMQ Email DLX Handler");
     console.log("  - Cron: View Counter");
     console.log("  - Cron: Share Counter");
   } catch (error) {

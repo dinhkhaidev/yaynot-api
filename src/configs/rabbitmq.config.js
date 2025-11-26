@@ -1,5 +1,11 @@
 require("dotenv").config();
 const rabbitmqConfig = (base) => {
+  // if grow scale, should to use:
+  // order.created.queue
+  // order.cancel.queue
+  // inventory.update.queue
+  // email.send.queue
+  // otp.verify.queue
   return {
     queue: {
       main: `${base}.queue.main`,

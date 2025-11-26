@@ -3,8 +3,8 @@ const { BadRequestError, NotFoundError } = require("../../core/error.response");
 const { OK, CREATED } = require("../../core/success.response");
 const AuthService = require("../../services/auth.service.js");
 const {
-  sendEmailVerify,
   sendEmailVerifyStateless,
+  getOtpToken,
 } = require("../../services/email.service.js");
 
 class AccessController {
@@ -56,9 +56,13 @@ class AccessController {
   };
 
   resendOtp = async (req, res, next) => {
+    await sendEmailVerifyStateless({ email: req.body.email });
+
+    //Wait a bit for worker to generate token
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     new OK({
       message: "Send otp successful!",
-      metadata: await sendEmailVerifyStateless({ email: req.body.email }),
+      metadata: await getOtpToken(req.body.email),
     }).send(res);
   };
 

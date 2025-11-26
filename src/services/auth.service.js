@@ -12,11 +12,19 @@ const {
   revokeAllUserSessions,
   verifyToken,
 } = require("../auth/authUtil.hybrid");
-const { setCache, getCache } = require("../infrastructures/cache/getCache");
-const { keyAuthSession } = require("../infrastructures/cache/keyBuilder");
+const {
+  setCache,
+  getCache,
+  delCache,
+} = require("../infrastructures/cache/getCache");
+const {
+  keyAuthSession,
+  keyOtpToken,
+} = require("../infrastructures/cache/keyBuilder");
 const {
   sendEmailVerify,
   sendEmailVerifyStateless,
+  getOtpToken,
 } = require("./email.service");
 const { findUserByEmail } = require("../models/repositories/access.repo");
 const { checkOtpToken, checkOtpStateless } = require("./otp.service");
@@ -51,11 +59,15 @@ class AuthService {
       throw new Error("User creation failed!");
     }
 
+    // sendEmailVerifyStateless({
+    //   email: newUser.user_email,
+    //   name: "email-verify",
+    // }).catch((err) => {
+    //   console.error("Failed to send verification email:", err);
+    // });
+
     sendEmailVerifyStateless({
       email: newUser.user_email,
-      name: "email-verify",
-    }).catch((err) => {
-      console.error("Failed to send verification email:", err);
     });
 
     // Auto login after registration
@@ -96,6 +108,7 @@ class AuthService {
         accessToken,
         refreshToken,
       },
+      otpToken: await getOtpToken(email),
       sessionId,
       message:
         "Registration successful. Please check your email to verify your account.",
@@ -147,7 +160,9 @@ class AuthService {
         { user_isVerify: true }
       );
 
-      return updateVerify;
+      // await delCache(keyOtpToken(decodedToken.email));
+
+      return decodedToken.email;
     } else {
       throw new BadRequestError("OTP incorrect!");
     }

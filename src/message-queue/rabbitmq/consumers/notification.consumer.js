@@ -39,14 +39,14 @@ const notificationConsumer = async () => {
         } catch (error) {
           console.error(
             "[CONSUMER] Error processing notification:",
-            error.message,
+            error.message
           );
-          // nack(msg, false, false): reject without requeue
+          // nack(msg, false, false): reject without requeue in this queue but send to dlx
           // This will send the message to retry queue via DLX
           channel.nack(msg, false, false);
         }
       },
-      { noAck: false },
+      { noAck: false }
     );
   } catch (error) {
     console.error("Error in notification consumer:", error.message);
