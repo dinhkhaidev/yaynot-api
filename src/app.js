@@ -49,6 +49,7 @@ app.use((req, res, next) => {
   res.header("X-XSS-Protection", "1; mode=block");
   next();
 });
+
 //swagger
 const swaggerFileName =
   process.env.NODE_ENV === "developer"
@@ -99,6 +100,13 @@ app.get("/api-docs", (req, res) => {
 
 //routes
 app.get("/health", (req, res) => res.json({ status: "ok", gateway: true }));
+//redirect to swagger UI
+app.use((req, res, next) => {
+  if (!req.path.startsWith("/api") && !req.path.startsWith("/api-docs")) {
+    return res.redirect("/api-docs");
+  }
+  next();
+});
 app.use("/", require("./routes/index"));
 app.use((req, res, next) => {
   const error = new Error("Route not found!");

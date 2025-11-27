@@ -9,7 +9,7 @@ const doc = {
     title: "YayNot API",
     description: "API documentation for YayNot social Q&A platform",
   },
-  host: "yaynot-api.vercel.app", // Domain only, no scheme
+  host: "yaynot-api.onrender.com", // Domain only, no scheme
   basePath: "/api/v1",
   schemes: ["https"], // Use https for production
   securityDefinitions: {

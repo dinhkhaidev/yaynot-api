@@ -401,8 +401,7 @@ class QuestionService {
         );
         return {
           ...questionObj,
-          view: viewCount,
-          viewCount: viewCount,
+          viewCount,
         };
       })
     );
