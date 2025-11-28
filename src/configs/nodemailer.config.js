@@ -10,4 +10,7 @@ const nodemailerInfra = require("../infrastructures/email/nodemailer");
 //     pass: process.env.PASS_NODEMAILER,
 //   },
 // });
-module.exports = { transporter: nodemailerInfra.transporter };
+module.exports = { 
+  transporter: nodemailerInfra.transporter,
+  sendMailWithRetry: nodemailerInfra.sendMailWithRetry 
+};

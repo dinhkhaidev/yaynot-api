@@ -2,7 +2,7 @@ const connectRabbitMQ = require("../connectRabbitmq");
 const { generateVerifyToken } = require("../../../services/email.service");
 const { getTemplate } = require("../../../services/template.service");
 const { replaceHolderTemplate } = require("../../../utils/email");
-const { transporter } = require("../../../configs/nodemailer.config");
+const { sendMailWithRetry } = require("../../../configs/nodemailer.config");
 const { getRedis } = require("../../../databases/init.redis");
 const { setCache } = require("../../../infrastructures/cache/getCache");
 const { keyOtpToken } = require("../../../infrastructures/cache/keyBuilder");
@@ -37,7 +37,7 @@ const emailConsumer = async () => {
           };
           const html = replaceHolderTemplate(template.html, params);
 
-          await transporter.sendMail({
+          await sendMailWithRetry({
             from: process.env.EMAIL_NODEMAILER,
             to: email,
             subject: "Verify your account!",

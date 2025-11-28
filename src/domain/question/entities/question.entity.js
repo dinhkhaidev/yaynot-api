@@ -2,25 +2,43 @@
 const QuestionStatusRule = require("../rules/questionStatus.rule");
 const QuestionVisibilityRule = require("../rules/questionVisibility.rule");
 
+/**
+ * QuestionEntity - Domain Entity for Question Aggregate
+ *
+ * DO NOT instantiate directly using `new QuestionEntity()`!
+ *
+ * Use static factory pattern methods instead:
+ * @see {QuestionEntity.createNew} - Create new question from user input
+ * @see {QuestionEntity.fromDatabase} - Reconstruct from database record
+ * @see {QuestionEntity.fromDatabaseArray} - Reconstruct array from database
+ * @todo add method fromDTO
+ */
 class QuestionEntity {
   constructor(data) {
     this.id = data.id || data._id;
     this.title = data.title;
     this.content = data.content;
+    this.userId = data.userId;
+
+    this.visibility = data.visibility || "private";
+    this.status = data.status || "draft";
+    this.moderationStatus = data.moderationStatus || "ok";
+
     this.image = data.image || [];
-    this.visibility = "private";
-    this.status = "draft";
-    this.moderationStatus = "ok";
+    this.shortTag = data.shortTag || [];
+
     this.isAnonymous = data.isAnonymous || false;
     this.isDeleted = data.isDeleted || false;
-    this.userId = data.userId;
-    this.shortTag = data.shortTag || [];
+
     this.viewCount = data.viewCount || 0;
     this.shareCount = data.shareCount || 0;
     this.voteCount = data.voteCount || 0;
     this.commentCount = data.commentCount || 0;
     this.bookmarkCount = data.bookmarkCount || 0;
     this.reportCount = data.reportCount || 0;
+
+    this.createdAt = data.createdAt;
+    this.updatedAt = data.updatedAt;
 
     this.validationRule = QuestionValidationRule;
     this.statusRule = QuestionStatusRule;
