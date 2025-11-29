@@ -47,4 +47,5 @@ const questionSchema = new mongoose.Schema(
   }
 );
 questionSchema.index({ userId: 1 });
+questionSchema.index({ status: 1, isDeleted: 1, createdAt: -1 });
 module.exports = mongoose.model(DOCUMENT_NAME, questionSchema);

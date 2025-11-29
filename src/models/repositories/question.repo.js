@@ -149,6 +149,35 @@ const createHistoryQuestionInDB = async ({
     version,
   });
 };
+//for trending
+const getTrendingCandidates = async (dayAgo = 3) => {
+  const since = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+
+  return await questionModel
+    .find({
+      status: "publish",
+      isDeleted: false,
+      createdAt: { $gte: since },
+    })
+    .select(
+      "_id upvotes commentCount view shareCount bookmarkCount careCount createdAt"
+    )
+    .lean();
+};
+const findByIds = async (ids) => {
+  if (ids.length === 0) return [];
+
+  const questions = await questionModel
+    .find({
+      _id: { $in: ids },
+      status: "publish",
+      isDeleted: false,
+    })
+    .populate("userId", "name avatar")
+    .lean();
+  const questionMap = new Map(questions.map((q) => [q._id.toString(), q]));
+  return ids.map((id) => questionMap.get(id.toString())).filter(Boolean);
+};
 module.exports = {
   createQuestionInDB,
   updateQuestionInDB,
@@ -166,4 +195,6 @@ module.exports = {
   getListCareQuestionByUserInDB,
   findHistoryQuestionByQuestionId,
   createHistoryQuestionInDB,
+  getTrendingCandidates,
+  findByIds,
 };

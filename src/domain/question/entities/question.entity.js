@@ -1,6 +1,7 @@
 ﻿const QuestionValidationRule = require("../rules/questionValidation.rule");
 const QuestionStatusRule = require("../rules/questionStatus.rule");
 const QuestionVisibilityRule = require("../rules/questionVisibility.rule");
+const { questionTrendingScore } = require("../../../configs/trending.config");
 
 /**
  * QuestionEntity - Domain Entity for Question Aggregate
@@ -148,11 +149,11 @@ class QuestionEntity {
 
   getEngagementScore() {
     return (
-      this.viewCount * 1 +
-      this.shareCount * 5 +
-      this.voteCount * 3 +
-      this.commentCount * 4 +
-      this.bookmarkCount * 6
+      this.viewCount * questionTrendingScore.VIEW +
+      this.shareCount * questionTrendingScore.SHARE +
+      this.voteCount * questionTrendingScore.TOTALVOTE +
+      this.commentCount * questionTrendingScore.COMMENT +
+      this.bookmarkCount * questionTrendingScore.BOOKMARK
     );
   }
 

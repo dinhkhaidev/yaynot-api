@@ -44,6 +44,16 @@ const keyFlushShareQuestion = (question_id) => {
 const keyQuestion = (question_id) => {
   return `question:${question_id}`;
 };
+//trending question
+const keyTrendingQuestionShort = () => {
+  return `trending:question:short`;
+};
+const keyTrendingQuestionLong = () => {
+  return `trending:question:long`;
+};
+const keyTrendingUserSeen = (userId) => {
+  return `trending:question:${userId}:seen`;
+};
 module.exports = {
   keyProfile,
   keyProfilePrivate,
@@ -57,4 +67,7 @@ module.exports = {
   keyAuthBlacklist,
   keyAuthSession,
   keyOtpToken,
+  keyTrendingQuestionShort,
+  keyTrendingQuestionLong,
+  keyTrendingUserSeen,
 };
