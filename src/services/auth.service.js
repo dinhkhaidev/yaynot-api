@@ -11,6 +11,7 @@ const {
   getSession,
   revokeAllUserSessions,
   verifyToken,
+  SESSION_CONFIG,
 } = require("../auth/authUtil.hybrid");
 const {
   setCache,

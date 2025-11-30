@@ -9,7 +9,7 @@ const keyAuthKeyToken = (user_id) => {
 
 const keyAuthBlacklist = (token) => {
   // Use first 16 chars of token as key (unique enough)
-  return `auth:blacklist:${token.substring(0, 16)}`;
+  return `auth:blacklist:${token.substring(-16)}`;
 };
 
 const keyAuthSession = (session_id) => {

@@ -27,7 +27,7 @@ const questionSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "user",
+      ref: "User",
     },
     viewCount: { type: Number, default: 0 },
     shareCount: { type: Number, default: 0 },
@@ -47,5 +47,7 @@ const questionSchema = new mongoose.Schema(
   }
 );
 questionSchema.index({ userId: 1 });
+//for trending
 questionSchema.index({ status: 1, isDeleted: 1, createdAt: -1 });
+questionSchema.index({ _id: 1, status: 1, isDeleted: 1 });
 module.exports = mongoose.model(DOCUMENT_NAME, questionSchema);

@@ -150,9 +150,8 @@ const createHistoryQuestionInDB = async ({
   });
 };
 //for trending
-const getTrendingCandidates = async (dayAgo = 3) => {
+const getTrendingCandidates = async (daysAgo = 3) => {
   const since = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
-
   return await questionModel
     .find({
       status: "publish",
@@ -160,11 +159,12 @@ const getTrendingCandidates = async (dayAgo = 3) => {
       createdAt: { $gte: since },
     })
     .select(
-      "_id upvotes commentCount view shareCount bookmarkCount careCount createdAt"
+      "_id viewCount shareCount voteCount shareCount commentCount bookmarkCount createdAt"
     )
     .lean();
 };
 const findByIds = async (ids) => {
+  console.log("ids", ids);
   if (ids.length === 0) return [];
 
   const questions = await questionModel
@@ -173,7 +173,7 @@ const findByIds = async (ids) => {
       status: "publish",
       isDeleted: false,
     })
-    .populate("userId", "name avatar")
+    .populate("userId", "user_name")
     .lean();
   const questionMap = new Map(questions.map((q) => [q._id.toString(), q]));
   return ids.map((id) => questionMap.get(id.toString())).filter(Boolean);

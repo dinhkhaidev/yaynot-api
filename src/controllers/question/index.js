@@ -3,6 +3,7 @@ const QuestionService = require("../../services/question/question.service");
 const BookmarkService = require("../../services/bookmark.service");
 const HistoryQuestionService = require("../../services/question/extensions/history.service");
 const CareQuestionService = require("../../services/question/extensions/care.service");
+const QuestionTrending = require("../../services/trending/question.trending");
 class QuestionController {
   //question methods
   createQuestion = async (req, res, next) => {
@@ -182,6 +183,23 @@ class QuestionController {
       metadata: await HistoryQuestionService.getHistoryQuestion({
         questionId: req.params.questionId,
       }),
+    }).send(res);
+  };
+
+  //trending
+  getTrendingQuestions = async (req, res, next) => {
+    new OK({
+      message: "Get trending questions successful!",
+      metadata: await QuestionTrending.getTrendingQuestion({
+        userId: req.user.user_id,
+      }),
+    }).send(res);
+  };
+
+  getTrendingStats = async (req, res, next) => {
+    new OK({
+      message: "Get trending stats successful!",
+      metadata: await QuestionTrending.getStats(),
     }).send(res);
   };
 }

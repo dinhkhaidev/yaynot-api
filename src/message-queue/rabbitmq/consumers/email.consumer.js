@@ -2,13 +2,16 @@ const connectRabbitMQ = require("../connectRabbitmq");
 const { generateVerifyToken } = require("../../../services/email.service");
 const { getTemplate } = require("../../../services/template.service");
 const { replaceHolderTemplate } = require("../../../utils/email");
-const { sendMailWithRetry } = require("../../../configs/nodemailer.config");
+// const { sendMailWithRetry } = require("../../../configs/nodemailer.config");
 const { getRedis } = require("../../../databases/init.redis");
 const { setCache } = require("../../../infrastructures/cache/getCache");
 const { keyOtpToken } = require("../../../infrastructures/cache/keyBuilder");
 const rabbitmqConfig = require("../../../configs/rabbitmq.config");
+const {
+  sendMailWithRetrySendGrid,
+} = require("../../../infrastructures/email/sendGrid");
 
-const configType = rabbitmqConfig("email");
+const configType = rabbitmqConfig("email.auth");
 const QUEUE_NAME = configType.queue.main;
 
 const emailConsumer = async () => {
@@ -27,8 +30,8 @@ const emailConsumer = async () => {
           console.log(`[Email Consumer] Processing email for: ${email}`);
 
           const { otpToken, otp } = await generateVerifyToken(email);
-          //Save otpToken to Redis 15 min TTL)
           await setCache(keyOtpToken(email), otpToken, 900);
+          console.log(`[Email Consumer] Token cached for: ${email}`);
 
           const template = await getTemplate(name);
           const params = {
@@ -37,7 +40,7 @@ const emailConsumer = async () => {
           };
           const html = replaceHolderTemplate(template.html, params);
 
-          await sendMailWithRetry({
+          await sendMailWithRetrySendGrid({
             from: process.env.EMAIL_NODEMAILER,
             to: email,
             subject: "Verify your account!",

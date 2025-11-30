@@ -1,6 +1,9 @@
 const cron = require("node-cron");
 const QuestionTrending = require("../../services/trending/question.trending");
 const TrendingQuestionCache = require("../../services/cache/trendingQuestionCache");
+const {
+  getTrendingCandidates,
+} = require("../../models/repositories/question.repo");
 class TrendingQuestionCronjob {
   static startShortTrendings() {
     cron.schedule("0 * * * *", async () => {
@@ -17,9 +20,9 @@ class TrendingQuestionCronjob {
           .filter((q) => QuestionTrending.meetsThreshold(q.score))
           .sort((a, b) => b.score - a.score)
           .slice(0, 100);
-        await TrendingQuestionCache.updateTrending(scoredQuestions, "long");
+        await TrendingQuestionCache.updateTrending(scoredQuestions, "short");
         console.log(
-          `[Cron] Short newsfeed updated: ${scored.length} questions`
+          `[Cron] Short newsfeed updated: ${scoredQuestions.length} questions`
         );
       } catch (error) {
         console.error("[Cron] Short newsfeed error:", error);
@@ -42,15 +45,17 @@ class TrendingQuestionCronjob {
           .sort((a, b) => b.score - a.score)
           .slice(0, 200);
         await TrendingQuestionCache.updateTrending(scoredQuestions, "long");
-        console.log(`[Cron] Long newsfeed updated: ${scored.length} questions`);
+        console.log(
+          `[Cron] Long newsfeed updated: ${scoredQuestions.length} questions`
+        );
       } catch (error) {
         console.error("[Cron] Long newsfeed error:", error);
       }
     });
   }
   static start() {
-    this.startShortNewsfeed();
-    this.startLongNewsfeed();
+    this.startShortTrendings();
+    this.startLongTrendings();
     console.log("[Cron] Trending jobs scheduled");
   }
 }

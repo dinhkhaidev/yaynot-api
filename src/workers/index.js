@@ -18,10 +18,8 @@ async function startWorker() {
     // Setup RabbitMQ infrastructure (queues/exchanges/bindings)
     // This needs to run BEFORE consumers can start
     console.log("Setting up RabbitMQ infrastructure...");
-    require("../message-queue/rabbitmq/setupRabbitmq");
-
-    // Wait for setup to complete
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const setupRabbitmq = require("../message-queue/rabbitmq/setupRabbitmq");
+    await setupRabbitmq();
     console.log("RabbitMQ queues ready");
 
     // Start RabbitMQ consumers
@@ -41,9 +39,7 @@ async function startWorker() {
     const {
       notificationDlx,
     } = require("../message-queue/rabbitmq/dlx/notification.dlx");
-    const {
-      emailDlx,
-    } = require("../message-queue/rabbitmq/dlx/email.dlx");
+    const { emailDlx } = require("../message-queue/rabbitmq/dlx/email.dlx");
 
     await notificationConsumer();
     console.log("Notification consumer started");
@@ -68,6 +64,7 @@ async function startWorker() {
     const asyncViewCronjob = require("../cronjob/question/asyncView.cron");
     const asyncDataCronjob = require("../cronjob/question/asyncData.cron");
     const { keyFlushShareQuestion } = require("../utils/cacheRedis");
+    const TrendingQuestionCronjob = require("../cronjob/question/updateTrending.cron");
 
     asyncViewCronjob({
       patternKeyViewQuestion: "question:*:view",
@@ -81,6 +78,7 @@ async function startWorker() {
       fieldData: "shareCount",
     });
 
+    TrendingQuestionCronjob.start();
     console.log("Worker process started successfully!");
     console.log("Active services:");
     console.log("  - RabbitMQ Notification Consumer");
@@ -91,6 +89,8 @@ async function startWorker() {
     console.log("  - RabbitMQ Email DLX Handler");
     console.log("  - Cron: View Counter");
     console.log("  - Cron: Share Counter");
+    console.log("  - Cron: Trending Short Question");
+    console.log("  - Cron: Trending Long Question");
   } catch (error) {
     console.error("Failed to start worker:", error);
     process.exit(1);

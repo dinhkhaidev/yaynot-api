@@ -18,6 +18,8 @@
   "private": true,
   "description": "",
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "@sendgrid/mail": "^8.1.6",
     "accesscontrol": "^2.2.1",
     "amqplib": "^0.10.9",
     "aws-sdk": "^2.1692.0",

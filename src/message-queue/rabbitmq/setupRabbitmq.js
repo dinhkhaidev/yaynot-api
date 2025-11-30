@@ -47,7 +47,7 @@ async function setupQueueTopology(channel, config) {
  * Setup all RabbitMQ queues
  * @param {Array<string>} queueTypes - Array of queue types to setup (default: ["notification"])
  */
-async function setupRabbitmq(queueTypes = ["notification", "email"]) {
+async function setupRabbitmq(queueTypes = ["notification", "email.auth"]) {
   let connection, channel;
 
   try {
@@ -71,14 +71,14 @@ async function setupRabbitmq(queueTypes = ["notification", "email"]) {
   }
 }
 
-// Run setup if executed directly
-// if (require.main === module) {
-//   setupRabbitmq()
-//     .then(() => process.exit(0))
-//     .catch((err) => {
-//       console.error(err);
-//       process.exit(1);
-//     });
-// }
+//Run setup if executed directly
+if (require.main === module) {
+  setupRabbitmq()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
 
-module.exports = setupRabbitmq();
+module.exports = setupRabbitmq;

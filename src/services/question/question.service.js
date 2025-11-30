@@ -45,7 +45,7 @@ const {
   QuestionMetrics,
 } = require("../../domain/question");
 const QuestionDomainService = require("../../domain/question/QuestionDomainRules.simple");
-const { getCache } = require("../../infrastructures/cache/getCache");
+const { getCache, setCache } = require("../../infrastructures/cache/getCache");
 
 const statusMapping = {
   private: "archive",
@@ -143,8 +143,8 @@ class QuestionService {
   }
 
   static async getQuestionById(questionId, userId) {
-    const keyQuestion = keyQuestion(questionId);
-    await getCache(keyQuestion);
+    const key = keyQuestion(questionId);
+    await getCache(key);
     const questionRecord = await QuestionValidationRule.validateQuestion({
       questionId,
     });
@@ -155,7 +155,11 @@ class QuestionService {
     QuestionValidationRule.validateOwnership(questionRecord, userId);
 
     const questionEntity = QuestionEntity.fromDatabase(questionRecord);
-
+    await setCache(
+      key,
+      await this.enrichQuestionsWithViewCount(questionEntity.toDTO()),
+      120
+    );
     return await this.enrichQuestionsWithViewCount(questionEntity.toDTO());
   }
 

@@ -34,15 +34,15 @@ class UserProfileService {
     }
     throw new BadRequestError("No changes detected in submitted data!");
   }
-  static async getInfoProfile({ user_id, name }) {
+  static async getInfoProfile({ user_id, username }) {
     const key = keyProfile(user_id);
     await getCache(key);
     const userProfileRecord = await findUserProfileInDB({ userId: user_id });
     if (!userProfileRecord) {
-      return { username: name, name, follower: 0, following: 0 };
+      return { username, name: username, follower: 0, following: 0 };
     }
-    await setCache(key, { ...userProfileRecord, username: name }, 120);
-    return { ...userProfileRecord, username: name };
+    await setCache(key, { ...userProfileRecord, username }, 120);
+    return { ...userProfileRecord, username: username };
   }
   static async updateAvatar({ userId, url }) {
     return await updateAvatarInDB({ userId, url });

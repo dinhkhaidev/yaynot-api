@@ -4,7 +4,7 @@ const rabbitmqConfig = require("../../../configs/rabbitmq.config");
 const emailRetry = async () => {
   try {
     const { channel, connect } = await connectRabbitmq();
-    const configType = rabbitmqConfig("email");
+    const configType = rabbitmqConfig("email.auth");
     const retryQueue = configType.queue.retry;
     const deadQueue = configType.queue.dlx;
     const RETRY_LIMIT = 3;
@@ -17,7 +17,7 @@ const emailRetry = async () => {
       try {
         if (retries >= RETRY_LIMIT) {
           console.log(
-            `[DLQ] Exceeded retry limit (${retries}/${RETRY_LIMIT}). Moving email for: ${emailData.to}`,
+            `[DLQ] Exceeded retry limit (${retries}/${RETRY_LIMIT}). Moving email for: ${emailData.to}`
           );
           channel.sendToQueue(deadQueue, msg.content, {
             headers: {
@@ -33,13 +33,11 @@ const emailRetry = async () => {
         }
         const newRetries = retries + 1;
         console.log(
-          `[RETRY] Attempt ${newRetries}/${RETRY_LIMIT} for email to: ${emailData.to}`,
+          `[RETRY] Attempt ${newRetries}/${RETRY_LIMIT} for email to: ${emailData.to}`
         );
         const originQueue = headers["x-origin-queue"];
         if (!originQueue) {
-          console.error(
-            `[RETRY] Missing origin queue for: ${emailData.to}`,
-          );
+          console.error(`[RETRY] Missing origin queue for: ${emailData.to}`);
           channel.sendToQueue(deadQueue, msg.content, {
             headers: {
               ...headers,
@@ -64,7 +62,7 @@ const emailRetry = async () => {
       } catch (error) {
         console.error(
           `[ERROR] Failed to process retry for ${emailData.to}:`,
-          error,
+          error
         );
         channel.nack(msg, false, true);
       }

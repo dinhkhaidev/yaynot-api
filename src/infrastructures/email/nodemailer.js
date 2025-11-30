@@ -44,7 +44,7 @@ const sendMailWithRetry = async (mailOptions, retries = 3) => {
     } catch (error) {
       console.error(`[Nodemailer] Attempt ${i + 1} failed:`, error.message);
       if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
+      await new Promise((resolve) => setTimeout(resolve, 2000 * (i + 1)));
     }
   }
 };

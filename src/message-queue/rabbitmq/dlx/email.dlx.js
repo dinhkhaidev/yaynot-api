@@ -4,7 +4,7 @@ const emailDlx = async () => {
   try {
     const result = await connectRabbitmq();
     const { channel, connect } = result;
-    const configType = rabbitmqConfig("email");
+    const configType = rabbitmqConfig("email.auth");
     const dlxQueue = configType.queue.dlx;
     await channel.prefetch(1);
     console.log(`[DLX] Waiting for failed messages in ${dlxQueue}...`);

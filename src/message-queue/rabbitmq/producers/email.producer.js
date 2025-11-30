@@ -1,7 +1,7 @@
 const rabbitmqConfig = require("../../../configs/rabbitmq.config");
 const connectRabbitMQ = require("../connectRabbitmq");
 
-const configType = rabbitmqConfig("email");
+const configType = rabbitmqConfig("email.auth");
 const QUEUE_NAME = configType.queue.main;
 const publishVerificationEmail = async ({ email, name = "email-verify" }) => {
   try {
