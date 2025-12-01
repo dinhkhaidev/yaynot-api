@@ -164,7 +164,6 @@ const getTrendingCandidates = async (daysAgo = 3) => {
     .lean();
 };
 const findByIds = async (ids) => {
-  console.log("ids", ids);
   if (ids.length === 0) return [];
 
   const questions = await questionModel

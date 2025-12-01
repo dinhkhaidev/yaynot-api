@@ -192,6 +192,7 @@ class QuestionController {
       message: "Get trending questions successful!",
       metadata: await QuestionTrending.getTrendingQuestion({
         userId: req.user.user_id,
+        ...req.query,
       }),
     }).send(res);
   };

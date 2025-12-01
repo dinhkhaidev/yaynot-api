@@ -352,19 +352,20 @@ Truy cập **Swagger docs** tại:
 
 ### Tổng quan API Endpoints
 
-| Module            | Endpoint                  | Methods                                  |
-| ----------------- | ------------------------- | ---------------------------------------- |
-| **Auth**          | `/api/v1/auth/*`          | Register, Login, Logout, Refresh, Verify |
-| **Questions**     | `/api/v1/questions/*`     | CRUD, Publish, Bookmark, View, Share     |
-| **Comments**      | `/api/v1/comments/*`      | CRUD, Like, Pin                          |
-| **Votes**         | `/api/v1/votes/*`         | Upvote, Downvote                         |
-| **Users**         | `/api/v1/profiles/*`      | Cập nhật profile, Avatar                 |
-| **Follow**        | `/api/v1/follows/*`       | Follow, Unfollow, Followers, Followings  |
-| **Upload**        | `/api/v1/uploads/:type`   | Upload ảnh (avatar, post, thumb)         |
-| **Chat**          | `/api/v1/chats/*`         | Conversations, Messages                  |
-| **Notifications** | `/api/v1/notifications/*` | Danh sách, Đánh dấu đã đọc, Xóa          |
-| **Reports**       | `/api/v1/reports/*`       | Gửi báo cáo, Xem báo cáo                 |
-| **Admin**         | `/api/admin/v1/*`         | Kiểm duyệt, Thống kê                     |
+| Module            | Endpoint                  | Methods                                             |
+| ----------------- | ------------------------- | --------------------------------------------------- |
+| **Auth**          | `/api/v1/auth/*`          | Register, Login, Logout, Refresh, Verify, Sessions  |
+| **Questions**     | `/api/v1/questions/*`     | CRUD, Publish, Bookmark, View, Share, Care, History |
+| **Trending**      | `/api/v1/trending/*`      | Lấy câu hỏi trending, Thống kê                      |
+| **Comments**      | `/api/v1/comments/*`      | CRUD, Like, Pin                                     |
+| **Votes**         | `/api/v1/votes/*`         | Upvote, Downvote                                    |
+| **Profile**       | `/api/v1/profile/*`       | Cập nhật profile, Avatar                            |
+| **Follow**        | `/api/v1/follows/*`       | Follow, Unfollow, Followers, Followings             |
+| **Upload**        | `/api/v1/uploads/:type`   | Upload ảnh (avatar, post, thumb)                    |
+| **Chat**          | `/api/v1/chats/*`         | Conversations, Messages, Search                     |
+| **Notifications** | `/api/v1/notifications/*` | Danh sách, Đánh dấu đã đọc, Xóa                     |
+| **Reports**       | `/api/v1/reports/*`       | Gửi báo cáo, Xem báo cáo, Hủy                       |
+| **Admin**         | `/api/admin/v1/*`         | Kiểm duyệt, Thống kê, Xem xét báo cáo               |
 
 ### Authentication
 
@@ -381,68 +382,140 @@ Authorization: Bearer <your_access_token>
 ```
 yaynot-api/
 ├── .github/
-│   └── workflows/          # CI/CD workflows
-│       ├── deploy-vercel.yml
-│       └── deploy-railway.yml
+│   └── workflows/              # CI/CD workflows
+│       ├── deploy-vercel.yml   # Vercel tự động deploy
+│       ├── deploy-railway.yml  # Railway tự động deploy
+│       ├── deploy-render.yml   # Render deployment
+│       └── deploy-cloud.yml    # Cloud deployment
 ├── src/
-│   ├── app.js             # Express app setup
-│   ├── auth/              # JWT utilities
-│   ├── configs/           # Config files (DB, Redis, RabbitMQ, Multer, etc.)
-│   ├── constants/         # Enums & constants
-│   ├── controllers/       # Request handlers
-│   │   ├── access/        # Auth controllers
+│   ├── app.js                  # Express app setup point
+│   ├── auth/                   # JWT utilities
+│   │   └── authUtil.hybrid.js
+│   ├── configs/                # Configuration files
+│   │   ├── auth.config.js
+│   │   ├── mongodb.config.js
+│   │   ├── redis.config.js
+│   │   ├── rabbitmq.config.js
+│   │   ├── cloudinary.config.js
+│   │   ├── multer.config.js
+│   │   ├── socketio.config.js
+│   │   ├── trending.config.js
+│   │   └── ...
+│   ├── constants/              # Enums & constants
+│   ├── controllers/            # Request handlers
+│   │   ├── auth/
 │   │   ├── question/
-│   │   ├── comment/
+│   │   ├── nestedComment/
 │   │   ├── vote/
+│   │   ├── follow/
+│   │   ├── chat/
 │   │   ├── notification/
-│   │   └── report/
-│   ├── core/              # Response wrappers (success/error)
-│   ├── cronjob/           # Scheduled tasks
+│   │   ├── report/
+│   │   ├── upload/
+│   │   ├── userProfile/
+│   │   └── rbac/
+│   ├── core/                   # Response wrappers
+│   │   ├── success.response.js
+│   │   └── error.response.js
+│   ├── cronjob/                # Scheduled tasks
 │   │   └── question/
-│   ├── databases/         # DB connection (MongoDB, Redis)
-│   ├── domain/            # Business logic layer
+│   ├── databases/              # DB connections
+│   │   ├── init.mongodb.js
+│   │   └── init.redis.js
+│   ├── domain/                 # Business logic layer
 │   │   ├── question/
 │   │   └── report/
-│   ├── helpers/           # Utility functions
-│   ├── interface/         # Contracts/interfaces
-│   ├── logger/            # Winston logger
-│   ├── logs/              # Log files
-│   ├── message-queue/     # RabbitMQ setup
+│   ├── helpers/                # Utility functions
+│   ├── infrastructures/        # Infrastructure layer
+│   ├── interface/              # Contracts/interfaces
+│   ├── logger/                 # Winston logger
+│   ├── logs/                   # Log files (gitignored)
+│   ├── message-queue/          # Message queue systems
+│   │   ├── kafka/
 │   │   └── rabbitmq/
+│   │       ├── connectRabbitmq.js
 │   │       ├── setupRabbitmq.js
 │   │       ├── consumers/
-│   │       └── producers/
-│   ├── middlewares/       # Express middlewares
+│   │       ├── producers/
+│   │       ├── dlx/
+│   │       └── retry-policy/
+│   ├── middlewares/            # Express middlewares
 │   │   ├── auth/
 │   │   ├── rbac/
-│   │   └── validate.js
-│   ├── models/            # Mongoose models
-│   │   └── repositories/  # Repository pattern
-│   ├── routes/            # API routes
+│   │   ├── vote/
+│   │   ├── validate.js
+│   │   ├── checkOwnership.js
+│   │   └── ...
+│   ├── models/                 # Mongoose models
+│   │   ├── user.model.js
+│   │   ├── question.model.js
+│   │   ├── nestedComment.model.js
+│   │   ├── vote.model.js
+│   │   ├── notification.model.js
+│   │   ├── report.model.js
+│   │   ├── bookmark.model.js
+│   │   ├── follow.model.js
+│   │   └── repositories/       # Repository pattern
+│   ├── routes/                 # API routes
 │   │   ├── api/
-│   │   │   ├── v1/
+│   │   │   ├── v1/             # API version 1
 │   │   │   │   ├── auth/
-│   │   │   │   └── user/
-│   │   │   └── admin/
+│   │   │   │   ├── question/
+│   │   │   │   ├── comment/
+│   │   │   │   ├── vote/
+│   │   │   │   ├── follow/
+│   │   │   │   ├── chat/
+│   │   │   │   ├── notification/
+│   │   │   │   ├── report/
+│   │   │   │   ├── upload/
+│   │   │   │   └── trending/
+│   │   │   └── admin/          # Admin routes
+│   │   │       └── v1/
 │   │   └── index.js
-│   ├── services/          # Business logic services
-│   ├── sockets/           # Socket.io handlers
-│   ├── test/              # Unit & integration tests
-│   ├── utils/             # Helper utilities
-│   ├── validations/       # Joi schemas
-│   └── workers/           # Background worker entry
-├── swagger/
+│   ├── services/               # Business logic services
+│   │   ├── auth.service.js
+│   │   ├── question/
+│   │   ├── nestedComment.service.js
+│   │   ├── vote.service.js
+│   │   ├── follow.service.js
+│   │   ├── chat.service.js
+│   │   ├── notification.service.js
+│   │   ├── report.service.js
+│   │   ├── trending/
+│   │   └── cache/
+│   ├── sockets/                # Socket.io handlers
+│   ├── test/                   # Unit & integration tests
+│   ├── utils/                  # Helper utilities
+│   ├── validations/            # Joi schemas
+│   │   ├── Joi/
+│   │   └── service/
+│   └── workers/                # Background workers
+├── swagger/                    # API documentation
 │   ├── swagger-generate.js
-│   └── swagger-output.json
-├── md-docs/               # Additional documentation
-├── docker-compose.yaml    # Docker orchestration
-├── Dockerfile             # Container build
-├── vercel.json            # Vercel config
-├── railway.json           # Railway config
-├── server.js              # Entry point
-├── package.json
-├── README.md              # English docs
-└── README.vi.md           # Vietnamese docs
+│   ├── swagger-output.json
+│   ├── swagger-output.local.json
+│   └── swagger-output-vercel.json
+├── md-docs/                    # Tài liệu bổ sung
+│   ├── API_STRUCTURE.md
+│   ├── DEPLOYMENT_CHECKLIST.md
+│   ├── DOMAIN_LAYER_INDEX.md
+│   ├── RAILWAY_SETUP.md
+│   ├── VERCEL_DEPLOYMENT.md
+│   └── trending/
+├── docker-compose.yaml         # Docker orchestration
+├── Dockerfile                  # Production container
+├── Dockerfile.production       # Alternative build
+├── vercel.json                 # Vercel config
+├── railway.json                # Railway config
+├── render.yaml                 # Render config
+├── nixpacks.toml               # Nixpacks config
+├── Procfile                    # Process file
+├── server.js                   # Entry point
+├── package.json                # Dependencies
+├── .eslintrc.json              # ESLint config
+├── .env.example                # Environment template
+├── README.md
+└── README.vi.md                # Vietnamese docs
 ```
 
 ---

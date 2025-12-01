@@ -356,7 +356,7 @@
         }
       }
     },
-    "/v1/auth/refresh-token": {
+    "/v1/auth/refresh": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Refresh JWT token",
@@ -368,6 +368,118 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/auth/logout-all": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout from all sessions",
+        "description": "Logout user from all active sessions",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Logged out from all sessions successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/auth/sessions": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get active sessions",
+        "description": "Get list of all active sessions for current user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Sessions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/auth/sessions/{sessionId}": {
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Revoke specific session",
+        "description": "Revoke a specific session by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session revoked successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Session not found"
+          }
+        }
+      }
+    },
+    "/v1/auth/verify-email": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Verify email with token",
+        "description": "Verify user email using verification token from email link",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Email verification token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email verified successfully"
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify OTP code",
+        "description": "Verify email using OTP code",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string",
+                  "description": "OTP code from email"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully"
+          },
+          "400": {
+            "description": "Invalid OTP"
           }
         }
       }
@@ -422,6 +534,60 @@
           },
           "429": {
             "description": "Too many requests"
+          }
+        }
+      }
+    },
+    "/v1/questions/trending": {
+      "get": {
+        "tags": ["Trending"],
+        "summary": "Get trending questions",
+        "description": "Get trending questions based on engagement metrics",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string",
+            "enum": ["short", "long"],
+            "default": "short",
+            "description": "Trending period: short (3 days) or long (30 days)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 0
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending questions retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/questions/trending/stats": {
+      "get": {
+        "tags": ["Trending"],
+        "summary": "Get trending statistics",
+        "description": "Get statistics about trending questions",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Trending statistics retrieved successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -525,6 +691,7 @@
         }
       }
     },
+
     "/v1/questions/drafts": {
       "get": {
         "tags": ["Questions"],

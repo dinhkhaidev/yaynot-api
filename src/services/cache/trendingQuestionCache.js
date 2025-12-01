@@ -56,7 +56,6 @@ class TrendingQuestionCache {
         score: results[i + 1],
       });
     }
-    console.log("questions", questions);
     return questions;
   }
 
