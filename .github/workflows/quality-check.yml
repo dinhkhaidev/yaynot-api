@@ -50,7 +50,7 @@ jobs:
         with:
           args: test --all-projects --json > snyk-report.json
       - name: Upload Snyk report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: snyk-report
           path: snyk-report.json
