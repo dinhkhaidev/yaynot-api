@@ -35,7 +35,7 @@ jobs:
         run: npm audit --audit-level=moderate
 
       - name: Check outdated packages
-        run: npm outdated || true
+        run: npm outdated
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@ba3875ecf642b2129de2b589510c81a8b53dbf4e
