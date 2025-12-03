@@ -10,7 +10,6 @@ const asyncViewCronjob = require("./cronjob/question/asyncView.cron");
 const asyncDataCronjob = require("./cronjob/question/asyncData.cron");
 const { keyFlushShareQuestion } = require("./utils/cacheRedis");
 const { initRedis } = require("./databases/init.redis");
-// const mongodb=require("./databases/mongodb.database")
 require("./databases/mongodb.database");
 
 // Detect deployment environment

@@ -1,7 +1,10 @@
+const { default: mongoose } = require("mongoose");
 const { voteModel, voteSummaryModel } = require("../vote.model");
 
 const findVoteByUserAndQuestionInDB = async (userId, questionId) => {
-  return await voteModel.findOne({ userId, questionId }).lean();
+  const safeUserId = mongoose.Types.ObjectId(userId);
+  const safeQuestionId = mongoose.Types.ObjectId(questionId);
+  return await voteModel.findOne({ safeUserId, safeQuestionId }).lean();
 };
 const upsertVoteInDB = async ({ questionId, voteType, userId }) => {
   const filter = { questionId, userId },
