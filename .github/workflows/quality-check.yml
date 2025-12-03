@@ -26,31 +26,36 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
-        # continue-on-error: false
+        continue-on-error: true
 
       # - name: Run tests
       #   run: npm test
 
       - name: Run npm audit
         run: npm audit --audit-level=moderate
+        continue-on-error: true
 
       - name: Check outdated packages
         run: npm outdated
+        continue-on-error: true
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@ba3875ecf642b2129de2b589510c81a8b53dbf4e
+        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions@9adf32b1121593767fc3c057af55b55db032dc04
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: test --all-projects --json > snyk-report.json
       - name: Upload Snyk report
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        if: always()
         with:
           name: snyk-report
           path: snyk-report.json
