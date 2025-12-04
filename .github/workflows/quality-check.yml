@@ -43,8 +43,9 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@ba3875ecf642b2129de2b589510c81a8b53dbf4e
         continue-on-error: true
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: "https://sonarcloud.io"
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions@9adf32b1121593767fc3c057af55b55db032dc04
