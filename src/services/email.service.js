@@ -222,33 +222,57 @@ const sendEmailVerifyStateless = async ({ email, name = "email-verify" }) => {
 // };
 
 const getOtpToken = async (email, maxRetries = 10) => {
-  const fastRetries = 3;
-  const baseDelay = 100; // exponential backoff
+  //Detect environment: PaaS (Render/Railway) vs local/IAAS(ec2) development
+  const isPaaS = process.env.IS_PAAS === "true";
+
+  //Config for PaaS vs local/IAAS(ec2) Redis
+  const config = isPaaS
+    ? {
+        //PaaS Redis (higher network latency ~50-200ms)
+        //Redis hosted on Upstash/Redis Cloud with shared infrastructure
+        fastRetries: 6,
+        baseDelay: 100,
+        initialWait: 60,
+        jitter: 30,
+        maxWait: 250,
+        totalTimeout: 1500,
+      }
+    : {
+        //local/IAAS(ec2) Redis (very low latency ~1-5ms)
+        fastRetries: 5,
+        baseDelay: 30,
+        initialWait: 30,
+        jitter: 20,
+        maxWait: 200,
+        totalTimeout: 500,
+      };
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const otpToken = await getCache(keyOtpToken(email));
-    console.log("otpToken", otpToken);
     if (otpToken) {
       return { email, otpToken };
     }
 
     if (attempt === maxRetries - 1) break;
 
-    //delay strategies
     let waitTime;
 
-    if (attempt < fastRetries) {
-      // Polling fast
-      waitTime = 50 + Math.random() * 20; // 20–40ms
+    if (attempt < config.fastRetries) {
+      //Polling: initial wait + jitter
+      waitTime = config.initialWait + Math.random() * config.jitter;
     } else {
-      // Exponential backoff + jitter
-      const exp = baseDelay * Math.pow(1.5, attempt - fastRetries);
-      waitTime = exp + Math.random() * 50;
+      //Exponential backoff
+      const exp =
+        config.baseDelay * 2 * Math.pow(1.5, attempt - config.fastRetries);
+      waitTime = Math.min(exp + Math.random() * config.jitter, config.maxWait);
     }
-    console.log("waitTime", waitTime);
 
     await sleep(waitTime);
   }
+
+  throw new BadRequestError(
+    "OTP token not found. Please try again or request a new verification email."
+  );
 };
 
 module.exports = {

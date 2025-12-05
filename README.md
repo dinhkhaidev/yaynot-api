@@ -559,6 +559,7 @@ API_SECRET=your-api-secret
 
 # Deployment Mode
 IS_SERVERLESS=false  # true for Vercel, false for Railway/local
+IS_PAAS=false        # true for PaaS platforms (Render/Railway), false for local/IaaS
 
 # Rate Limiting
 WINDOW_MS_AUTH=10
@@ -584,6 +585,51 @@ VERCEL=1  # Auto-set by Vercel
 
 ```bash
 IS_SERVERLESS=false
+```
+
+### Platform Performance Configuration
+
+**`IS_PAAS`** - Optimizes retry logic and timeout settings based on platform infrastructure:
+
+| Platform Type               | `IS_PAAS` | Redis Latency | Config Optimization                                             |
+| --------------------------- | --------- | ------------- | --------------------------------------------------------------- |
+| **Local Development**       | `false`   | ~1-5ms        | Fast polling (30-50ms intervals), 5 retries, ~300-450ms total   |
+| **PaaS (Render/Railway)**   | `true`    | ~50-200ms     | Slower polling (60-90ms intervals), 6 retries, ~400-600ms total |
+| **IaaS (AWS EC2/Azure VM)** | `false`   | ~5-50ms       | Use local config if Redis in same VPC/region                    |
+
+**When to use `IS_PAAS=true`:**
+
+- Deploying to **Render**, **Railway**, or similar PaaS platforms
+- Using **managed Redis** services (Upstash, Redis Cloud, CloudAMQP)
+- App and Redis are in **different networks/regions**
+
+**When to use `IS_PAAS=false`:**
+
+- **Local development** with Redis on same machine
+- **IaaS deployments** (AWS EC2, Azure VM) with Redis in same VPC
+- **Self-hosted** infrastructure with low-latency Redis connection
+
+**Impact:**
+
+- Email OTP verification response time
+- Background job processing speed
+- Cache polling intervals for async operations
+
+**Example:**
+
+```bash
+# Render/Railway deployment
+IS_PAAS=true
+REDIS_URL=redis://upstash.redis.com:6379
+
+# Local development
+IS_PAAS=false
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# AWS EC2 with Redis in same VPC
+IS_PAAS=false
+REDIS_HOST=10.0.1.50  # Private IP in VPC
 ```
 
 ---

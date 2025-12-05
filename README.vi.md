@@ -560,6 +560,7 @@ API_SECRET=your-api-secret
 
 # Deployment Mode
 IS_SERVERLESS=false  # true cho Vercel, false cho Railway/local
+IS_PAAS=false        # true cho PaaS platforms (Render/Railway), false cho local/IaaS
 
 # Rate Limiting
 WINDOW_MS_AUTH=10
@@ -585,6 +586,51 @@ VERCEL=1  # Tự động set bởi Vercel
 
 ```bash
 IS_SERVERLESS=false
+```
+
+### Cấu hình Performance theo Platform
+
+**`IS_PAAS`** - Tối ưu hóa retry logic và timeout dựa trên hạ tầng platform:
+
+| Loại Platform               | `IS_PAAS` | Redis Latency | Tối ưu hóa Config                                        |
+| --------------------------- | --------- | ------------- | -------------------------------------------------------- |
+| **Local Development**       | `false`   | ~1-5ms        | Polling nhanh (30-50ms), 5 lần retry, ~300-450ms tổng    |
+| **PaaS (Render/Railway)**   | `true`    | ~50-200ms     | Polling chậm hơn (60-90ms), 6 lần retry, ~400-600ms tổng |
+| **IaaS (AWS EC2/Azure VM)** | `false`   | ~5-50ms       | Dùng config local nếu Redis cùng VPC/region              |
+
+**Khi nào dùng `IS_PAAS=true`:**
+
+- Deploy lên **Render**, **Railway**, hoặc các PaaS platform tương tự
+- Sử dụng **managed Redis** services (Upstash, Redis Cloud, CloudAMQP)
+- App và Redis ở **khác network/region**
+
+**Khi nào dùng `IS_PAAS=false`:**
+
+- **Local development** với Redis trên cùng máy
+- **IaaS deployments** (AWS EC2, Azure VM) với Redis trong cùng VPC
+- **Self-hosted** infrastructure với kết nối Redis latency thấp
+
+**Ảnh hưởng:**
+
+- Thời gian response của email OTP verification
+- Tốc độ xử lý background jobs
+- Khoảng thời gian polling cache cho async operations
+
+**Ví dụ:**
+
+```bash
+# Deploy trên Render/Railway
+IS_PAAS=true
+REDIS_URL=redis://upstash.redis.com:6379
+
+# Local development
+IS_PAAS=false
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# AWS EC2 với Redis trong cùng VPC
+IS_PAAS=false
+REDIS_HOST=10.0.1.50  # Private IP trong VPC
 ```
 
 ---

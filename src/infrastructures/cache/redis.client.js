@@ -26,7 +26,7 @@ const initRedis = () => {
           password: process.env.REDIS_PASSWORD || "",
           retryStrategy: (times) => Math.min(times * 50, 2000),
           maxRetriesPerRequest: 3,
-          enableReadyCheck: false,
+          enableReadyCheck: true, //must on if using cluster
           enableOfflineQueue: false,
           lazyConnect: true,
         };
@@ -36,11 +36,13 @@ const initRedis = () => {
 
     instanceRedis.on(statusConnectRedis.READY, () => {
       console.log("Redis ready");
+      client = instanceRedis;
       resolve(instanceRedis);
     });
 
     instanceRedis.on(statusConnectRedis.ERROR, (err) => {
       console.error("Redis error:", err.message);
+      reject(err);
     });
 
     instanceRedis.on(statusConnectRedis.CONNECT, () => {
@@ -48,9 +50,10 @@ const initRedis = () => {
     });
 
     instanceRedis.on(statusConnectRedis.CLOSE, () => {
-      console.log("Redis closed");
-      client = null;
-      connectionPromise = null;
+      console.log("Redis connection closed - will auto-reconnect");
+      // ioredis will auto-reconnect with retryStrategy
+      // client = null;
+      // connectionPromise = null;
     });
 
     // Connect once
