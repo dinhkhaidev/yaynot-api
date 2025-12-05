@@ -259,11 +259,13 @@ const getOtpToken = async (email, maxRetries = 10) => {
 
     if (attempt < config.fastRetries) {
       //Polling: initial wait + jitter
+      // NOSONAR - Math.random() is safe for jitter (non-cryptographic use)
       waitTime = config.initialWait + Math.random() * config.jitter;
     } else {
       //Exponential backoff
       const exp =
         config.baseDelay * 2 * Math.pow(1.5, attempt - config.fastRetries);
+      // NOSONAR - Math.random() is safe for jitter (non-cryptographic use)
       waitTime = Math.min(exp + Math.random() * config.jitter, config.maxWait);
     }
 
