@@ -2,9 +2,14 @@ const { default: mongoose } = require("mongoose");
 const { voteModel, voteSummaryModel } = require("../vote.model");
 
 const findVoteByUserAndQuestionInDB = async (userId, questionId) => {
-  const safeUserId = mongoose.Types.ObjectId(userId);
-  const safeQuestionId = mongoose.Types.ObjectId(questionId);
-  return await voteModel.findOne({ safeUserId, safeQuestionId }).lean();
+  const safeUserId = new mongoose.Types.ObjectId(userId);
+  const safeQuestionId = new mongoose.Types.ObjectId(questionId);
+  return await voteModel
+    .findOne({
+      userId: safeUserId,
+      questionId: safeQuestionId,
+    })
+    .lean();
 };
 const upsertVoteInDB = async ({ questionId, voteType, userId }) => {
   const filter = { questionId, userId },
@@ -27,13 +32,19 @@ const deleteVoteInDB = async (id) => {
 const updateVoteSummaryById = async ({
   questionId,
   voteTypeIncrease,
+  voteTypeDecrease,
   typeIncr,
 }) => {
-  const filter = { questionId },
-    payload = {
-      $inc: { [voteTypeIncrease]: typeIncr ? 1 : -1 },
-    },
-    options = { upsert: true, new: true };
+  const filter = { questionId };
+  const payload = {
+    $inc: { [voteTypeIncrease]: typeIncr ? 1 : -1 },
+  };
+
+  if (voteTypeDecrease && voteTypeDecrease !== voteTypeIncrease) {
+    payload.$inc[voteTypeDecrease] = -1;
+  }
+
+  const options = { upsert: true, new: true };
   return await voteSummaryModel.findOneAndUpdate(filter, payload, options);
 };
 const getVoteSummaryByQuestionId = async (questionId) => {

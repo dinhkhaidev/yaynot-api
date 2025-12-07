@@ -16,8 +16,13 @@ class QuestionTrending {
       )
     );
   }
-  static meetsThreshold(score) {
-    return score >= questionTrendingScore.THRESHOLD;
+  static meetsThreshold(score, type = "long") {
+    return (
+      score >=
+      (type === "long"
+        ? questionTrendingScore.THRESHOLD_LONG
+        : questionTrendingScore.THRESHOLD)
+    );
   }
   static async getTrendingQuestion({ userId, page = 0, pageSize = 10 }) {
     let trending = await TrendingQuestionCache.getTrending(

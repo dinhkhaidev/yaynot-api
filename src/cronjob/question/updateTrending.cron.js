@@ -17,7 +17,7 @@ class TrendingQuestionCronjob {
               score: QuestionTrending.caculator(question),
             };
           })
-          .filter((q) => QuestionTrending.meetsThreshold(q.score))
+          .filter((q) => QuestionTrending.meetsThreshold(q.score, "short"))
           .sort((a, b) => b.score - a.score)
           .slice(0, 100);
         await TrendingQuestionCache.updateTrending(scoredQuestions, "short");
@@ -41,7 +41,7 @@ class TrendingQuestionCronjob {
               score: QuestionTrending.caculator(question),
             };
           })
-          .filter((q) => QuestionTrending.meetsThreshold(q.score))
+          .filter((q) => QuestionTrending.meetsThreshold(q.score, "long"))
           .sort((a, b) => b.score - a.score)
           .slice(0, 200);
         await TrendingQuestionCache.updateTrending(scoredQuestions, "long");

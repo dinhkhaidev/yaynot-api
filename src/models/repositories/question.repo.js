@@ -177,6 +177,15 @@ const findByIds = async (ids) => {
   const questionMap = new Map(questions.map((q) => [q._id.toString(), q]));
   return ids.map((id) => questionMap.get(id.toString())).filter(Boolean);
 };
+const updateQuestionVoteCount = async ({ questionId, increment }) => {
+  return await questionModel.findByIdAndUpdate(
+    questionId,
+    {
+      $inc: { voteCount: increment ? 1 : -1 },
+    },
+    { new: true }
+  );
+};
 module.exports = {
   createQuestionInDB,
   updateQuestionInDB,
@@ -196,4 +205,5 @@ module.exports = {
   createHistoryQuestionInDB,
   getTrendingCandidates,
   findByIds,
+  updateQuestionVoteCount,
 };

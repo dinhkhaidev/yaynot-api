@@ -11,8 +11,8 @@ const checkVotedUser = async (req, res, next) => {
   try {
     const userId = req.user?.user_id;
     const questionId = req.params.questionId || req.body.questionId;
-    const safeUserId = mongoose.Types.ObjectId(userId);
-    const safeQuestionId = mongoose.Types.ObjectId(questionId);
+    const safeUserId = new mongoose.Types.ObjectId(userId);
+    const safeQuestionId = new mongoose.Types.ObjectId(questionId);
     if (!safeUserId || !safeQuestionId) {
       throw new BadRequestError("Missing userId or questionId!");
     }

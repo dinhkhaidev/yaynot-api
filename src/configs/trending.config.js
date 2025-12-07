@@ -8,6 +8,7 @@ const questionTrendingScore = {
   GRAVITY: parseFloat(process.env.TRENDING_GRAVITY),
   OFFSET: parseFloat(process.env.TRENDING_OFFSET),
   THRESHOLD: parseFloat(process.env.TRENDING_THRESHOLD),
+  THRESHOLD_LONG: parseFloat(process.env.TRENDING_THRESHOLD_LONG),
 };
 module.exports = {
   questionTrendingScore,

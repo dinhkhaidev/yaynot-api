@@ -9,3 +9,4 @@ src/services/old
 .env.*
 .vercel
 /swagger/swagger-output.local.json
+/test_performances
