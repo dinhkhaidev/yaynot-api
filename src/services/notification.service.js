@@ -11,9 +11,9 @@ const {
   deleteNotification,
   deleteUserNotification,
 } = require("../models/repositories/notification.repo");
-const NotificationInterface = require("../interface/notifications");
 const { BadRequestError, NotFoundError } = require("../core/error.response");
-class SenderAll extends NotificationInterface {
+const { INotificationService } = require("../interface/notifications");
+class SenderAll extends INotificationService {
   async pushNotification(newNotification) {
     const batchSize = 1000;
     const userCursor = await findListUserId(batchSize);
@@ -33,7 +33,7 @@ class SenderAll extends NotificationInterface {
     }
   }
 }
-class SenderSingle extends NotificationInterface {
+class SenderSingle extends INotificationService {
   async pushNotification(newNotification, receiveId) {
     const receiveRecord = await findUserById(receiveId);
     if (!receiveRecord) {

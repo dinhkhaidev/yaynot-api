@@ -1,8 +1,10 @@
 const { BadRequestError } = require("../../core/error.response");
 
-class NotificationInterface {
+class INotificationService {
   async pushNotification() {
-    throw new Error("Not implement!");
+    throw new BadRequestError("Not implement!");
   }
 }
-module.exports = NotificationInterface;
+module.exports = {
+  INotificationService,
+};

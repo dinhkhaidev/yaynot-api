@@ -1,4 +1,4 @@
-name: "CI Quality & Security - YaynotAPI"
+name: CI - YaynotAPI
 
 on:
   push:
@@ -57,10 +57,18 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: test --all-projects --json > snyk-report.json
+          args: --json-file-output=snyk-report.json
       - name: Upload Snyk report
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         if: always()
         with:
           name: snyk-report
           path: snyk-report.json
+      - name: Log in to GHCR
+        run: echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build image
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/yaynot-api:latest .
+
+      - name: Push image
+        run: docker push ghcr.io/${{ github.repository_owner }}/yaynot-api:latest
