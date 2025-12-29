@@ -10,11 +10,13 @@ const { BadRequestError } = require("../../core/error.response");
 /** @type {import("ioredis").Redis} */
 const redis = getRedisInstance();
 class TrendingQuestionCache {
-  static TTL = {
-    SHORT: 3 * 24 * 60 * 60, // 3 days
-    LONG: 30 * 24 * 60 * 60, // 30 days
-    USER_SEEN: 7 * 24 * 60 * 60, // 7 days
-  };
+  static TTL() {
+    return {
+      SHORT: 3 * 24 * 60 * 60, // 3 days
+      LONG: 30 * 24 * 60 * 60, // 30 days
+      USER_SEEN: 7 * 24 * 60 * 60, // 7 days
+    };
+  }
 
   static async updateTrending(questions, type = "short") {
     const key =
