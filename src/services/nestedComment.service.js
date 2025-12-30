@@ -26,8 +26,9 @@ const { nestedComment } = require("../models/nestedComment.model");
 const {
   commentServiceValidate,
 } = require("../validations/service/commentService.validate");
-const { voteSummaryModel } = require("../models/vote.model");
 const QuestionValidationRule = require("../domain/question/rules/questionValidation.rule");
+const { withTransaction } = require("../helpers/wrapperTransaction");
+const questionModel = require("../models/question.model");
 
 class CommentService {
   static async createComment({
@@ -36,49 +37,55 @@ class CommentService {
     questionId,
     userId,
   }) {
-    const createComment = new nestedComment({
-      commentParentId,
-      content,
-      questionId,
-      userId,
-    });
-    const { status } = await QuestionValidationRule.validateQuestion({
-      questionId,
-    });
-    if (status !== "publish")
-    {throw new ForbiddenError("Can't access to this question!");}
-    let rightValue;
-    if (commentParentId) {
-      const commentParentRecord = await findCommentParentInDB(commentParentId);
-      if (!commentParentRecord)
-      {throw new NotFoundError("Comment parent not found!");}
-      rightValue = commentParentRecord.right;
-      await updateLeftRightNested(questionId, rightValue);
-      createComment.left = rightValue;
-      createComment.right = rightValue + 1;
-    } else {
-      const maxRightComment = await nestedComment.findOne(
-        { questionId: questionId },
-        "right",
-        { sort: { right: -1 } },
-      );
-      rightValue = maxRightComment?.right ? maxRightComment.right + 1 : 1;
-      createComment.left = rightValue;
-      createComment.right = rightValue + 1;
-    }
-    await createComment.save();
-    await voteSummaryModel.findOneAndUpdate(
-      { questionId: questionId },
-      {
-        $inc: {
-          commentCount: 1,
+    return withTransaction(async (session) => {
+      const createComment = new nestedComment({
+        commentParentId,
+        content,
+        questionId,
+        userId,
+      });
+      const { status } = await QuestionValidationRule.validateQuestion({
+        questionId,
+      });
+      if (status !== "publish") {
+        throw new ForbiddenError("Can't access to this question!");
+      }
+      let rightValue;
+      if (commentParentId) {
+        const commentParentRecord = await findCommentParentInDB(
+          commentParentId
+        );
+        if (!commentParentRecord) {
+          throw new NotFoundError("Comment parent not found!");
+        }
+        rightValue = commentParentRecord.right;
+        await updateLeftRightNested(questionId, rightValue);
+        createComment.left = rightValue;
+        createComment.right = rightValue + 1;
+      } else {
+        const maxRightComment = await nestedComment.findOne(
+          { questionId: questionId },
+          "right",
+          { sort: { right: -1 } }
+        );
+        rightValue = maxRightComment?.right ? maxRightComment.right + 1 : 1;
+        createComment.left = rightValue;
+        createComment.right = rightValue + 1;
+      }
+      await createComment.save({ session });
+      await questionModel.findOneAndUpdate(
+        { _id: questionId },
+        {
+          $inc: {
+            commentCount: 1,
+          },
         },
-      },
-      {
-        upsert: true,
-      },
-    );
-    return createComment;
+        {
+          upsert: true,
+        }
+      );
+      return createComment;
+    });
   }
   //get all comment and get replies of comment
   static async getListComment({
@@ -96,7 +103,7 @@ class CommentService {
       const listComment = await getListNestedCommentInDB(
         questionId,
         leftValue,
-        rightValue,
+        rightValue
       );
       return listComment;
     } else {
@@ -107,41 +114,56 @@ class CommentService {
   static async updateComment({ questionId, commentId, content }) {
     await QuestionValidationRule.validateQuestion({ questionId });
     const commentRecord = await findCommentInDB(commentId);
-    if (!commentRecord) {throw new NotFoundError("Comment not found!");}
-    if (content === commentRecord.content)
-    {throw new BadRequestError("Content is existed!");}
+    if (!commentRecord) {
+      throw new NotFoundError("Comment not found!");
+    }
+    if (content === commentRecord.content) {
+      throw new BadRequestError("Content is existed!");
+    }
     return await updateCommentInDB(commentId, { content });
   }
   static async deleteComment({ questionId, commentId }) {
-    await QuestionValidationRule.validateQuestion({ questionId });
-    const commentRecord = await findCommentInDB(commentId);
-    if (!commentRecord) {throw new NotFoundError("Comment not found!");}
-    const { left, right } = commentRecord;
-    const deleteComment = await deleteCommentInDB(questionId, left, right);
-    await nestedComment.updateMany(
-      { questionId: questionId, right: { $gte: right } },
-      {
-        $inc: { right: -right },
-      },
-    );
-    await nestedComment.updateMany(
-      { questionId: questionId, left: { $gte: right } },
-      {
-        $inc: { left: -right },
-      },
-    );
-    await voteSummaryModel.findOneAndUpdate(
-      { questionId: questionId },
-      {
-        $inc: {
-          commentCount: -1,
+    return withTransaction(async (session) => {
+      await QuestionValidationRule.validateQuestion({ questionId });
+      const commentRecord = await findCommentInDB(commentId, session);
+      if (!commentRecord) {
+        throw new NotFoundError("Comment not found!");
+      }
+      const { left, right } = commentRecord;
+      const deleteComment = await deleteCommentInDB(
+        questionId,
+        left,
+        right,
+        session
+      );
+      await nestedComment.updateMany(
+        { questionId: questionId, right: { $gte: right } },
+        {
+          $inc: { right: -right },
         },
-      },
-      {
-        upsert: true,
-      },
-    );
-    return deleteComment;
+        { session }
+      );
+      await nestedComment.updateMany(
+        { questionId: questionId, left: { $gte: right } },
+        {
+          $inc: { left: -right },
+        },
+        { session }
+      );
+      await questionModel.findOneAndUpdate(
+        { _id: questionId },
+        {
+          $inc: {
+            commentCount: -1,
+          },
+        },
+        {
+          upsert: true,
+          session,
+        }
+      );
+      return deleteComment;
+    });
   }
   static async likeCommentByAction({ commentId, action, userId }) {
     await commentServiceValidate(commentId);
@@ -150,14 +172,16 @@ class CommentService {
       commentId,
     });
     if (action === "like") {
-      if (commentLikeRecord)
-      {throw new BadRequestError("You already liked this comment!");}
+      if (commentLikeRecord) {
+        throw new BadRequestError("You already liked this comment!");
+      }
       const likeCommentData = await likeCommentInDB({ userId, commentId });
       return likeCommentData;
     }
     if (action === "unlike") {
-      if (!commentLikeRecord)
-      {throw new BadRequestError("You haven't liked this comment yet!");}
+      if (!commentLikeRecord) {
+        throw new BadRequestError("You haven't liked this comment yet!");
+      }
       const unlikeCommentData = await unlikeCommentInDB({ userId, commentId });
       return unlikeCommentData;
     }
@@ -168,19 +192,22 @@ class CommentService {
     const listCommentLike = await getListCommentLikeInDB(
       cursor,
       commentId,
-      sort,
+      sort
     );
     return listCommentLike;
   }
   static async changeStatusPinnedComment({ commentId, status }) {
     await commentServiceValidate(commentId);
     const commentRecord = await findCommentInDB(commentId);
-    if (!commentRecord) {throw new NotFoundError("Comment not found!");}
+    if (!commentRecord) {
+      throw new NotFoundError("Comment not found!");
+    }
     if (!status) {
       throw new BadRequestError("Status is required!");
     }
-    if (commentRecord.isPinned === status)
-    {throw new BadRequestError("Status is existed!");}
+    if (commentRecord.isPinned === status) {
+      throw new BadRequestError("Status is existed!");
+    }
     return await updateCommentInDB(commentId, { isPinned: status });
   }
 }

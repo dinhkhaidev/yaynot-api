@@ -5,16 +5,15 @@ const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
   findVoteByUserAndQuestionInDB,
   deleteVoteInDB,
-  updateVoteSummaryById,
   findVoteById,
-  getVoteSummaryByQuestionId,
   findVoteByQuestionId,
   upsertVoteInDB,
 } = require("../models/repositories/vote.repo");
 const {
   updateQuestionVoteCount,
+  updateVoteSummaryById,
+  getVoteSummaryByQuestionId,
 } = require("../models/repositories/question.repo");
-const { voteSummaryModel } = require("../models/vote.model");
 const {
   validateFindQuestionById,
   validateIdQuestionPayload,
@@ -120,7 +119,7 @@ class VoteService {
     }
     const voteSummary = { ...voteSummaryRecord };
     const { voteYesCount, voteNoCount } = voteSummaryRecord;
-    //hanlde topcomment ...
+    //handle topcomment ...
     voteSummary.voteYesPercentage =
       Math.round((voteYesCount / (voteYesCount + voteNoCount)) * 100) || 0;
     voteSummary.voteNoPercentage =

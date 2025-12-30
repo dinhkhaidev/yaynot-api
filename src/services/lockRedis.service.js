@@ -1,10 +1,6 @@
 // const redis = require("../configs/redis.config");
 const { getRedis } = require("../databases/init.redis");
 const redis = getRedis();
-const {
-  upsertVoteInDB,
-  updateVoteSummaryById,
-} = require("../models/repositories/vote.repo");
 const { RequestTimeoutError } = require("../core/error.response");
 const acquireLock = async ({ questionId, userId }) => {
   const key = `${process.env.DISTRIBUTED_LOCK}-${questionId}-${userId}`;
