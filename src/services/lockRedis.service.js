@@ -2,8 +2,8 @@
 const { getRedis } = require("../databases/init.redis");
 const redis = getRedis();
 const { RequestTimeoutError } = require("../core/error.response");
-const acquireLock = async ({ questionId, userId }) => {
-  const key = `${process.env.DISTRIBUTED_LOCK}-${questionId}-${userId}`;
+const acquireLock = async ({ questionId }) => {
+  const key = `${process.env.DISTRIBUTED_LOCK}-${questionId}`;
   const retries = 10;
   const expire = 5000;
   for (let index = 0; index < retries; index++) {

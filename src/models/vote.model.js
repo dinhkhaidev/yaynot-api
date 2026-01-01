@@ -16,7 +16,24 @@ const voteSchema = new mongoose.Schema(
     collection: COLLECTION_NAME,
   }
 );
+const voteSummarySchema = new mongoose.Schema(
+  {
+    questionId: {
+      type: mongoose.Types.ObjectId,
+      ref: "question",
+      required: true,
+    },
+    voteYesCount: { type: Number, default: 0 },
+    voteNoCount: { type: Number, default: 0 },
+  },
+  {
+    timestamps: true,
+    collection: "vote_summaries",
+  }
+);
 voteSchema.index({ questionId: 1, userId: 1 }, { unique: true });
+voteSummarySchema.index({ questionId: 1 });
 module.exports = {
   voteModel: mongoose.model(DOCUMENT_NAME, voteSchema),
+  voteSummaryModel: mongoose.model("voteSummary", voteSummarySchema),
 };

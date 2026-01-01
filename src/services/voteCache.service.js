@@ -1,4 +1,7 @@
 const { getRedis } = require("../databases/init.redis");
+const {
+  findVoteByUserAndQuestionInDB,
+} = require("../models/repositories/vote.repo");
 const redis = getRedis();
 
 class VoteCacheService {
@@ -7,12 +10,14 @@ class VoteCacheService {
    * Value: "yay" | "nay" | null
    * TTL: 1 hour (votes rarely change)
    */
-  static async hasUserVoted(questionId, userId) {
+  static async hasUserVoted(questionId, userId, voteType) {
     const key = `voted:${questionId}:${userId}`;
     const cached = await redis.get(key);
 
-    if (cached === null) return null;
-    return cached === "yay"; //Convert to boolean
+    if (cached !== null) return cached === "yay"; //Convert to boolean
+    //fallback db
+    const voteRecord = await findVoteByUserAndQuestionInDB(userId, questionId);
+    return !!voteRecord && voteRecord.voteType === voteType;
   }
   static async cacheVote(questionId, userId, voteType) {
     const key = `voted:${questionId}:${userId}`;

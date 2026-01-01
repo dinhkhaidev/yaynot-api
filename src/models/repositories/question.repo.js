@@ -187,30 +187,6 @@ const updateQuestionVoteCount = async ({ questionId, increment }) => {
   );
 };
 
-const updateVoteSummaryById = async ({
-  questionId,
-  voteTypeIncrease,
-  voteTypeDecrease,
-  typeIncr,
-}) => {
-  const filter = { _id: questionId };
-  const payload = {
-    $inc: { [voteTypeIncrease]: typeIncr ? 1 : -1 },
-  };
-
-  if (voteTypeDecrease && voteTypeDecrease !== voteTypeIncrease) {
-    payload.$inc[voteTypeDecrease] = -1;
-  }
-
-  const options = { upsert: true, new: true };
-  return await questionModel.findOneAndUpdate(filter, payload, options);
-};
-const getVoteSummaryByQuestionId = async (questionId) => {
-  return await questionModel
-    .findOne({ _id: questionId })
-    .select("voteYesCount voteNoCount commentCount")
-    .lean();
-};
 module.exports = {
   createQuestionInDB,
   updateQuestionInDB,
@@ -231,6 +207,4 @@ module.exports = {
   getTrendingCandidates,
   findByIds,
   updateQuestionVoteCount,
-  updateVoteSummaryById,
-  getVoteSummaryByQuestionId,
 };

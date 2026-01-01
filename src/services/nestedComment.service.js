@@ -38,12 +38,15 @@ class CommentService {
     userId,
   }) {
     return withTransaction(async (session) => {
-      const createComment = new nestedComment({
-        commentParentId,
-        content,
-        questionId,
-        userId,
-      });
+      const createComment = new nestedComment(
+        {
+          commentParentId,
+          content,
+          questionId,
+          userId,
+        },
+        session
+      );
       const { status } = await QuestionValidationRule.validateQuestion({
         questionId,
       });
@@ -53,20 +56,22 @@ class CommentService {
       let rightValue;
       if (commentParentId) {
         const commentParentRecord = await findCommentParentInDB(
-          commentParentId
+          commentParentId,
+          session
         );
         if (!commentParentRecord) {
           throw new NotFoundError("Comment parent not found!");
         }
         rightValue = commentParentRecord.right;
-        await updateLeftRightNested(questionId, rightValue);
+        await updateLeftRightNested(questionId, rightValue, session);
         createComment.left = rightValue;
         createComment.right = rightValue + 1;
       } else {
         const maxRightComment = await nestedComment.findOne(
           { questionId: questionId },
           "right",
-          { sort: { right: -1 } }
+          { sort: { right: -1 } },
+          { session }
         );
         rightValue = maxRightComment?.right ? maxRightComment.right + 1 : 1;
         createComment.left = rightValue;
@@ -82,6 +87,7 @@ class CommentService {
         },
         {
           upsert: true,
+          session,
         }
       );
       return createComment;

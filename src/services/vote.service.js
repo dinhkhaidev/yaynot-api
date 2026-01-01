@@ -8,11 +8,11 @@ const {
   findVoteById,
   findVoteByQuestionId,
   upsertVoteInDB,
+  updateVoteSummaryById,
+  getVoteSummaryByQuestionId,
 } = require("../models/repositories/vote.repo");
 const {
   updateQuestionVoteCount,
-  updateVoteSummaryById,
-  getVoteSummaryByQuestionId,
 } = require("../models/repositories/question.repo");
 const {
   validateFindQuestionById,
@@ -21,32 +21,27 @@ const {
 const { acquireLock } = require("./lockRedis.service");
 const VoteCacheService = require("./voteCache.service");
 const QuestionValidationRule = require("../domain/question/rules/questionValidation.rule");
+const { withTransaction } = require("../helpers/wrapperTransaction");
 class VoteService {
   static async upsertVote({ questionId, voteType, userId }) {
-    if (!userId) {
-      throw new NotFoundError("User ID is required!");
-    }
-
-    let keyLock;
-    try {
-      keyLock = await acquireLock({ questionId, userId });
+    return withTransaction(async (session) => {
+      if (!userId) {
+        throw new NotFoundError("User ID is required!");
+      }
       const cachedVote = await VoteCacheService.hasUserVoted(
         questionId,
-        userId
+        userId,
+        voteType,
+        session
       );
       if (cachedVote !== null && cachedVote === voteType) {
         throw new BadRequestError("Vote is existed!");
       }
-      //fallback db
-      const voteRecord = await findVoteByUserAndQuestionInDB(
-        userId,
-        questionId
-      );
-      if (voteRecord && voteRecord.voteType === voteType) {
-        throw new BadRequestError("Vote is existed!");
-      }
 
-      const newVote = await upsertVoteInDB({ questionId, voteType, userId });
+      const newVote = await upsertVoteInDB(
+        { questionId, voteType, userId },
+        session
+      );
       if (!newVote) {
         return "vote_failed";
       }
@@ -58,11 +53,14 @@ class VoteService {
       const voteTypeDecrease = !voteType ? "voteYesCount" : "voteNoCount";
 
       if (!newVote.lastErrorObject.updatedExisting) {
-        await updateVoteSummaryById({
-          questionId,
-          voteTypeIncrease,
-          typeIncr: true,
-        });
+        await updateVoteSummaryById(
+          {
+            questionId,
+            voteTypeIncrease,
+            typeIncr: true,
+          },
+          session
+        );
         //non-blocking
         updateQuestionVoteCount({ questionId, increment: true }).catch((err) =>
           console.error("Failed to update question voteCount:", err)
@@ -70,44 +68,46 @@ class VoteService {
       } else {
         //Changed vote: increase new, decrease old in SINGLE query
         //voteCount stays same (user just changed vote type, not adding new vote)
-        await updateVoteSummaryById({
-          questionId,
-          voteTypeIncrease,
-          voteTypeDecrease,
-          typeIncr: true,
-        });
+        await updateVoteSummaryById(
+          {
+            questionId,
+            voteTypeIncrease,
+            voteTypeDecrease,
+            typeIncr: true,
+          },
+          session
+        );
       }
       return newVote;
-    } catch (error) {
-      throw error;
-    } finally {
-      if (keyLock?.key) {
-        await redis.del(keyLock.key);
-      }
-    }
+    });
   }
   static async deleteVote(voteId) {
-    const voteRecord = await findVoteById(voteId);
-    if (!voteRecord) {
-      throw new NotFoundError("Vote not found!");
-    }
-    const deleteVote = await deleteVoteInDB(voteId);
-    const voteTypeIncrease = voteRecord.voteType
-      ? "voteYesCount"
-      : "voteNoCount";
-    await updateVoteSummaryById({
-      questionId: voteRecord.questionId,
-      voteTypeIncrease,
-      type: false,
+    return withTransaction(async (session) => {
+      const voteRecord = await findVoteById(voteId, session);
+      if (!voteRecord) {
+        throw new NotFoundError("Vote not found!");
+      }
+      const deleteVote = await deleteVoteInDB(voteId, session);
+      const voteTypeIncrease = voteRecord.voteType
+        ? "voteYesCount"
+        : "voteNoCount";
+      await updateVoteSummaryById(
+        {
+          questionId: voteRecord.questionId,
+          voteTypeIncrease,
+          type: false,
+        },
+        session
+      );
+      //non-blocking
+      updateQuestionVoteCount({
+        questionId: voteRecord.questionId,
+        increment: false,
+      }).catch((err) =>
+        console.error("Failed to update question voteCount:", err)
+      );
+      return deleteVote;
     });
-    //non-blocking
-    updateQuestionVoteCount({
-      questionId: voteRecord.questionId,
-      increment: false,
-    }).catch((err) =>
-      console.error("Failed to update question voteCount:", err)
-    );
-    return deleteVote;
   }
   //handle detail vote of question
   static async getDetailVote({ questionId, myVote }) {

@@ -13,6 +13,7 @@ const {
 } = require("../models/repositories/notification.repo");
 const { BadRequestError, NotFoundError } = require("../core/error.response");
 const { INotificationService } = require("../interface/notifications");
+const { withTransaction } = require("../helpers/wrapperTransaction");
 class SenderAll extends INotificationService {
   async pushNotification(newNotification) {
     const batchSize = 1000;
@@ -35,14 +36,21 @@ class SenderAll extends INotificationService {
 }
 class SenderSingle extends INotificationService {
   async pushNotification(newNotification, receiveId) {
-    const receiveRecord = await findUserById(receiveId);
-    if (!receiveRecord) {
-      await deleteNotification(newNotification._id);
-      throw new BadRequestError("ReceiveId incorrect!");
-    }
-    await userNotificationModel.create({
-      userId: receiveId,
-      notificationId: newNotification._id,
+    return withTransaction(async (session) => {
+      const receiveRecord = await findUserById(receiveId, session);
+      if (!receiveRecord) {
+        await deleteNotification(newNotification._id, session);
+        throw new BadRequestError("ReceiveId incorrect!");
+      }
+      await userNotificationModel.create(
+        [
+          {
+            userId: receiveId,
+            notificationId: newNotification._id,
+          },
+        ],
+        { session }
+      );
     });
   }
 }
