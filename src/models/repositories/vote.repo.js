@@ -46,10 +46,10 @@ const updateVoteSummaryById = async ({
   }
 
   const options = { upsert: true, new: true };
-  return await voteSummaryModel.findOneAndUpdate(filter, payload, options);
+  return voteSummaryModel.findOneAndUpdate(filter, payload, options);
 };
 const getVoteSummaryByQuestionId = async (questionId) => {
-  return await voteSummaryModel
+  return voteSummaryModel
     .findOne({ questionId: questionId })
     .select("voteYesCount voteNoCount")
     .lean();

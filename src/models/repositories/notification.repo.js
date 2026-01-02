@@ -7,7 +7,7 @@ const {
 } = require("../notification.model");
 
 const createNotification = async (payload) => {
-  return await notificationModel.create(payload);
+  return notificationModel.create(payload);
 };
 const getListNotificationByUserIdInDB = async ({ userId, cursor }) => {
   const query = { userId };
@@ -24,21 +24,19 @@ const getListNotificationByUserIdInDB = async ({ userId, cursor }) => {
   return buildResultCursorBased(listNoti, 10);
 };
 const findUserNotificationInDB = async ({ userId, notificationId }) => {
-  return await userNotificationModel.findOne({ userId, notificationId });
+  return userNotificationModel.findOne({ userId, notificationId });
 };
 const markedNotificationInDB = async ({ userId, notificationId }) => {
-  return await userNotificationModel.updateOne(
+  return userNotificationModel.updateOne(
     { userId, notificationId },
     { $set: { isRead: true } }
   );
 };
 const deleteNotification = async (notificationId) => {
-  return await notificationModel.deleteOne({ _id: notificationId }).lean();
+  return notificationModel.deleteOne({ _id: notificationId }).lean();
 };
 const deleteUserNotification = async ({ userId, notificationId }) => {
-  return await userNotificationModel
-    .deleteOne({ userId, notificationId })
-    .lean();
+  return userNotificationModel.deleteOne({ userId, notificationId }).lean();
 };
 module.exports = {
   createNotification,

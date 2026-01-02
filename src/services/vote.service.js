@@ -32,7 +32,7 @@ class VoteService {
         questionId,
         userId,
         voteType,
-        session
+        { session }
       );
       if (cachedVote !== null && cachedVote === voteType) {
         throw new BadRequestError("Vote is existed!");
@@ -40,7 +40,7 @@ class VoteService {
 
       const newVote = await upsertVoteInDB(
         { questionId, voteType, userId },
-        session
+        { session }
       );
       if (!newVote) {
         return "vote_failed";
@@ -59,7 +59,7 @@ class VoteService {
             voteTypeIncrease,
             typeIncr: true,
           },
-          session
+          { session }
         );
         //non-blocking
         updateQuestionVoteCount({ questionId, increment: true }).catch((err) =>
@@ -75,7 +75,7 @@ class VoteService {
             voteTypeDecrease,
             typeIncr: true,
           },
-          session
+          { session }
         );
       }
       return newVote;
@@ -83,11 +83,11 @@ class VoteService {
   }
   static async deleteVote(voteId) {
     return withTransaction(async (session) => {
-      const voteRecord = await findVoteById(voteId, session);
+      const voteRecord = await findVoteById(voteId, { session });
       if (!voteRecord) {
         throw new NotFoundError("Vote not found!");
       }
-      const deleteVote = await deleteVoteInDB(voteId, session);
+      const deleteVote = await deleteVoteInDB(voteId, { session });
       const voteTypeIncrease = voteRecord.voteType
         ? "voteYesCount"
         : "voteNoCount";
@@ -97,7 +97,7 @@ class VoteService {
           voteTypeIncrease,
           type: false,
         },
-        session
+        { session }
       );
       //non-blocking
       updateQuestionVoteCount({

@@ -5,22 +5,24 @@ const conventionModel = require("../convention.model");
 const messageModel = require("../message.model");
 
 const createConventionInDB = async (payload) => {
-  return await conventionModel.create(payload);
+  return conventionModel.create(payload);
 };
 const findConventionInDB = async (query) => {
-  return await conventionModel.findOne(query).lean();
+  return conventionModel.findOne(query).lean();
 };
 const findConventionByIdInDB = async (conventionId) => {
-  return await conventionModel.findById(conventionId).lean();
+  return conventionModel.findById(conventionId).lean();
 };
 const createMessageInDB = async (payload) => {
-  return await messageModel.create(payload);
+  return messageModel.create(payload);
 };
 const getListConventionsUserInDB = async ({ userId, limit = 10, cursor }) => {
   const query = {
     participants: { $in: userId },
   };
-  if (cursor) {query._id = { $lt: cursor };}
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
   const conventionList = await conventionModel
     .find(query)
     .sort({ updatedAt: -1 })
@@ -33,7 +35,9 @@ const getConventionMessagesInDB = async ({ convoId, limit = 15, cursor }) => {
   const query = {
     convoId,
   };
-  if (cursor) {query._id = { $lt: cursor };}
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
   const messageList = await messageModel
     .find(query)
     .sort({ updatedAt: -1 })
@@ -43,23 +47,25 @@ const getConventionMessagesInDB = async ({ convoId, limit = 15, cursor }) => {
   return buildResultCursorBased(messageList, limit);
 };
 const updateLastMessage = async ({ convoId, content, senderId }) => {
-  return await conventionModel.findOneAndUpdate(
+  return conventionModel.findOneAndUpdate(
     { _id: convoId },
-    { $set: { lastMessage: { content, senderId, createdAt: Date.now() } } },
+    { $set: { lastMessage: { content, senderId, createdAt: Date.now() } } }
   );
 };
 const deleteMessageInDB = async (messageId) => {
-  return await messageModel.deleteOne({ _id: messageId });
+  return messageModel.deleteOne({ _id: messageId });
 };
 const findMessageInDB = async (messageId) => {
-  return await messageModel.findById(messageId).lean();
+  return messageModel.findById(messageId).lean();
 };
 const searchMessageInDB = async ({ keyword, convoId, cursor, limit = 20 }) => {
   const query = {
     content: { $regex: keyword },
     convoId,
   };
-  if (cursor) {query._id = { $lt: cursor };}
+  if (cursor) {
+    query._id = { $lt: cursor };
+  }
   const messageList = await messageModel
     .find(query)
     .limit(limit)

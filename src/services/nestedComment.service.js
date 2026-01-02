@@ -45,7 +45,7 @@ class CommentService {
           questionId,
           userId,
         },
-        session
+        { session }
       );
       const { status } = await QuestionValidationRule.validateQuestion({
         questionId,
@@ -57,21 +57,20 @@ class CommentService {
       if (commentParentId) {
         const commentParentRecord = await findCommentParentInDB(
           commentParentId,
-          session
+          { session }
         );
         if (!commentParentRecord) {
           throw new NotFoundError("Comment parent not found!");
         }
         rightValue = commentParentRecord.right;
-        await updateLeftRightNested(questionId, rightValue, session);
+        await updateLeftRightNested(questionId, rightValue, { session });
         createComment.left = rightValue;
         createComment.right = rightValue + 1;
       } else {
         const maxRightComment = await nestedComment.findOne(
           { questionId: questionId },
           "right",
-          { sort: { right: -1 } },
-          { session }
+          { sort: { right: -1 }, session }
         );
         rightValue = maxRightComment?.right ? maxRightComment.right + 1 : 1;
         createComment.left = rightValue;
@@ -131,17 +130,14 @@ class CommentService {
   static async deleteComment({ questionId, commentId }) {
     return withTransaction(async (session) => {
       await QuestionValidationRule.validateQuestion({ questionId });
-      const commentRecord = await findCommentInDB(commentId, session);
+      const commentRecord = await findCommentInDB(commentId, { session });
       if (!commentRecord) {
         throw new NotFoundError("Comment not found!");
       }
       const { left, right } = commentRecord;
-      const deleteComment = await deleteCommentInDB(
-        questionId,
-        left,
-        right,
-        session
-      );
+      const deleteComment = await deleteCommentInDB(questionId, left, right, {
+        session,
+      });
       await nestedComment.updateMany(
         { questionId: questionId, right: { $gte: right } },
         {

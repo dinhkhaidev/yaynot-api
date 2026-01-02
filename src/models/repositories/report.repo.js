@@ -6,10 +6,10 @@ const reportStatus = require("../../constants/reportStatus");
  */
 class ReportRepository {
   static async createReport(reportData) {
-    return await Report.create(reportData);
+    return Report.create(reportData);
   }
   static async findReportById(reportId) {
-    return await Report.findById(reportId)
+    return Report.findById(reportId)
       .populate("reportedBy", "username email avatar")
       .populate("reviewedBy", "username email")
       .lean();
@@ -18,10 +18,10 @@ class ReportRepository {
     userId,
     targetType,
     targetId,
-    hoursAgo = 24,
+    hoursAgo = 24
   ) {
     const timeThreshold = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
-    return await Report.findOne({
+    return Report.findOne({
       reportedBy: userId,
       targetType,
       targetId,
@@ -33,7 +33,7 @@ class ReportRepository {
     if (status) {
       query.status = status;
     }
-    return await Report.countDocuments(query);
+    return Report.countDocuments(query);
   }
   static async getUserReports(userId, { page = 1, limit = 20, status = null }) {
     const query = { reportedBy: userId };
@@ -75,14 +75,24 @@ class ReportRepository {
 
     const query = {};
 
-    if (status) {query.status = status;}
-    if (targetType) {query.targetType = targetType;}
-    if (reportType) {query.reportType = reportType;}
+    if (status) {
+      query.status = status;
+    }
+    if (targetType) {
+      query.targetType = targetType;
+    }
+    if (reportType) {
+      query.reportType = reportType;
+    }
 
     if (startDate || endDate) {
       query.createdAt = {};
-      if (startDate) {query.createdAt.$gte = new Date(startDate);}
-      if (endDate) {query.createdAt.$lte = new Date(endDate);}
+      if (startDate) {
+        query.createdAt.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        query.createdAt.$lte = new Date(endDate);
+      }
     }
 
     const skip = (page - 1) * limit;
@@ -109,17 +119,17 @@ class ReportRepository {
     };
   }
   static async updateReportStatus(reportId, updateData) {
-    return await Report.findByIdAndUpdate(
+    return Report.findByIdAndUpdate(
       reportId,
       {
         ...updateData,
         reviewedAt: new Date(),
       },
-      { new: true },
+      { new: true }
     ).lean();
   }
   static async deleteReport(reportId) {
-    return await Report.findByIdAndDelete(reportId);
+    return Report.findByIdAndDelete(reportId);
   }
   static async getReportStats() {
     const [statusStats, typeStats, totalPending] = await Promise.all([
@@ -156,29 +166,29 @@ class ReportRepository {
     };
   }
   static async getReportsByTarget(targetType, targetId) {
-    return await Report.find({ targetType, targetId })
+    return Report.find({ targetType, targetId })
       .sort({ createdAt: -1 })
       .populate("reportedBy", "username email avatar")
       .lean();
   }
   static async increasePriorityForTarget(targetType, targetId) {
-    return await Report.updateMany(
+    return Report.updateMany(
       { targetType, targetId, status: reportStatus.PENDING },
-      { $inc: { priority: 1 } },
+      { $inc: { priority: 1 } }
     );
   }
   /**
    * Auto-resolve
    */
   static async autoResolveReportsByTarget(targetType, targetId, actionTaken) {
-    return await Report.updateMany(
+    return Report.updateMany(
       { targetType, targetId, status: reportStatus.PENDING },
       {
         status: reportStatus.RESOLVED,
         actionTaken,
         isAutoResolved: true,
         reviewedAt: new Date(),
-      },
+      }
     );
   }
 }

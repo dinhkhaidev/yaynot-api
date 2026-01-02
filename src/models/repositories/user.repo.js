@@ -7,31 +7,31 @@ const upsertUserProfileInDB = async ({ userId, payload }) => {
     {
       upsert: true,
       new: true,
-    },
+    }
   );
   return test;
 };
 const findUserProfileInDB = async ({ userId }) => {
-  return await userProfileModel
+  return userProfileModel
     .findOne({ _id: userId })
     .select("-_id -createdAt -updatedAt -__v")
     .lean();
 };
 const updateAvatarInDB = async ({ userId, url }) => {
-  return await userProfileModel.findByIdAndUpdate(
+  return userProfileModel.findByIdAndUpdate(
     { _id: userId },
     { avatar: url },
-    { new: true },
+    { new: true }
   );
 };
 const updateFollowCount = async ({ followerId, followingId }) => {
   const followerCountData = await userProfileModel.findByIdAndUpdate(
     followerId,
-    { $inc: { following: 1 } },
+    { $inc: { following: 1 } }
   );
   const followingCountData = await userProfileModel.findByIdAndUpdate(
     followingId,
-    { $inc: { follower: 1 } },
+    { $inc: { follower: 1 } }
   );
   return {
     followerCountData,
@@ -41,11 +41,11 @@ const updateFollowCount = async ({ followerId, followingId }) => {
 const updateUnfollowCount = async ({ followerId, followingId }) => {
   const followerCountData = await userProfileModel.findByIdAndUpdate(
     followerId,
-    { $inc: { following: -1 } },
+    { $inc: { following: -1 } }
   );
   const followingCountData = await userProfileModel.findByIdAndUpdate(
     followingId,
-    { $inc: { follower: -1 } },
+    { $inc: { follower: -1 } }
   );
   return {
     followerCountData,

@@ -7,14 +7,14 @@ const questionModel = require("../question.model");
 const questionHistoryModel = require("../questionHistory.model");
 
 const createQuestionInDB = async (payload) => {
-  return await questionModel.create(payload);
+  return questionModel.create(payload);
 };
 const updateQuestionInDB = async (id, payload) => {
-  return await questionModel.findByIdAndUpdate(id, payload, { new: true });
+  return questionModel.findByIdAndUpdate(id, payload, { new: true });
 };
 const findQuestionById = async (id) => {
   const query = { _id: id, isDeleted: false };
-  return await questionModel.findOne(query).lean();
+  return questionModel.findOne(query).lean();
 };
 const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
   const sortBy = sort ? sort : { _id: -1 };
@@ -32,7 +32,7 @@ const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
   return buildResultCursorBased(questionList, limit); // Fixed typo
 };
 const softDeleteQuestionInDB = async (id, statusDelete) => {
-  return await questionModel.findByIdAndUpdate(
+  return questionModel.findByIdAndUpdate(
     id,
     {
       isDeleted: true,
@@ -41,7 +41,7 @@ const softDeleteQuestionInDB = async (id, statusDelete) => {
   );
 };
 const hardDeleteQuestionInDB = async (id) => {
-  return await questionModel.deleteOne({ _id: id }).lean();
+  return questionModel.deleteOne({ _id: id }).lean();
 };
 const getAllStatusQuestionInDB = async ({
   filter,
@@ -50,7 +50,7 @@ const getAllStatusQuestionInDB = async ({
   cursor,
   select,
 }) => {
-  return await queryQuestion({ filter, limit, sort, cursor, select });
+  return queryQuestion({ filter, limit, sort, cursor, select });
 };
 const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
   const sortBy = sort ? sort : { _id: -1 };
@@ -68,7 +68,7 @@ const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
   return buildResultCursorBased(questionList, limit);
 };
 const publishForQuestionInDB = async (id) => {
-  return await questionModel
+  return questionModel
     .findByIdAndUpdate(
       id,
       { status: "publish", visibility: "public" },
@@ -79,7 +79,7 @@ const publishForQuestionInDB = async (id) => {
     .lean();
 };
 const draftForQuestionInDB = async (id) => {
-  return await questionModel
+  return questionModel
     .findByIdAndUpdate(
       id,
       { status: "draft", visibility: "private" },
@@ -90,7 +90,7 @@ const draftForQuestionInDB = async (id) => {
     .lean();
 };
 const archiveForQuestionInDB = async (id) => {
-  return await questionModel
+  return questionModel
     .findByIdAndUpdate(
       id,
       { status: "archive", visibility: "private" },
@@ -101,7 +101,7 @@ const archiveForQuestionInDB = async (id) => {
     .lean();
 };
 const changeVisibilityQuestionInDB = async (id, type) => {
-  return await questionModel.findByIdAndUpdate(
+  return questionModel.findByIdAndUpdate(
     id,
     {
       visibility: type,
@@ -113,13 +113,13 @@ const changeVisibilityQuestionInDB = async (id, type) => {
 };
 //care question
 const careQuestionInDB = async ({ userId, questionId }) => {
-  return await careQuestionModel.create({
+  return careQuestionModel.create({
     userId,
     questionId,
   });
 };
 const unCareQuestionInDB = async ({ userId, questionId }) => {
-  return await careQuestionModel.updateOne(
+  return careQuestionModel.updateOne(
     {
       userId,
       questionId,
@@ -131,10 +131,10 @@ const unCareQuestionInDB = async ({ userId, questionId }) => {
 };
 const getListCareQuestionByUserInDB = async ({ userId }) => {
   //handle sort, cursor,...
-  return await careQuestionModel.find({ userId }).lean();
+  return careQuestionModel.find({ userId }).lean();
 };
 const findHistoryQuestionByQuestionId = async (questionId) => {
-  return await questionHistoryModel.find({ questionId }).lean();
+  return questionHistoryModel.find({ questionId }).lean();
 };
 const createHistoryQuestionInDB = async ({
   questionId,
@@ -142,7 +142,7 @@ const createHistoryQuestionInDB = async ({
   metadata,
   version,
 }) => {
-  return await questionHistoryModel.create({
+  return questionHistoryModel.create({
     questionId,
     userId,
     metadata,
@@ -152,7 +152,7 @@ const createHistoryQuestionInDB = async ({
 //for trending
 const getTrendingCandidates = async (daysAgo = 3) => {
   const since = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
-  return await questionModel
+  return questionModel
     .find({
       status: "publish",
       isDeleted: false,
@@ -178,7 +178,7 @@ const findByIds = async (ids) => {
   return ids.map((id) => questionMap.get(id.toString())).filter(Boolean);
 };
 const updateQuestionVoteCount = async ({ questionId, increment }) => {
-  return await questionModel.findByIdAndUpdate(
+  return questionModel.findByIdAndUpdate(
     { _id: questionId },
     {
       $inc: { voteCount: increment ? 1 : -1 },

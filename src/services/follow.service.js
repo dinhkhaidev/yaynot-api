@@ -21,7 +21,7 @@ const {
 class FollowSerivice {
   static async followUser({ followerId, followingId }) {
     return withTransaction(async (session) => {
-      const userRecord = await findUserById(followingId, session);
+      const userRecord = await findUserById(followingId, { session });
       if (!userRecord) {
         throw new NotFoundError("User incorrect!");
       }
@@ -33,22 +33,22 @@ class FollowSerivice {
           followerId,
           followingId,
         },
-        session
+        { session }
       );
       if (followUserRecord) {
         throw new BadRequestError("You are already following this user!");
       }
       const followUserData = await followUserInDB(
         { followerId, followingId },
-        session
+        { session }
       );
-      await updateFollowCount({ followerId, followingId }, session);
+      await updateFollowCount({ followerId, followingId }, { session });
       return followUserData;
     });
   }
   static async unfollowUser({ followerId, followingId }) {
     return withTransaction(async (session) => {
-      const userRecord = await findUserById(followingId, session);
+      const userRecord = await findUserById(followingId, { session });
       if (!userRecord) {
         throw new NotFoundError("User incorrect!");
       }
@@ -57,7 +57,7 @@ class FollowSerivice {
           followerId,
           followingId,
         },
-        session
+        { session }
       );
       if (!followUserRecord) {
         throw new BadRequestError("You are not following this user!");
@@ -67,9 +67,9 @@ class FollowSerivice {
           followerId,
           followingId,
         },
-        session
+        { session }
       );
-      await updateUnfollowCount({ followerId, followingId }, session);
+      await updateUnfollowCount({ followerId, followingId }, { session });
       return unfollowUserData;
     });
   }

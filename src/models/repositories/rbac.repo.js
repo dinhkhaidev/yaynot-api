@@ -2,20 +2,20 @@ const resourceModel = require("../resource.model");
 const roleModel = require("../role.model");
 
 const findNameRole = async (name) => {
-  return await roleModel.findOne({ name }).lean();
+  return roleModel.findOne({ name }).lean();
 };
 const findNameResource = async (name) => {
-  return await resourceModel.findOne({ name }).lean();
+  return resourceModel.findOne({ name }).lean();
 };
 const createRoleInDB = async (payload) => {
-  return await roleModel.create(payload);
+  return roleModel.create(payload);
 };
 const createResourceInDB = async (payload) => {
   console.log("payload", payload);
-  return await resourceModel.create(payload);
+  return resourceModel.create(payload);
 };
 const getListResourceInDB = async () => {
-  return await resourceModel.aggregate([
+  return resourceModel.aggregate([
     {
       $project: {
         _id: 0,
