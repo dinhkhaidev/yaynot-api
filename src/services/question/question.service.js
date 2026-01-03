@@ -1,6 +1,4 @@
-const { default: mongoose } = require("mongoose");
-const { BadRequestError, NotFoundError } = require("../../core/error.response");
-const { findUserById } = require("../../models/repositories/access.repo");
+const { BadRequestError } = require("../../core/error.response");
 const {
   createQuestionInDB,
   findQuestionById,
@@ -8,23 +6,12 @@ const {
   getListQuestionInDB,
   softDeleteQuestionInDB,
   hardDeleteQuestionInDB,
-  getAllDraftQuestionInDB,
-  getAllPublishQuestionInDB,
-  changeQuestionStatus,
   publishForQuestionInDB,
   draftForQuestionInDB,
   archiveForQuestionInDB,
   getAllStatusQuestionInDB,
   changeVisibilityQuestionInDB,
 } = require("../../models/repositories/question.repo");
-const {
-  validateUpdateQuestionPayload,
-  validateIdQuestionPayload,
-  validateFindQuestionById,
-} = require("../../validations/service/questionService.validate");
-const { getInfoData } = require("../../utils");
-const { isObjectId } = require("../../utils/validateType");
-const statusQuestion = require("../../constants/statusQuestion");
 const TagService = require("../tag.service");
 const {
   keyFlushViewQuestion,
@@ -39,10 +26,6 @@ const HistoryQuestionService = require("./extensions/history.service");
 const {
   QuestionEntity,
   QuestionValidationRule,
-  QuestionStatusRule,
-  QuestionVisibilityRule,
-  QuestionContent,
-  QuestionMetrics,
 } = require("../../domain/question");
 const QuestionDomainService = require("../../domain/question/QuestionDomainRules.simple");
 const { getCache, setCache } = require("../../infrastructures/cache/getCache");

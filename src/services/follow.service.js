@@ -4,7 +4,6 @@ const {
   NotFoundError,
 } = require("../core/error.response");
 const { withTransaction } = require("../helpers/wrapperTransaction");
-const followModel = require("../models/follow.model");
 const { findUserById } = require("../models/repositories/access.repo");
 const {
   findFollowUserInDB,
@@ -75,10 +74,10 @@ class FollowSerivice {
   }
   static async getListFollowByAction({ followId, cursor, sort, action }) {
     if (action === "follower") {
-      return await getListFollowerById({ followId, cursor, sort });
+      return getListFollowerById({ followId, cursor, sort });
     }
     if (action === "following") {
-      return await getListFollowingById({ followId, cursor, sort });
+      return getListFollowingById({ followId, cursor, sort });
     }
   }
 }

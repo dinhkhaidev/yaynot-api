@@ -1,12 +1,8 @@
 // const redis = require("../configs/redis.config");
-const { getRedis } = require("../databases/init.redis");
-const redis = getRedis();
 const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
-  findVoteByUserAndQuestionInDB,
   deleteVoteInDB,
   findVoteById,
-  findVoteByQuestionId,
   upsertVoteInDB,
   updateVoteSummaryById,
   getVoteSummaryByQuestionId,
@@ -15,10 +11,8 @@ const {
   updateQuestionVoteCount,
 } = require("../models/repositories/question.repo");
 const {
-  validateFindQuestionById,
   validateIdQuestionPayload,
 } = require("../validations/service/questionService.validate");
-const { acquireLock } = require("./lockRedis.service");
 const VoteCacheService = require("./voteCache.service");
 const QuestionValidationRule = require("../domain/question/rules/questionValidation.rule");
 const { withTransaction } = require("../helpers/wrapperTransaction");

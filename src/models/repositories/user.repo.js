@@ -24,28 +24,35 @@ const updateAvatarInDB = async ({ userId, url }) => {
     { new: true }
   );
 };
-const updateFollowCount = async ({ followerId, followingId }) => {
+const updateFollowCount = async ({ followerId, followingId }, options = {}) => {
   const followerCountData = await userProfileModel.findByIdAndUpdate(
     followerId,
-    { $inc: { following: 1 } }
+    { $inc: { following: 1 } },
+    options
   );
   const followingCountData = await userProfileModel.findByIdAndUpdate(
     followingId,
-    { $inc: { follower: 1 } }
+    { $inc: { follower: 1 } },
+    options
   );
   return {
     followerCountData,
     followingCountData,
   };
 };
-const updateUnfollowCount = async ({ followerId, followingId }) => {
+const updateUnfollowCount = async (
+  { followerId, followingId },
+  options = {}
+) => {
   const followerCountData = await userProfileModel.findByIdAndUpdate(
     followerId,
-    { $inc: { following: -1 } }
+    { $inc: { following: -1 } },
+    options
   );
   const followingCountData = await userProfileModel.findByIdAndUpdate(
     followingId,
-    { $inc: { follower: -1 } }
+    { $inc: { follower: -1 } },
+    options
   );
   return {
     followerCountData,
@@ -53,7 +60,7 @@ const updateUnfollowCount = async ({ followerId, followingId }) => {
   };
 };
 const findUserProfileById = async (profileId) => {
-  return await userProfileModel.findById(profileId);
+  return userProfileModel.findById(profileId);
 };
 module.exports = {
   upsertUserProfileInDB,

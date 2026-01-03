@@ -1,114 +1,120 @@
 const {
   buildResultCursorBased,
 } = require("../../helpers/buildResultCursorBased");
-const { getSelectData, getUnselectData } = require("../../utils");
+const { getUnselectData } = require("../../utils");
 const careQuestionModel = require("../careQuestion.model");
 const questionModel = require("../question.model");
 const questionHistoryModel = require("../questionHistory.model");
 
-const createQuestionInDB = async (payload) => {
-  return questionModel.create(payload);
+const createQuestionInDB = async (payload, options = {}) => {
+  return questionModel.create([payload], options);
 };
-const updateQuestionInDB = async (id, payload) => {
-  return questionModel.findByIdAndUpdate(id, payload, { new: true });
+const updateQuestionInDB = async (id, payload, options = {}) => {
+  options.new = true;
+  return questionModel.findByIdAndUpdate(id, payload, options);
 };
-const findQuestionById = async (id) => {
+const findQuestionById = async (id, options = {}) => {
   const query = { _id: id, isDeleted: false };
-  return questionModel.findOne(query).lean();
+  return questionModel.findOne(query, null, options).lean();
 };
-const getListQuestionInDB = async ({ id, limit, sort, cursor, select }) => {
+const getListQuestionInDB = async (
+  { id, limit, sort, cursor, select },
+  options = {}
+) => {
   const sortBy = sort ? sort : { _id: -1 };
-  const query = { userId: id, moderationStatus: "ok", isDeleted: false };
+  const filter = { userId: id, moderationStatus: "ok", isDeleted: false };
   if (cursor) {
-    query._id = { $lt: cursor };
+    filter._id = { $lt: cursor };
   }
-  const questionList = await questionModel // Fixed typo: questonList → questionList
-    .find(query)
+  const { session } = options;
+  let query = await questionModel // Fixed typo: questonList → questionList
+    .find(filter)
     .sort(sortBy)
     .limit(limit)
     .select(getUnselectData(select))
     .lean();
+  if (session) {
+    query = query.session(session);
+  }
+  const questionList = await query.exec();
 
   return buildResultCursorBased(questionList, limit); // Fixed typo
 };
-const softDeleteQuestionInDB = async (id, statusDelete) => {
+const softDeleteQuestionInDB = async (id, options = {}) => {
+  options.new = true;
   return questionModel.findByIdAndUpdate(
     id,
     {
       isDeleted: true,
     },
-    { new: true }
+    options
   );
 };
-const hardDeleteQuestionInDB = async (id) => {
-  return questionModel.deleteOne({ _id: id }).lean();
+const hardDeleteQuestionInDB = async (id, options = {}) => {
+  return questionModel.deleteOne({ _id: id }, options).lean();
 };
-const getAllStatusQuestionInDB = async ({
-  filter,
-  limit,
-  sort,
-  cursor,
-  select,
-}) => {
-  return queryQuestion({ filter, limit, sort, cursor, select });
+const getAllStatusQuestionInDB = async (
+  { filter, limit, sort, cursor, select },
+  options = {}
+) => {
+  return queryQuestion({ filter, limit, sort, cursor, select }, options);
 };
-const queryQuestion = async ({ filter, limit, sort, cursor, select }) => {
+
+const queryQuestion = async (
+  { filter, limit, sort, cursor, select },
+  options = {}
+) => {
   const sortBy = sort ? sort : { _id: -1 };
-  const query = filter;
+  const filterQuery = filter;
   if (cursor) {
-    query._id = { $lt: cursor };
+    filterQuery._id = { $lt: cursor };
   }
-  const questionList = await questionModel // Fixed typo: added const
-    .find(query)
+
+  const { session } = options;
+  let query = await questionModel // Fixed typo: added const
+    .find(filterQuery)
     .sort(sortBy)
     .limit(limit)
     .select(getUnselectData(select))
     .lean();
+  if (session) {
+    query = query.session(session);
+  }
+
+  const questionList = await query.exec();
 
   return buildResultCursorBased(questionList, limit);
 };
-const publishForQuestionInDB = async (id) => {
+const publishForQuestionInDB = async (id, options = {}) => {
+  options.new = true;
   return questionModel
-    .findByIdAndUpdate(
-      id,
-      { status: "publish", visibility: "public" },
-      {
-        new: true,
-      }
-    )
+    .findByIdAndUpdate(id, { status: "publish", visibility: "public" }, options)
     .lean();
 };
-const draftForQuestionInDB = async (id) => {
+const draftForQuestionInDB = async (id, options = {}) => {
+  options.new = true;
   return questionModel
-    .findByIdAndUpdate(
-      id,
-      { status: "draft", visibility: "private" },
-      {
-        new: true,
-      }
-    )
+    .findByIdAndUpdate(id, { status: "draft", visibility: "private" }, options)
     .lean();
 };
-const archiveForQuestionInDB = async (id) => {
+const archiveForQuestionInDB = async (id, options = {}) => {
+  options.new = true;
   return questionModel
     .findByIdAndUpdate(
       id,
       { status: "archive", visibility: "private" },
-      {
-        new: true,
-      }
+      options
     )
     .lean();
 };
-const changeVisibilityQuestionInDB = async (id, type) => {
+const changeVisibilityQuestionInDB = async (id, type, options = {}) => {
+  options.new = true;
   return questionModel.findByIdAndUpdate(
     id,
     {
       visibility: type,
     },
-    {
-      new: true,
-    }
+    options
   );
 };
 //care question
@@ -133,21 +139,25 @@ const getListCareQuestionByUserInDB = async ({ userId }) => {
   //handle sort, cursor,...
   return careQuestionModel.find({ userId }).lean();
 };
-const findHistoryQuestionByQuestionId = async (questionId) => {
-  return questionHistoryModel.find({ questionId }).lean();
+
+const findHistoryQuestionByQuestionId = async (questionId, options = {}) => {
+  return questionHistoryModel.find({ questionId }, null, options).lean();
 };
-const createHistoryQuestionInDB = async ({
-  questionId,
-  userId,
-  metadata,
-  version,
-}) => {
-  return questionHistoryModel.create({
-    questionId,
-    userId,
-    metadata,
-    version,
-  });
+const createHistoryQuestionInDB = async (
+  { questionId, userId, metadata, version },
+  options = {}
+) => {
+  return questionHistoryModel.create(
+    [
+      {
+        questionId,
+        userId,
+        metadata,
+        version,
+      },
+    ],
+    options
+  );
 };
 //for trending
 const getTrendingCandidates = async (daysAgo = 3) => {

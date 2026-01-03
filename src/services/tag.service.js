@@ -1,10 +1,7 @@
 const { NotFoundError } = require("../core/error.response");
 const questionModel = require("../models/question.model");
 const slugify = require("slugify");
-const {
-  findTagByNameInDB,
-  findTagByQuestionId,
-} = require("../models/repositories/tag.repo");
+const { findTagByQuestionId } = require("../models/repositories/tag.repo");
 const { tagModel, tagQuestionModel } = require("../models/tag.model");
 
 class TagService {
@@ -31,8 +28,9 @@ class TagService {
     const tagRecord = await tagModel
       .findOne({ name: slug, isPublish: true })
       .select(" -isDeleted -isFlag -isPublish -__v");
-    if (!tagRecord)
-    {throw new NotFoundError("Tag not exists. Let create with new hashtag!");}
+    if (!tagRecord) {
+      throw new NotFoundError("Tag not exists. Let create with new hashtag!");
+    }
     const skip = page * limit;
     const tagMappings = await tagQuestionModel
       .find({ tagId: tagRecord._id })

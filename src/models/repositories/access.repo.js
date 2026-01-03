@@ -6,16 +6,15 @@ const findUserByEmail = async (email, options = {}) => {
 const findUserById = async (id, options = {}) => {
   return userModel.findById(id, null, options).lean();
 };
-const findListUserId = async (limit, options = {}) => {
+const findListUserId = async (batchSize, options = {}) => {
   const { session } = options;
+  //using lazy evaluation
+  let query = userModel.find().select("_id");
+
   if (session) {
-    return userModel
-      .find()
-      .select("_id")
-      .session(session)
-      .cursor({ batchSize: limit });
+    query = query.session(session);
   }
-  return userModel.find().select("_id").cursor({ batchSize: limit });
+  return query.cursor({ batchSize });
 };
 module.exports = {
   findUserByEmail,
