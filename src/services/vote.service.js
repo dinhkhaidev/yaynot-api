@@ -72,7 +72,7 @@ class VoteService {
           { session }
         );
       }
-      return newVote;
+      return newVote.value;
     });
   }
   static async deleteVote(voteId) {

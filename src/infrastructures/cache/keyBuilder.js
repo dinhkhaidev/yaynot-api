@@ -46,13 +46,17 @@ const keyQuestion = (question_id) => {
 };
 //trending question
 const keyTrendingQuestionShort = () => {
-  return `trending:question:short`;
+  return "trending:question:short";
 };
 const keyTrendingQuestionLong = () => {
-  return `trending:question:long`;
+  return "trending:question:long";
 };
 const keyTrendingUserSeen = (userId) => {
   return `trending:question:${userId}:seen`;
+};
+//idempotency
+const keyIdempotency = (path, userId) => {
+  return `idempotency:${path}:${userId}`;
 };
 module.exports = {
   keyProfile,
@@ -70,4 +74,5 @@ module.exports = {
   keyTrendingQuestionShort,
   keyTrendingQuestionLong,
   keyTrendingUserSeen,
+  keyIdempotency,
 };

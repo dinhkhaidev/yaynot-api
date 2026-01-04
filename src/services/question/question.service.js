@@ -37,49 +37,38 @@ const statusMapping = {
 };
 class QuestionService {
   static async createQuestion({ title, content, topicId, userId, tags }) {
-    return withTransaction(async (session) => {
-      const { content: validatedContent } =
-        await QuestionDomainService.validateQuestionCreation(
-          {
-            title,
-            content,
-            userId,
-          },
-          { session }
-        );
+    const { content: validatedContent } =
+      await QuestionDomainService.validateQuestionCreation({
+        title,
+        content,
+        userId,
+      });
 
-      const questionEntity = QuestionEntity.createNew(
-        {
-          title: validatedContent.title,
-          content: validatedContent.content,
-          topicId,
-          userId,
-          shortTag: tags,
-        },
-        { session }
-      );
-
-      const newQuestion = await createQuestionInDB(
-        questionEntity.toDatabase(),
-        { session }
-      );
-      if (!newQuestion) {
-        throw new BadRequestError("Can't create question!");
-      }
-
-      if (tags && Array.isArray(tags)) {
-        await Promise.all(
-          tags.map(async (tag) => {
-            await TagService.upsertTag({
-              name: tag.trim().toLowerCase(),
-              questionId: newQuestion._id,
-            });
-          })
-        );
-      }
-
-      return QuestionEntity.fromDatabase(newQuestion).toDTO();
+    const questionEntity = QuestionEntity.createNew({
+      title: validatedContent.title,
+      content: validatedContent.content,
+      topicId,
+      userId,
+      shortTag: tags,
     });
+
+    const newQuestion = await createQuestionInDB(questionEntity.toDatabase());
+    if (!newQuestion) {
+      throw new BadRequestError("Can't create question!");
+    }
+
+    if (tags && Array.isArray(tags)) {
+      await Promise.all(
+        tags.map(async (tag) => {
+          await TagService.upsertTag({
+            name: tag.trim().toLowerCase(),
+            questionId: newQuestion._id,
+          });
+        })
+      );
+    }
+
+    return QuestionEntity.fromDatabase(newQuestion).toDTO();
   }
 
   static async updateQuestion(payload) {

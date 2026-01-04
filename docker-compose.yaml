@@ -49,19 +49,30 @@ services:
     volumes:
       - redis_data:/data/cache_data
 
-  mongodb:
-    image: mongo:8.0
-    ports:
-      - 27019:27017
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - mongo_data:/data/database
-    networks:
-      - backend_yaynot
+mongodb:
+  image: mongo:8.0
+  container_name: mongodb
+  ports:
+    - "27019:27017"
+  command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+  healthcheck:
+    test: >
+      mongosh --eval "
+      try {
+        rs.status()
+      } catch (e) {
+        rs.initiate({
+          _id: 'rs0',
+          members: [{ _id: 0, host: 'mongodb:27017' }]
+        })
+      }"
+    interval: 10s
+    timeout: 5s
+    retries: 5
+  volumes:
+    - mongo_data:/data/db
+  networks:
+    - backend_yaynot
 
   rabbitmq:
     image: rabbitmq:3.13-management

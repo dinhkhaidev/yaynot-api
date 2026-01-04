@@ -4,12 +4,14 @@ const { BadRequestError } = require("../core/error.response");
 const withTransaction = async (fn) => {
   const session = await mongoose.startSession();
   try {
+    session.startTransaction();
     const result = await fn(session);
     await session.commitTransaction();
     return result;
   } catch (error) {
     await session.abortTransaction();
-    throw new BadRequestError("Something wrong about command handle!", error);
+    console.log("Transaction error:", error);
+    throw new BadRequestError(error);
   } finally {
     session.endSession();
   }
