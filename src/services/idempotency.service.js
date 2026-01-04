@@ -24,7 +24,7 @@ class IdempotencyService {
   static async storeIdempotency(payload) {
     //set cache idempotency in service
     const { userId, path, statusCode, ...data } = payload;
-    const value = { status: "DONE", dataCached: data, status: statusCode };
+    const value = { status: "DONE", dataCached: data, statusCode };
     const key = keyIdempotency(path, userId);
     await setCache(key, JSON.stringify(value), 60 * 60);
   }
